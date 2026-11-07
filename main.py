@@ -122,7 +122,7 @@ def main(page: ft.Page):
                                  on_click=lambda e: _close(dialog))]
         if is_edit:
             buttons.append(ft.TextButton("Delete 🗑️", on_click=delete_clicked))
-        buttons.append(ft.ElevatedButton("Save 💾", on_click=save_clicked))
+        buttons.append(ft.Button("Save 💾", on_click=save_clicked))
         dialog = ft.AlertDialog(
             title=ft.Text("Edit habit ✏️" if is_edit else "Plant a new habit 🌱"),
             content=ft.Column(
@@ -162,7 +162,7 @@ def main(page: ft.Page):
             content=field,
             actions=[ft.TextButton("Cancel",
                                    on_click=lambda e: _close(dialog)),
-                     ft.ElevatedButton("Add ✨", on_click=add_clicked)])
+                     ft.Button("Add ✨", on_click=add_clicked)])
         page.dialog = dialog
         dialog.open = True
         page.update()
@@ -215,7 +215,7 @@ def main(page: ft.Page):
                                  size=15, color=MUTED))
         return ft.Column(
             [header,
-             ft.ElevatedButton("＋ Plant a new habit 🌱",
+             ft.Button("＋ Plant a new habit 🌱",
                                on_click=lambda e: open_habit_dialog()),
              *cards],
             spacing=12)
