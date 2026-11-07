@@ -116,3 +116,29 @@ def last_7_days(logs, habits, end_date=None):
         day = end - timedelta(days=i)
         days.append(daily_summary(logs, habits, day.isoformat()))
     return days
+
+
+def weekly_summary(logs, habits, end_date=None):
+    """Summary of the last 7 days ending on end_date (default today).
+
+    Returns the per-day summaries (oldest first), the total minutes
+    across the week, the average daily % achieved, and the best day
+    (highest %, then most minutes). Handles an empty habit list:
+    0 total minutes, 0% average, and the first day as best day.
+    """
+    if isinstance(end_date, str):
+        end = date.fromisoformat(end_date)
+    else:
+        end = end_date or date.today()
+    days = last_7_days(logs, habits, end_date=end)
+    total_minutes = sum(d["total_minutes"] for d in days)
+    average_percent = round(sum(d["percent"] for d in days) / len(days)) if days else 0
+    best_day = max(days, key=lambda d: (d["percent"], d["total_minutes"])) if days else None
+    return {
+        "end_date": end.isoformat(),
+        "days": days,
+        "total_minutes": total_minutes,
+        "average_percent": average_percent,
+        "best_day": best_day,
+        "best_day_date": best_day["date"] if best_day else None,
+    }
