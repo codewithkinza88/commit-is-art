@@ -329,4 +329,4 @@ def main(page: ft.Page):
     refresh()
 
 
-ft.app(target=main)
+ft.run(main)
