@@ -19,6 +19,7 @@ from app.habits import (
 )
 from app.garden import garden_summary
 from app.store import DEFAULT_PATH, load_store, save_store, seed_store
+from app.version import APP_NAME, APP_VERSION
 from app.tracker import (
     current_streak, daily_summary, is_done, last_7_days, log_minutes,
     minutes_for, set_done, today_str,
@@ -38,7 +39,7 @@ MUTED = "#9A8A99"
 
 
 def main(page: ft.Page):
-    page.title = "Habit Garden 🌸"
+    page.title = f"{APP_NAME} 🌸 v{APP_VERSION}"
     page.bgcolor = BG
     page.theme_mode = ft.ThemeMode.LIGHT
     page.padding = 16
@@ -323,7 +324,7 @@ def main(page: ft.Page):
         ],
         on_change=on_nav)
     page.add(
-        ft.Text("🌸 Habit Garden", size=20, weight=ft.FontWeight.BOLD, color=TEXT),
+        ft.Text(f"🌸 {APP_NAME}", size=20, weight=ft.FontWeight.BOLD, color=TEXT),
         content)
     refresh()
 
