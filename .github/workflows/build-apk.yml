@@ -27,9 +27,11 @@ jobs:
         run: pip install -r requirements.txt
       - name: Build the Android APK
         run: flet build apk --verbose
+      - name: List APK files
+        run: find build -name "*.apk" -ls; ls -R build/apk || true
       - name: Upload the APK
         uses: actions/upload-artifact@v4
         with:
           name: habit-garden-apk
-          path: build/apk/app-release.apk
+          path: build/apk/**/*.apk
           if-no-files-found: error
