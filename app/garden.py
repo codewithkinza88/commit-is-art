@@ -49,6 +49,11 @@ def plant_for(habit, logs, date_str):
     }
 
 
+def empty_garden_message():
+    """Friendly message shown when there are no habits (no plants) yet."""
+    return "Your garden is empty — plant your first habit! 🌱"
+
+
 def garden_summary(habits, logs, date_str):
     """All plants for a date, plus a count of plants at each stage."""
     plants = [plant_for(h, logs, date_str) for h in (habits or [])]
@@ -57,7 +62,7 @@ def garden_summary(habits, logs, date_str):
         counts[plant["stage"]] = counts.get(plant["stage"], 0) + 1
     blooming = counts.get("blooming", 0) + counts.get("full_bloom", 0)
     if not plants:
-        message = "Your garden is empty — plant your first habit! 🌱"
+        message = empty_garden_message()
     elif blooming == len(plants):
         message = "Your garden is blooming! 🌸✨"
     elif blooming:

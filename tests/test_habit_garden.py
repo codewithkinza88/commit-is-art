@@ -16,7 +16,7 @@ from app.tracker import (  # noqa: E402
     set_done, toggle_done, log_minutes, is_done, minutes_for,
     current_streak, daily_summary, last_7_days,
 )
-from app.garden import growth_stage, garden_summary  # noqa: E402
+from app.garden import growth_stage, garden_summary, empty_garden_message  # noqa: E402
 from app.store import empty_store, seed_store, load_store, save_store  # noqa: E402
 
 PASSED = 0
@@ -131,10 +131,18 @@ def test_empty_store_and_seed():
         check("corrupt file loads empty", load_store(path) == empty_store())
 
 
+def test_empty_garden_message():
+    message = empty_garden_message()
+    check("empty garden message mentions empty", "empty" in message)
+    check("empty garden message matches garden summary",
+          message == garden_summary([], {}, "2026-11-07")["message"])
+
+
 if __name__ == "__main__":
     test_add_edit_delete_habit()
     test_tick_and_minutes()
     test_streak_and_summary()
     test_garden_stages()
     test_empty_store_and_seed()
+    test_empty_garden_message()
     print(f"{PASSED} tests passed")
