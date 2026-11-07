@@ -7,6 +7,27 @@ your own little garden grow. 🌱 → 🌿 → 🌸 → 🌷
 
 > Every commit is a small piece of art. 🎨
 
+## Download & install
+
+- **Download the app code (ZIP):**
+  <https://github.com/codewithkinza88/commit-is-art/archive/refs/heads/main.zip>
+- **Or clone it:**
+  ```bash
+  git clone https://github.com/codewithkinza88/commit-is-art.git
+  cd commit-is-art
+  ```
+- **Install & run it:**
+  ```bash
+  pip install -r requirements.txt
+  flet run
+  ```
+  You need Python 3.10+ on your computer. That is all — there is no
+  account or sign-in.
+- **Android APK:** there is no ready-made APK download yet. The APK is
+  built from this same code with `flet build apk` (see
+  [How to build the Android APK](#how-to-build-the-android-apk) below),
+  and will be added as a download link here once it is built.
+
 ## Features
 
 - 🌱 **Add your own habits** — name, category (Study, Books, Health,
