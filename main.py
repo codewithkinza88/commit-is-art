@@ -1,0 +1,331 @@
+"""Habit Garden 🌸 — a cute habit tracker in Python (Flet).
+
+No login at all (login comes later). All data lives locally in
+habit_garden.json on the device.
+
+Run on desktop:
+    pip install -r requirements.txt
+    flet run            # or: python3 main.py
+
+Build the Android APK (needs the Flet CLI + Flutter + Android SDK):
+    flet build apk
+"""
+
+import flet as ft
+
+from app.habits import (
+    CATEGORIES, COLOURS, ICONS, add_habit, delete_habit, edit_habit,
+    get_habit, new_habit,
+)
+from app.garden import garden_summary
+from app.store import DEFAULT_PATH, load_store, save_store, seed_store
+from app.tracker import (
+    current_streak, daily_summary, is_done, last_7_days, log_minutes,
+    minutes_for, set_done, today_str,
+)
+
+# Pastel palette — soft, cute, friendly 🌸
+BG = "#FFF8F0"
+PINK = "#F9A8D4"
+LIGHT_PINK = "#FDE7F3"
+LILAC = "#E4C1F9"
+SKY = "#BDE0FE"
+MINT = "#B5EAD7"
+PEACH = "#FFD6A5"
+CREAM = "#FFF3D6"
+TEXT = "#5B4B5A"
+MUTED = "#9A8A99"
+
+
+def main(page: ft.Page):
+    page.title = "Habit Garden 🌸"
+    page.bgcolor = BG
+    page.theme_mode = ft.ThemeMode.LIGHT
+    page.padding = 16
+    page.scroll = ft.ScrollMode.AUTO
+
+    store = load_store(DEFAULT_PATH)
+    if not store["habits"]:
+        store = seed_store()
+        save_store(store, DEFAULT_PATH)
+    habits = store["habits"]
+    logs = store["logs"]
+    today = today_str()
+    current_view = [0]  # 0 Today, 1 Garden, 2 Tonight
+
+    def persist():
+        save_store({"habits": habits, "logs": logs}, DEFAULT_PATH)
+
+    def snack(message):
+        page.snack_bar = ft.SnackBar(ft.Text(message))
+        page.snack_bar.open = True
+        page.update()
+
+    # ---------- habit form (add / edit) ----------
+    def open_habit_dialog(habit=None):
+        is_edit = habit is not None
+        name_field = ft.TextField(
+            label="Habit name 🌸", value=habit["name"] if is_edit else "",
+            autofocus=True)
+        category_field = ft.Dropdown(
+            label="Category",
+            value=habit["category"] if is_edit else "Study",
+            options=[ft.dropdown.Option(c) for c in CATEGORIES])
+        target_field = ft.TextField(
+            label="Daily target (minutes, 0 = none)",
+            value=str(habit["target_minutes"]) if is_edit else "0",
+            keyboard_type=ft.KeyboardType.NUMBER)
+        icon_field = ft.Dropdown(
+            label="Icon",
+            value=habit["icon"] if is_edit else "🌱",
+            options=[ft.dropdown.Option(i) for i in ICONS])
+        colour_field = ft.Dropdown(
+            label="Colour",
+            value=habit["colour"] if is_edit else "#BDE0FE",
+            options=[ft.dropdown.Option(c) for c in COLOURS])
+
+        def save_clicked(_e):
+            try:
+                target = int(target_field.value or 0)
+            except ValueError:
+                target = 0
+            if is_edit:
+                edit_habit(habits, habit["id"], name=name_field.value,
+                           category=category_field.value,
+                           target_minutes=target, icon=icon_field.value,
+                           colour=colour_field.value)
+                snack("Habit updated! 💕")
+            else:
+                try:
+                    add_habit(habits, new_habit(
+                        name_field.value, category_field.value, target,
+                        icon_field.value, colour_field.value, today))
+                except ValueError:
+                    snack("Please give your habit a name first 🌱")
+                    return
+                snack("New habit planted! 🌱")
+            persist()
+            dialog.open = False
+            page.update()
+            refresh()
+
+        def delete_clicked(_e):
+            delete_habit(habits, habit["id"])
+            persist()
+            dialog.open = False
+            snack("Habit removed 🌿")
+            page.update()
+            refresh()
+
+        buttons = [ft.TextButton("Cancel",
+                                 on_click=lambda e: _close(dialog))]
+        if is_edit:
+            buttons.append(ft.TextButton("Delete 🗑️", on_click=delete_clicked))
+        buttons.append(ft.ElevatedButton("Save 💾", on_click=save_clicked))
+        dialog = ft.AlertDialog(
+            title=ft.Text("Edit habit ✏️" if is_edit else "Plant a new habit 🌱"),
+            content=ft.Column(
+                [name_field, category_field, target_field,
+                 icon_field, colour_field],
+                tight=True, spacing=12),
+            actions=buttons)
+        page.dialog = dialog
+        dialog.open = True
+        page.update()
+
+    def _close(dialog):
+        dialog.open = False
+        page.update()
+
+    # ---------- minutes dialog ----------
+    def open_minutes_dialog(habit):
+        field = ft.TextField(label="Minutes", value="15",
+                             keyboard_type=ft.KeyboardType.NUMBER,
+                             autofocus=True)
+
+        def add_clicked(_e):
+            try:
+                minutes = int(field.value or 0)
+            except ValueError:
+                minutes = 0
+            if minutes > 0:
+                log_minutes(logs, habit["id"], today, minutes)
+                persist()
+                snack(f"+{minutes} min logged for {habit['name']} ⏱️")
+            dialog.open = False
+            page.update()
+            refresh()
+
+        dialog = ft.AlertDialog(
+            title=ft.Text(f"Log minutes — {habit['name']} ⏱️"),
+            content=field,
+            actions=[ft.TextButton("Cancel",
+                                   on_click=lambda e: _close(dialog)),
+                     ft.ElevatedButton("Add ✨", on_click=add_clicked)])
+        page.dialog = dialog
+        dialog.open = True
+        page.update()
+
+    # ---------- views ----------
+    def today_view():
+        summary = daily_summary(logs, habits, today)
+        header = ft.Column([
+            ft.Text("Today 🌞", size=26, weight=ft.FontWeight.BOLD, color=TEXT),
+            ft.Text(f"{summary['done']} of {summary['total']} habits done "
+                    f"• {summary['percent']}% • "
+                    f"{summary['total_minutes']} min logged",
+                    size=14, color=MUTED),
+            ft.ProgressBar(value=summary["percent"] / 100,
+                           color=PINK, bgcolor=LIGHT_PINK, height=10),
+        ], spacing=6)
+
+        cards = []
+        for habit in habits:
+            done = is_done(logs, habit, today)
+            streak = current_streak(logs, habit)
+            minutes = minutes_for(logs, habit["id"], today)
+            target = habit.get("target_minutes") or 0
+            target_text = f"🎯 {target} min" if target else "no target"
+            card = ft.Container(
+                content=ft.Row([
+                    ft.Checkbox(
+                        value=done,
+                        on_change=lambda e, h=habit: _tick(h, e.control.value)),
+                    ft.Column([
+                        ft.Text(f"{habit['icon']}  {habit['name']}",
+                                size=16, weight=ft.FontWeight.BOLD, color=TEXT),
+                        ft.Text(f"{habit['category']} • {target_text} • "
+                                f"🔥 {streak} day streak • ⏱️ {minutes} min",
+                                size=13, color=MUTED),
+                    ], expand=True, spacing=2),
+                    ft.IconButton(icon=ft.Icons.ADD, tooltip="+15 min",
+                                  on_click=lambda e, h=habit: _quick_minutes(h)),
+                    ft.IconButton(icon=ft.Icons.TIMER, tooltip="Log minutes",
+                                  on_click=lambda e, h=habit: open_minutes_dialog(h)),
+                    ft.IconButton(icon=ft.Icons.EDIT, tooltip="Edit habit",
+                                  on_click=lambda e, h=habit: open_habit_dialog(h)),
+                ]),
+                bgcolor=habit.get("colour", SKY) + "55",
+                border_radius=18, padding=12)
+            cards.append(card)
+
+        if not habits:
+            cards.append(ft.Text("No habits yet — plant your first one! 🌱",
+                                 size=15, color=MUTED))
+        return ft.Column(
+            [header,
+             ft.ElevatedButton("＋ Plant a new habit 🌱",
+                               on_click=lambda e: open_habit_dialog()),
+             *cards],
+            spacing=12)
+
+    def _tick(habit, value):
+        set_done(logs, habit["id"], today, value)
+        persist()
+        snack("Well done! 🌸" if value else "Unticked — no worries, try again 💕")
+        refresh()
+
+    def _quick_minutes(habit):
+        log_minutes(logs, habit["id"], today, 15)
+        persist()
+        snack(f"+15 min for {habit['name']} ⏱️")
+        refresh()
+
+    def garden_view():
+        garden = garden_summary(habits, logs, today)
+        plants = []
+        for plant in garden["plants"]:
+            plants.append(ft.Container(
+                content=ft.Column([
+                    ft.Text(plant["emoji"], size=48),
+                    ft.Text(plant["name"], size=15,
+                            weight=ft.FontWeight.BOLD, color=TEXT),
+                    ft.Text(f"{plant['label']} • 🔥 {plant['streak']} days",
+                            size=13, color=MUTED),
+                    ft.Text(plant["message"], size=12, color=MUTED),
+                ], horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                    spacing=4),
+                bgcolor=plant["colour"] + "55", border_radius=20,
+                padding=16, width=170))
+        if not plants:
+            plants.append(ft.Text("Your garden is empty — plant a habit! 🌱",
+                                  size=15, color=MUTED))
+        return ft.Column([
+            ft.Text("My Garden 🌷", size=26, weight=ft.FontWeight.BOLD, color=TEXT),
+            ft.Text(garden["message"], size=15, color=MUTED),
+            ft.Row(plants, wrap=True, spacing=12),
+        ], spacing=14)
+
+    def tonight_view():
+        summary = daily_summary(logs, habits, today)
+        week = last_7_days(logs, habits)
+        if summary["percent"] >= 80:
+            message = "Amazing day! You did so much — sleep proud 😴💖"
+        elif summary["percent"] >= 50:
+            message = "A lovely day — more than halfway there! 🌙"
+        elif summary["done"]:
+            message = "A gentle start — every little step counts 🌱"
+        else:
+            message = "Tomorrow is a fresh seed — rest well tonight 🌙"
+        rows = []
+        for day in week:
+            rows.append(ft.Row([
+                ft.Text(day["date"], size=14, color=TEXT, expand=True),
+                ft.Text(f"{day['done']}/{day['total']} • {day['percent']}% • "
+                        f"{day['total_minutes']} min", size=14, color=MUTED),
+            ]))
+        minutes_rows = []
+        for name, mins in summary["minutes_per_habit"].items():
+            minutes_rows.append(ft.Text(f"⏱️ {name}: {mins} min",
+                                        size=14, color=TEXT))
+        return ft.Column([
+            ft.Text("Tonight's review 🌙", size=26,
+                    weight=ft.FontWeight.BOLD, color=TEXT),
+            ft.Text(message, size=15, color=MUTED),
+            ft.Container(
+                content=ft.Column([
+                    ft.Text(f"{summary['done']} / {summary['total']} habits",
+                            size=22, weight=ft.FontWeight.BOLD, color=TEXT),
+                    ft.Text(f"{summary['percent']}% achieved today",
+                            size=16, color=TEXT),
+                    ft.Text(f"Total time: {summary['total_minutes']} minutes",
+                            size=15, color=MUTED),
+                    ft.Text(f"Best habit today: "
+                            f"{summary['best_habit'] or '—'} "
+                            f"({summary['best_minutes']} min)",
+                            size=15, color=MUTED),
+                ], spacing=6),
+                bgcolor=CREAM, border_radius=20, padding=18),
+            ft.Text("Minutes per habit", size=17,
+                    weight=ft.FontWeight.BOLD, color=TEXT),
+            *minutes_rows,
+            ft.Text("Last 7 days 📅", size=17,
+                    weight=ft.FontWeight.BOLD, color=TEXT),
+            *rows,
+        ], spacing=12)
+
+    content = ft.Column([], spacing=12, scroll=ft.ScrollMode.AUTO, expand=True)
+
+    def refresh():
+        views = [today_view(), garden_view(), tonight_view()]
+        content.controls = [views[current_view[0]]]
+        page.update()
+
+    def on_nav(e):
+        current_view[0] = e.control.selected_index
+        refresh()
+
+    page.navigation_bar = ft.NavigationBar(
+        destinations=[
+            ft.NavigationBarDestination(icon=ft.Icons.TODAY, label="Today"),
+            ft.NavigationBarDestination(icon=ft.Icons.LOCAL_FLORIST, label="Garden"),
+            ft.NavigationBarDestination(icon=ft.Icons.NIGHTLIGHT_ROUND, label="Tonight"),
+        ],
+        on_change=on_nav)
+    page.add(
+        ft.Text("🌸 Habit Garden", size=20, weight=ft.FontWeight.BOLD, color=TEXT),
+        content)
+    refresh()
+
+
+ft.app(target=main)

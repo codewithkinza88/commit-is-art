@@ -1,0 +1,17 @@
+# Python / Flet / Flutter build output
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+build/
+dist/
+*.apk
+*.aab
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# Habit Garden local user data — real habits/logs live on the device only
+habit_garden.json
