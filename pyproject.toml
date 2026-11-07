@@ -1,0 +1,18 @@
+[project]
+name = "habit-garden"
+version = "1.0.0"
+description = "Habit Garden — a cute habit tracker: add habits, tick them off daily, watch your garden grow."
+requires-python = ">=3.10"
+dependencies = ["flet==1.0.5"]
+
+[tool.flet]
+# Flet build settings for Habit Garden.
+
+[tool.flet.android.gradle_properties]
+# The default Gradle heap (-Xmx8G) is larger than this machine's RAM.
+# Lower it so the Gradle daemon can actually start and finish the build.
+"org.gradle.jvmargs" = "-Xmx2G -XX:MaxMetaspaceSize=512m -XX:ReservedCodeCacheSize=256m -XX:+HeapDumpOnOutOfMemoryError"
+# Gradle daemon client/server communication over localhost TCP does not work
+# in this VM (daemon starts and listens, but the client reads garbage from
+# the socket: "Unexpected type tag 109"). Run the build in-process instead.
+"org.gradle.daemon" = "false"
