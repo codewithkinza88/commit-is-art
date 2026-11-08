@@ -215,7 +215,7 @@ def main(page: ft.Page):
                                   on_click=lambda e, h=habit: open_habit_dialog(h)),
                 ]),
                 bgcolor=card_bg(habit.get("colour", SKY), done=done),
-                border=ft.border.all(1, DONE_BORDER if done else LIGHT_PINK),
+                border=ft.Border.all(1, DONE_BORDER if done else LIGHT_PINK),
                 border_radius=CARD_RADIUS, padding=12)
             cards.append(card)
 
@@ -256,7 +256,7 @@ def main(page: ft.Page):
                 ], horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                     spacing=4),
                 bgcolor=stage_colour(plant["stage"]),
-                border=ft.border.all(1, LIGHT_PINK),
+                border=ft.Border.all(1, LIGHT_PINK),
                 border_radius=CARD_RADIUS,
                 padding=16, width=GARDEN_CARD_WIDTH))
         if not plants:
@@ -311,7 +311,7 @@ def main(page: ft.Page):
                             f"({summary['best_minutes']} min)",
                             size=15, color=MUTED),
                 ], spacing=6),
-                bgcolor=CREAM, border=ft.border.all(1, PEACH),
+                bgcolor=CREAM, border=ft.Border.all(1, PEACH),
                 border_radius=CARD_RADIUS, padding=18),
             ft.Text("Minutes per habit", size=17,
                     weight=ft.FontWeight.BOLD, color=TEXT),
