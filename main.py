@@ -20,9 +20,9 @@ from app.habits import (
 from app.garden import garden_summary
 from app.store import DEFAULT_PATH, load_store, save_store, seed_store
 from app.theme import (
-    BG, CARD_RADIUS, CREAM, DONE_BG, DONE_BORDER, LIGHT_PINK, LILAC, MINT,
-    MUTED, PEACH, PINK, PROGRESS_HEIGHT, SKY, TEXT, card_bg, done_label,
-    progress_colour,
+    BG, CARD_RADIUS, CREAM, DONE_BG, DONE_BORDER, GARDEN_CARD_WIDTH,
+    LIGHT_PINK, LILAC, MINT, MUTED, PEACH, PINK, PROGRESS_HEIGHT, SKY, TEXT,
+    card_bg, done_label, progress_colour, stage_colour,
 )
 from app.version import APP_NAME, APP_VERSION
 from app.tracker import (
@@ -239,16 +239,18 @@ def main(page: ft.Page):
         for plant in garden["plants"]:
             plants.append(ft.Container(
                 content=ft.Column([
-                    ft.Text(plant["emoji"], size=48),
+                    ft.Text(plant["emoji"], size=56),
                     ft.Text(plant["name"], size=15,
                             weight=ft.FontWeight.BOLD, color=TEXT),
-                    ft.Text(f"{plant['label']} • 🔥 {plant['streak']} days",
+                    ft.Text(f"🌷 {plant['label']} • 🔥 {plant['streak']} days",
                             size=13, color=MUTED),
                     ft.Text(plant["message"], size=12, color=MUTED),
                 ], horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                     spacing=4),
-                bgcolor=plant["colour"] + "55", border_radius=20,
-                padding=16, width=170))
+                bgcolor=stage_colour(plant["stage"]),
+                border=ft.border.all(1, LIGHT_PINK),
+                border_radius=CARD_RADIUS,
+                padding=16, width=GARDEN_CARD_WIDTH))
         if not plants:
             plants.append(ft.Text("Your garden is empty — plant a habit! 🌱",
                                   size=15, color=MUTED))
