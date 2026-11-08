@@ -274,10 +274,14 @@ def main(page: ft.Page):
         rows = []
         for day in week:
             rows.append(ft.Row([
-                ft.Text(day["date"], size=14, color=TEXT, expand=True),
-                ft.Text(f"{day['done']}/{day['total']} • {day['percent']}% • "
-                        f"{day['total_minutes']} min", size=14, color=MUTED),
-            ]))
+                ft.Text(day["date"], size=14, color=TEXT, width=110),
+                ft.ProgressBar(value=day["percent"] / 100,
+                               color=progress_colour(day["percent"]),
+                               bgcolor=LIGHT_PINK, height=8,
+                               border_radius=6, expand=True),
+                ft.Text(f"{day['done']}/{day['total']} • {day['percent']}%",
+                        size=13, color=MUTED),
+            ], spacing=8))
         minutes_rows = []
         for name, mins in summary["minutes_per_habit"].items():
             minutes_rows.append(ft.Text(f"⏱️ {name}: {mins} min",
@@ -299,7 +303,8 @@ def main(page: ft.Page):
                             f"({summary['best_minutes']} min)",
                             size=15, color=MUTED),
                 ], spacing=6),
-                bgcolor=CREAM, border_radius=20, padding=18),
+                bgcolor=CREAM, border=ft.border.all(1, PEACH),
+                border_radius=CARD_RADIUS, padding=18),
             ft.Text("Minutes per habit", size=17,
                     weight=ft.FontWeight.BOLD, color=TEXT),
             *minutes_rows,
