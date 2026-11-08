@@ -21,7 +21,8 @@ from app.garden import garden_summary
 from app.store import DEFAULT_PATH, load_store, save_store, seed_store
 from app.theme import (
     BG, CARD_RADIUS, CREAM, DONE_BG, DONE_BORDER, LIGHT_PINK, LILAC, MINT,
-    MUTED, PEACH, PINK, SKY, TEXT, card_bg, done_label,
+    MUTED, PEACH, PINK, PROGRESS_HEIGHT, SKY, TEXT, card_bg, done_label,
+    progress_colour,
 )
 from app.version import APP_NAME, APP_VERSION
 from app.tracker import (
@@ -171,7 +172,11 @@ def main(page: ft.Page):
                     f"{summary['total_minutes']} min logged",
                     size=14, color=MUTED),
             ft.ProgressBar(value=summary["percent"] / 100,
-                           color=PINK, bgcolor=LIGHT_PINK, height=10),
+                           color=progress_colour(summary["percent"]),
+                           bgcolor=LIGHT_PINK, height=PROGRESS_HEIGHT,
+                           border_radius=8),
+            ft.Text(f"🌸 {summary['percent']}% of today done",
+                    size=13, color=PINK),
         ], spacing=6)
 
         cards = []
