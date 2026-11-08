@@ -140,9 +140,10 @@ def main(page: ft.Page):
 
     # ---------- minutes dialog ----------
     def open_minutes_dialog(habit):
-        field = ft.TextField(label="Minutes", value="15",
+        field = ft.TextField(label="Minutes ⏱️", hint_text="e.g. 15, 30 or 60",
+                             value="15",
                              keyboard_type=ft.KeyboardType.NUMBER,
-                             autofocus=True)
+                             autofocus=True, border_radius=16)
 
         def add_clicked(_e):
             try:
