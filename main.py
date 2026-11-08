@@ -20,8 +20,8 @@ from app.habits import (
 from app.garden import garden_summary
 from app.store import DEFAULT_PATH, load_store, save_store, seed_store
 from app.theme import (
-    BG, CARD_RADIUS, CREAM, LIGHT_PINK, LILAC, MINT, MUTED, PEACH, PINK,
-    SKY, TEXT,
+    BG, CARD_RADIUS, CREAM, DONE_BG, DONE_BORDER, LIGHT_PINK, LILAC, MINT,
+    MUTED, PEACH, PINK, SKY, TEXT, card_bg, done_label,
 )
 from app.version import APP_NAME, APP_VERSION
 from app.tracker import (
@@ -192,6 +192,7 @@ def main(page: ft.Page):
                         ft.Text(f"{habit['category']} • {target_text} • "
                                 f"🔥 {streak} day streak • ⏱️ {minutes} min",
                                 size=13, color=MUTED),
+                        ft.Text(done_label(done), size=12, color=MUTED),
                     ], expand=True, spacing=2),
                     ft.IconButton(icon=ft.Icons.ADD, tooltip="+15 min",
                                   on_click=lambda e, h=habit: _quick_minutes(h)),
@@ -200,8 +201,9 @@ def main(page: ft.Page):
                     ft.IconButton(icon=ft.Icons.EDIT, tooltip="Edit habit",
                                   on_click=lambda e, h=habit: open_habit_dialog(h)),
                 ]),
-                bgcolor=habit.get("colour", SKY) + "55",
-                border_radius=18, padding=12)
+                bgcolor=card_bg(habit.get("colour", SKY), done=done),
+                border=ft.border.all(1, DONE_BORDER if done else LIGHT_PINK),
+                border_radius=CARD_RADIUS, padding=12)
             cards.append(card)
 
         if not habits:
