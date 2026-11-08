@@ -51,7 +51,7 @@ def plant_for(habit, logs, date_str):
 
 def empty_garden_message():
     """Friendly message shown when there are no habits (no plants) yet."""
-    return "Your garden is empty — plant your first habit! 🌱"
+    return "Your garden is empty — plant your first habit and watch it grow! 🌱"
 
 
 def garden_summary(habits, logs, date_str):
@@ -64,9 +64,9 @@ def garden_summary(habits, logs, date_str):
     if not plants:
         message = empty_garden_message()
     elif blooming == len(plants):
-        message = "Your garden is blooming! 🌸✨"
+        message = "Your whole garden is blooming! 🌸✨ So proud of you!"
     elif blooming:
         message = f"{blooming} of your plants are blooming! 🌸"
     else:
-        message = "Your garden is growing — tick a habit to water it! 💧"
+        message = "Your garden is growing — tick a habit to water it! 💧🌱"
     return {"plants": plants, "counts": counts, "message": message}

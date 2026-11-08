@@ -18,10 +18,10 @@ if it has no streak yet — today's care already makes it grow.
 
 ## The garden message
 
-- No habits yet: "Your garden is empty — plant your first habit! 🌱"
-- All plants blooming: "Your garden is blooming! 🌸✨"
+- No habits yet: "Your garden is empty — plant your first habit and watch it grow! 🌱"
+- All plants blooming: "Your whole garden is blooming! 🌸✨ So proud of you!"
 - Some plants blooming: "N of your plants are blooming! 🌸"
-- None blooming yet: "Your garden is growing — tick a habit to water it! 💧"
+- None blooming yet: "Your garden is growing — tick a habit to water it! 💧🌱"
 
 ## How to keep a plant alive
 
