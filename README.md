@@ -7,6 +7,13 @@ your own little garden grow. 🌱 → 🌿 → 🌸 → 🌷
 
 > Every commit is a small piece of art. 🎨
 
+## Cute UI 🌸
+
+Soft pastel colours, rounded cards, a mint glow on ticked-off habits,
+a progress bar that blushes pink as the day fills up, and garden
+plants tinted by growth stage. All colours live in `app/theme.py` —
+see `docs/UI.md` for the full guide.
+
 ## Download & install
 
 - **Download the app code (ZIP):**
