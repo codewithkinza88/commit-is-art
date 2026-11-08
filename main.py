@@ -61,24 +61,29 @@ def main(page: ft.Page):
     def open_habit_dialog(habit=None):
         is_edit = habit is not None
         name_field = ft.TextField(
-            label="Habit name 🌸", value=habit["name"] if is_edit else "",
-            autofocus=True)
+            label="Habit name 🌸", hint_text="e.g. Study — DSA / course",
+            value=habit["name"] if is_edit else "",
+            autofocus=True, border_radius=16)
         category_field = ft.Dropdown(
-            label="Category",
+            label="Category 🌿",
             value=habit["category"] if is_edit else "Study",
-            options=[ft.dropdown.Option(c) for c in CATEGORIES])
+            options=[ft.dropdown.Option(c) for c in CATEGORIES],
+            border_radius=16)
         target_field = ft.TextField(
             label="Daily target (minutes, 0 = none)",
+            hint_text="How many minutes a day?",
             value=str(habit["target_minutes"]) if is_edit else "0",
-            keyboard_type=ft.KeyboardType.NUMBER)
+            keyboard_type=ft.KeyboardType.NUMBER, border_radius=16)
         icon_field = ft.Dropdown(
-            label="Icon",
+            label="Icon ✨",
             value=habit["icon"] if is_edit else "🌱",
-            options=[ft.dropdown.Option(i) for i in ICONS])
+            options=[ft.dropdown.Option(i) for i in ICONS],
+            border_radius=16)
         colour_field = ft.Dropdown(
-            label="Colour",
+            label="Colour 🎨",
             value=habit["colour"] if is_edit else "#BDE0FE",
-            options=[ft.dropdown.Option(c) for c in COLOURS])
+            options=[ft.dropdown.Option(c) for c in COLOURS],
+            border_radius=16)
 
         def save_clicked(_e):
             try:
