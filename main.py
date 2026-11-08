@@ -173,6 +173,8 @@ def main(page: ft.Page):
         summary = daily_summary(logs, habits, today)
         header = ft.Column([
             ft.Text("Today 🌞", size=26, weight=ft.FontWeight.BOLD, color=TEXT),
+            ft.Text("Water your garden, one tick at a time 🌱",
+                    size=14, color=PINK),
             ft.Text(f"{summary['done']} of {summary['total']} habits done "
                     f"• {summary['percent']}% • "
                     f"{summary['total_minutes']} min logged",
