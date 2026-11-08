@@ -19,23 +19,17 @@ from app.habits import (
 )
 from app.garden import garden_summary
 from app.store import DEFAULT_PATH, load_store, save_store, seed_store
+from app.theme import (
+    BG, CARD_RADIUS, CREAM, LIGHT_PINK, LILAC, MINT, MUTED, PEACH, PINK,
+    SKY, TEXT,
+)
 from app.version import APP_NAME, APP_VERSION
 from app.tracker import (
     current_streak, daily_summary, is_done, last_7_days, log_minutes,
     minutes_for, set_done, today_str,
 )
 
-# Pastel palette — soft, cute, friendly 🌸
-BG = "#FFF8F0"
-PINK = "#F9A8D4"
-LIGHT_PINK = "#FDE7F3"
-LILAC = "#E4C1F9"
-SKY = "#BDE0FE"
-MINT = "#B5EAD7"
-PEACH = "#FFD6A5"
-CREAM = "#FFF3D6"
-TEXT = "#5B4B5A"
-MUTED = "#9A8A99"
+# Pastel palette — soft, cute, friendly 🌸 (see app/theme.py)
 
 
 def main(page: ft.Page):
@@ -317,6 +311,7 @@ def main(page: ft.Page):
         refresh()
 
     page.navigation_bar = ft.NavigationBar(
+        bgcolor=LIGHT_PINK,
         destinations=[
             ft.NavigationBarDestination(icon=ft.Icons.TODAY, label="Today"),
             ft.NavigationBarDestination(icon=ft.Icons.LOCAL_FLORIST, label="Garden"),
