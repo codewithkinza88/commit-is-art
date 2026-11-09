@@ -22,6 +22,7 @@ from app.ordering import sort_habits
 from app.motivation import nightly_message
 from app.streaks import best_streak
 from app.achievements import badges_for
+from app.categories import total_minutes_by_category
 from app.store import DEFAULT_PATH, load_store, save_store, seed_store
 from app.theme import (
     BG, CARD_RADIUS, CREAM, DONE_BG, DONE_BORDER, GARDEN_CARD_WIDTH,
@@ -282,6 +283,14 @@ def main(page: ft.Page):
         badges_text = (", ".join(
             f"{b['emoji']} {b['label']}" for b in badges)
             if badges else "No badges yet today — plant a habit! 🌱")
+        minutes_by_category = total_minutes_by_category(logs, habits, today)
+        category_rows = []
+        for category, mins in minutes_by_category.items():
+            category_rows.append(ft.Text(f"⏱️ {category}: {mins} min",
+                                        size=14, color=TEXT))
+        if not category_rows:
+            category_rows.append(ft.Text("No minutes logged yet today ⏱️",
+                                        size=14, color=MUTED))
         rows = []
         for day in week:
             rows.append(ft.Row([
@@ -324,6 +333,9 @@ def main(page: ft.Page):
             ft.Text("Minutes per habit", size=17,
                     weight=ft.FontWeight.BOLD, color=TEXT),
             *minutes_rows,
+            ft.Text("Minutes by category 🌿", size=17,
+                    weight=ft.FontWeight.BOLD, color=TEXT),
+            *category_rows,
             ft.Text("Last 7 days 📅", size=17,
                     weight=ft.FontWeight.BOLD, color=TEXT),
             *rows,
