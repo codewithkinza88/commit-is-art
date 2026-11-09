@@ -20,6 +20,7 @@ from app.habits import (
 from app.garden import garden_summary
 from app.ordering import sort_habits
 from app.motivation import nightly_message
+from app.streaks import best_streak
 from app.store import DEFAULT_PATH, load_store, save_store, seed_store
 from app.theme import (
     BG, CARD_RADIUS, CREAM, DONE_BG, DONE_BORDER, GARDEN_CARD_WIDTH,
@@ -274,6 +275,8 @@ def main(page: ft.Page):
         summary = daily_summary(logs, habits, today)
         week = last_7_days(logs, habits)
         message = nightly_message(summary)
+        longest_streak = max(
+            (best_streak(logs, habit) for habit in habits), default=0)
         rows = []
         for day in week:
             rows.append(ft.Row([
@@ -304,6 +307,8 @@ def main(page: ft.Page):
                     ft.Text(f"Best habit today: "
                             f"{summary['best_habit'] or '—'} "
                             f"({summary['best_minutes']} min)",
+                            size=15, color=MUTED),
+                    ft.Text(f"🔥 Longest streak ever: {longest_streak} days",
                             size=15, color=MUTED),
                 ], spacing=6),
                 bgcolor=CREAM, border=ft.Border.all(1, PEACH),
