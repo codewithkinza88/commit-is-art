@@ -18,6 +18,7 @@ from app.habits import (
     get_habit, new_habit,
 )
 from app.garden import garden_summary
+from app.ordering import sort_habits
 from app.store import DEFAULT_PATH, load_store, save_store, seed_store
 from app.theme import (
     BG, CARD_RADIUS, CREAM, DONE_BG, DONE_BORDER, GARDEN_CARD_WIDTH,
@@ -188,7 +189,7 @@ def main(page: ft.Page):
         ], spacing=6)
 
         cards = []
-        for habit in habits:
+        for habit in sort_habits(habits, logs, today):
             done = is_done(logs, habit, today)
             streak = current_streak(logs, habit)
             minutes = minutes_for(logs, habit["id"], today)
