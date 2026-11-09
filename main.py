@@ -19,6 +19,7 @@ from app.habits import (
 )
 from app.garden import garden_summary
 from app.ordering import sort_habits
+from app.motivation import nightly_message
 from app.store import DEFAULT_PATH, load_store, save_store, seed_store
 from app.theme import (
     BG, CARD_RADIUS, CREAM, DONE_BG, DONE_BORDER, GARDEN_CARD_WIDTH,
@@ -272,14 +273,7 @@ def main(page: ft.Page):
     def tonight_view():
         summary = daily_summary(logs, habits, today)
         week = last_7_days(logs, habits)
-        if summary["percent"] >= 80:
-            message = "Amazing day! You did so much — sleep proud 😴💖"
-        elif summary["percent"] >= 50:
-            message = "A lovely day — more than halfway there! 🌙"
-        elif summary["done"]:
-            message = "A gentle start — every little step counts 🌱"
-        else:
-            message = "Tomorrow is a fresh seed — rest well tonight 🌙"
+        message = nightly_message(summary)
         rows = []
         for day in week:
             rows.append(ft.Row([
