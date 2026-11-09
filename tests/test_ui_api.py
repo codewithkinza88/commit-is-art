@@ -57,6 +57,8 @@ def test_ui_api():
           "ft.ElevatedButton" not in source)
     check("main.py launches with ft.run(main)",
           "ft.run(main)" in source)
+    check("edit path also rejects an empty habit name",
+          source.count("Please give your habit a name first") == 2)
 
 
 if __name__ == "__main__":

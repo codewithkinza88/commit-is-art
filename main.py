@@ -99,6 +99,9 @@ def main(page: ft.Page):
             except ValueError:
                 target = 0
             if is_edit:
+                if not (name_field.value or "").strip():
+                    snack("Please give your habit a name first 🌱")
+                    return
                 edit_habit(habits, habit["id"], name=name_field.value,
                            category=category_field.value,
                            target_minutes=target, icon=icon_field.value,
