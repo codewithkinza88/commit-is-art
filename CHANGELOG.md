@@ -2,6 +2,40 @@
 
 All notable changes to Habit Garden are listed here.
 
+## 2026-11-08 – 2026-11-09
+
+### Cute UI (8 November)
+- New pastel theme in `app/theme.py`: shared palette, rounded cards,
+  mint glow on ticked-off habits, progress bar that blushes pink.
+- Rounder habit cards, cuter Today progress bar, bigger garden plants,
+  softer Tonight review, friendlier add/edit and minutes dialogs.
+- New `docs/UI.md` guide and a "Cute UI" section in the README.
+
+### Fixed (8 November)
+- Today's cute-UI code crashed on launch: `main.py` used
+  `ft.border.all`, which does not exist in Flet 1.0.5 (correct call is
+  `ft.Border.all`). Fixed at all 3 sites (Today card, Garden card,
+  Tonight card) and guarded by new checks in `tests/test_ui_api.py`.
+- Android APK rebuilt from the fix (GitHub Actions run #5, commit
+  `ab1838c`): artifact `habit-garden-apk`, 60.4 MB. It has not been
+  tested on a phone yet — do not install older APKs.
+
+### Tonight's review now uses the backend (9 November)
+- Today view sorts undone habits first (`app/ordering.py`).
+- Tonight's message comes from `app/motivation.py`; it also shows the
+  longest streak ever (`app/streaks.py`), badges earned today
+  (`app/achievements.py`), minutes by category and best category
+  (`app/categories.py`), how November is going
+  (`app/monthly.py`), and weekly goal progress per habit
+  (`app/goals.py`, weekly target = daily target × 7).
+- Editing a habit with an empty name now shows the same
+  "Please give your habit a name first 🌱" message as adding one,
+  instead of silently keeping the old name.
+
+### Tests
+- 130 plain-script checks passing across 12 test files
+  (`for f in tests/test_*.py; do python3 "$f"; done`).
+
 ## v1.0.0 — 2026-11-07
 
 First launch of Habit Garden 🌸 — a cute habit tracker in Python (Flet).

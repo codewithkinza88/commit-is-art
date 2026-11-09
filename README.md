@@ -30,10 +30,13 @@ see `docs/UI.md` for the full guide.
   ```
   You need Python 3.10+ on your computer. That is all — there is no
   account or sign-in.
-- **Android APK:** there is no ready-made APK download yet. The APK is
-  built from this same code with `flet build apk` (see
-  [How to build the Android APK](#how-to-build-the-android-apk) below),
-  and will be added as a download link here once it is built.
+- **Android APK (latest built version):**
+  [Download Habit Garden APK — 60.4 MB](https://github.com/codewithkinza88/commit-is-art/actions/runs/42474397960/artifacts/13614737600)
+  — built 8 November 2026 from commit `ab1838c` (GitHub Actions run #5).
+  Sign in to GitHub as `codewithkinza88` first (otherwise the link
+  shows a 404), download the ZIP, unzip it, and install the APK inside.
+  Do not install older APKs — they crash on launch. This APK has not
+  been tested on a phone yet.
 
 ## Features
 
@@ -54,8 +57,11 @@ see `docs/UI.md` for the full guide.
   a glance, with each plant's stage and streak.
 - 🌙 **Tonight's review** — before sleep, see how much you achieved
   today: habits done out of total, % achieved, total minutes
-  studied / read, minutes per habit, streaks, your best habit, and a
-  gentle message. Plus a simple last-7-days view (per-day % done).
+  studied / read, minutes per habit, minutes by category and best
+  category, streaks (including your longest streak ever), badges
+  earned today, weekly goal progress per habit, and how November is
+  going so far — plus a gentle message and a simple last-7-days view
+  (per-day % done).
 - 🔒 **No login** — there is no account or sign-in at all (login will
   come later). Everything is stored locally on your device.
 
@@ -93,12 +99,25 @@ commit-is-art/
 ├── habit_garden.json       # your local data (created on first run, not committed)
 ├── app/
 │   ├── __init__.py
-│   ├── habits.py           # habit add / edit / delete logic
-│   ├── tracker.py          # daily ticks, minutes, streaks, summaries
+│   ├── achievements.py     # badges for milestones
+│   ├── categories.py       # minutes / best category per day
+│   ├── export.py           # export habits and logs
 │   ├── garden.py           # growth stages from streak + today's tick
-│   └── store.py            # load / save the local JSON store
+│   ├── goals.py            # weekly minutes-goal progress
+│   ├── habits.py           # habit add / edit / delete logic
+│   ├── monthly.py          # whole-month summary
+│   ├── motivation.py       # Tonight messages
+│   ├── ordering.py         # habit sorting (undone first)
+│   ├── store.py            # load / save the local JSON store
+│   ├── streaks.py          # best streak / streak summary
+│   ├── theme.py            # cute pastel palette + card helpers
+│   ├── tracker.py          # daily ticks, minutes, streaks, summaries
+│   └── version.py          # app name + version
 └── tests/
-    └── test_habit_garden.py
+    ├── test_achievements.py  test_categories.py  test_export.py
+    ├── test_goals.py  test_habit_garden.py  test_monthly.py
+    ├── test_motivation.py  test_ordering.py  test_streaks.py
+    ├── test_theme.py  test_ui_api.py  test_weekly.py
 ```
 
 ## Data storage
@@ -110,5 +129,7 @@ in `.gitignore`, so your real habit data is never committed to GitHub.
 ## Tests
 
 ```bash
-python3 tests/test_habit_garden.py
+# every test file is a plain script — run them all:
+for f in tests/test_*.py; do python3 "$f"; done
+# 130 checks passing (12 files)
 ```
