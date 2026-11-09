@@ -25,6 +25,7 @@ from app.achievements import badges_for
 from app.categories import (
     best_category, total_minutes_by_category)
 from app.monthly import monthly_summary
+from app.goals import weekly_goal_progress
 from app.store import DEFAULT_PATH, load_store, save_store, seed_store
 from app.theme import (
     BG, CARD_RADIUS, CREAM, DONE_BG, DONE_BORDER, GARDEN_CARD_WIDTH,
@@ -285,6 +286,21 @@ def main(page: ft.Page):
         badges_text = (", ".join(
             f"{b['emoji']} {b['label']}" for b in badges)
             if badges else "No badges yet today — plant a habit! 🌱")
+        goal_rows = []
+        for habit in habits:
+            target = habit.get("target_minutes") or 0
+            if not target:
+                continue
+            progress = weekly_goal_progress(logs, habit, target * 7)
+            goal_rows.append(ft.Text(
+                f"🎯 {habit['name']}: {progress['minutes']}/"
+                f"{progress['target']} min this week "
+                f"({progress['percent']}%)",
+                size=14, color=TEXT))
+        if not goal_rows:
+            goal_rows.append(ft.Text(
+                "No daily targets set — add one to track a weekly goal 🎯",
+                size=14, color=MUTED))
         month = monthly_summary(logs, habits, 2026, 11)
         month_text = (f"📅 November so far: {month['total_minutes']} min • "
                       f"{month['average_percent']}% average • "
@@ -348,6 +364,9 @@ def main(page: ft.Page):
             ft.Text(best_cat_text, size=14, color=TEXT),
             *category_rows,
             ft.Text(month_text, size=14, color=TEXT),
+            ft.Text("Weekly goals 🎯", size=17,
+                    weight=ft.FontWeight.BOLD, color=TEXT),
+            *goal_rows,
             ft.Text("Last 7 days 📅", size=17,
                     weight=ft.FontWeight.BOLD, color=TEXT),
             *rows,
