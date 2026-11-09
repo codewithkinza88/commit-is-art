@@ -21,6 +21,7 @@ from app.garden import garden_summary
 from app.ordering import sort_habits
 from app.motivation import nightly_message
 from app.streaks import best_streak
+from app.achievements import badges_for
 from app.store import DEFAULT_PATH, load_store, save_store, seed_store
 from app.theme import (
     BG, CARD_RADIUS, CREAM, DONE_BG, DONE_BORDER, GARDEN_CARD_WIDTH,
@@ -277,6 +278,10 @@ def main(page: ft.Page):
         message = nightly_message(summary)
         longest_streak = max(
             (best_streak(logs, habit) for habit in habits), default=0)
+        badges = badges_for(logs, habits, today)
+        badges_text = (", ".join(
+            f"{b['emoji']} {b['label']}" for b in badges)
+            if badges else "No badges yet today — plant a habit! 🌱")
         rows = []
         for day in week:
             rows.append(ft.Row([
@@ -313,6 +318,9 @@ def main(page: ft.Page):
                 ], spacing=6),
                 bgcolor=CREAM, border=ft.Border.all(1, PEACH),
                 border_radius=CARD_RADIUS, padding=18),
+            ft.Text("Badges earned 🏅", size=17,
+                    weight=ft.FontWeight.BOLD, color=TEXT),
+            ft.Text(badges_text, size=14, color=TEXT),
             ft.Text("Minutes per habit", size=17,
                     weight=ft.FontWeight.BOLD, color=TEXT),
             *minutes_rows,
