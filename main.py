@@ -24,6 +24,7 @@ from app.streaks import best_streak
 from app.achievements import badges_for
 from app.categories import (
     best_category, total_minutes_by_category)
+from app.monthly import monthly_summary
 from app.store import DEFAULT_PATH, load_store, save_store, seed_store
 from app.theme import (
     BG, CARD_RADIUS, CREAM, DONE_BG, DONE_BORDER, GARDEN_CARD_WIDTH,
@@ -284,6 +285,10 @@ def main(page: ft.Page):
         badges_text = (", ".join(
             f"{b['emoji']} {b['label']}" for b in badges)
             if badges else "No badges yet today — plant a habit! 🌱")
+        month = monthly_summary(logs, habits, 2026, 11)
+        month_text = (f"📅 November so far: {month['total_minutes']} min • "
+                      f"{month['average_percent']}% average • "
+                      f"{month['perfect_days']} perfect days")
         best_cat = best_category(logs, habits, today)
         best_cat_text = (f"🏆 Best category today: {best_cat['category']} "
                          f"({best_cat['percent']}% • {best_cat['minutes']} min)"
@@ -342,6 +347,7 @@ def main(page: ft.Page):
                     weight=ft.FontWeight.BOLD, color=TEXT),
             ft.Text(best_cat_text, size=14, color=TEXT),
             *category_rows,
+            ft.Text(month_text, size=14, color=TEXT),
             ft.Text("Last 7 days 📅", size=17,
                     weight=ft.FontWeight.BOLD, color=TEXT),
             *rows,
