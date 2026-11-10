@@ -2,6 +2,19 @@
 
 All notable changes to Habit Garden are listed here.
 
+## 2026-11-10
+
+### New helpers (10 November)
+- Search habits by name or category (`app/search.py`).
+- Weekday schedules: habits due on a given day (`app/schedule.py`).
+- Short daily notes per habit (`app/notes.py`).
+- Backup and restore your data as JSON (`app/backup.py`).
+- Validation for habit names and minutes (`app/validation.py`).
+- Insights: consistency score and the habit needing attention (`app/insights.py`).
+- Milestone celebrations for 7, 14, 30 and 100 day streaks (`app/celebration.py`).
+- New guides: `docs/TIPS.md` (study and reading tips) and
+  `docs/PRIVACY.md` (your data stays on your device).
+
 ## 2026-11-08 – 2026-11-09
 
 ### Cute UI (8 November)
