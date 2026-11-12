@@ -25,3 +25,5 @@ Small ideas that make the garden grow — for study, reading and health.
 
 - Before bed, open Tonight and look at what you did — not what you missed.
 - Pick **one** habit to focus on tomorrow (the app's insights can help).
+- Tonight now shows yesterday next to today — compare the two and see
+  whether you did a little more than yesterday. Even +1% counts. 🌱
