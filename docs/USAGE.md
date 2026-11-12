@@ -9,7 +9,9 @@ A cute daily routine for your habits — morning, day, and night.
    (Study, Books, Health, Mind, Daily Life), an optional daily target
    in minutes, and an emoji + pastel colour you love.
 3. Changed your mind? Tap a habit's edit button — rename it, change
-   the category, target, icon or colour, or delete it.
+   the category, target, icon or colour, or delete it. Deleting asks
+   first: tap Delete, then confirm in the dialog — a habit is only
+   removed when you tap Delete a second time.
 
 ## During the day ✅ — tick and log
 
@@ -46,3 +48,7 @@ Open the **Garden** tab to see your plants:
 
 Every tick waters a plant. Keep the streak alive and your garden
 will bloom. 💧
+
+The Garden tab also shows a count line, e.g. "🌱 2 seeds • 🌿 1
+sprout • 🌸 1 blooming", so you can see at a glance how many plants
+sit at each stage.
