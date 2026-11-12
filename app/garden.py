@@ -49,6 +49,28 @@ def plant_for(habit, logs, date_str):
     }
 
 
+def counts_text(counts):
+    """One short line of how many plants sit at each stage.
+
+    Example: "🌱 2 seeds • 🌿 1 sprout • 🌸 1 blooming".
+    With no plants at all: "No plants yet 🌱".
+    """
+    words = {
+        "seed": ("seed", "seeds"),
+        "sprout": ("sprout", "sprouts"),
+        "growing": ("growing", "growing"),
+        "blooming": ("blooming", "blooming"),
+        "full_bloom": ("in full bloom", "in full bloom"),
+    }
+    parts = []
+    for _minimum, stage, emoji, _label, _message in reversed(_STAGES):
+        n = (counts or {}).get(stage, 0)
+        if n:
+            singular, plural = words[stage]
+            parts.append(f"{emoji} {n} {singular if n == 1 else plural}")
+    return " • ".join(parts) if parts else "No plants yet 🌱"
+
+
 def empty_garden_message():
     """Friendly message shown when there are no habits (no plants) yet."""
     return "Your garden is empty — plant your first habit and watch it grow! 🌱"

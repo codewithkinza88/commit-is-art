@@ -16,7 +16,8 @@ from app.tracker import (  # noqa: E402
     set_done, toggle_done, log_minutes, is_done, minutes_for,
     current_streak, daily_summary, last_7_days,
 )
-from app.garden import growth_stage, garden_summary, empty_garden_message  # noqa: E402
+from app.garden import (  # noqa: E402
+    counts_text, growth_stage, garden_summary, empty_garden_message)
 from app.store import empty_store, seed_store, load_store, save_store  # noqa: E402
 
 PASSED = 0
@@ -131,6 +132,18 @@ def test_empty_store_and_seed():
         check("corrupt file loads empty", load_store(path) == empty_store())
 
 
+def test_garden_counts_text():
+    check("counts text lists seeds and sprouts",
+          counts_text({"seed": 2, "sprout": 1})
+          == "🌱 2 seeds • 🌿 1 sprout")
+    check("counts text handles full bloom",
+          counts_text({"full_bloom": 2}) == "🌷 2 in full bloom")
+    check("counts text is empty without plants",
+          counts_text({}) == "No plants yet 🌱")
+    check("counts text skips zero stages",
+          "🌿" not in counts_text({"seed": 1}))
+
+
 def test_empty_garden_message():
     message = empty_garden_message()
     check("empty garden message mentions empty", "empty" in message)
@@ -143,6 +156,7 @@ if __name__ == "__main__":
     test_tick_and_minutes()
     test_streak_and_summary()
     test_garden_stages()
+    test_garden_counts_text()
     test_empty_store_and_seed()
     test_empty_garden_message()
     print(f"{PASSED} tests passed")

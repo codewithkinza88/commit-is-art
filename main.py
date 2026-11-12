@@ -17,7 +17,7 @@ from app.habits import (
     CATEGORIES, COLOURS, ICONS, add_habit, delete_habit, edit_habit,
     get_habit, new_habit,
 )
-from app.garden import garden_summary
+from app.garden import counts_text, garden_summary
 from app.ordering import sort_habits
 from app.motivation import nightly_message
 from app.streaks import best_streak
@@ -292,11 +292,15 @@ def main(page: ft.Page):
         if not plants:
             plants.append(ft.Text("Your garden is empty — plant a habit! 🌱",
                                   size=15, color=MUTED))
-        return ft.Column([
+        garden_rows = [
             ft.Text("My Garden 🌷", size=26, weight=ft.FontWeight.BOLD, color=TEXT),
             ft.Text(garden["message"], size=15, color=MUTED),
-            ft.Row(plants, wrap=True, spacing=12),
-        ], spacing=14)
+        ]
+        if garden["plants"]:
+            garden_rows.append(ft.Text(
+                counts_text(garden["counts"]), size=14, color=MUTED))
+        garden_rows.append(ft.Row(plants, wrap=True, spacing=12))
+        return ft.Column(garden_rows, spacing=14)
 
     def tonight_view():
         summary = daily_summary(logs, habits, today)
