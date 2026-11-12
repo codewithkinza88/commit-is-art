@@ -69,6 +69,9 @@ def test_ui_api():
           "Yesterday vs today" in source)
     check("yesterday summary comes from daily_summary",
           "daily_summary(logs, habits, yesterday)" in source)
+    check("app version is 1.1.0",
+          open(os.path.join(root, "app", "version.py"),
+               encoding="utf-8").read().count('APP_VERSION = "1.1.0"') == 1)
 
 
 if __name__ == "__main__":
