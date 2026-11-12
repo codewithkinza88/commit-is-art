@@ -2,6 +2,24 @@
 
 All notable changes to Habit Garden are listed here.
 
+## 2026-11-12
+
+### Today (12 November)
+- Delete asks first: deleting a habit now shows a confirm dialog
+  ("Delete this habit?") — the habit is removed only from the
+  confirm button, so a stray tap cannot wipe it.
+- Garden tab shows how many plants sit at each stage
+  (`app/garden.py` counts_text, wired into main.py).
+- Export summary includes your longest streak
+  (`app/export.py` summary_to_text).
+- Tonight compares yesterday with today, side by side.
+- Version 1.1.0.
+- README APK link corrected to the newest built run (#6).
+
+Tests: 192 plain-script checks passing across 19 test files
+(`for f in tests/test_*.py; do python3 "$f"; done`, with
+tests/test_ui_api.py run under .venv for Flet).
+
 ## 2026-11-10
 
 ### New helpers (10 November)
