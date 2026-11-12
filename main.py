@@ -121,13 +121,32 @@ def main(page: ft.Page):
             page.update()
             refresh()
 
-        def delete_clicked(_e):
+        def confirm_delete(_e):
             delete_habit(habits, habit["id"])
             persist()
+            confirm_dialog.open = False
             dialog.open = False
             snack("Habit removed 🌿")
             page.update()
             refresh()
+
+        def delete_clicked(_e):
+            confirm_dialog.open = True
+            page.dialog = confirm_dialog
+            page.update()
+
+        confirm_dialog = None
+        if is_edit:
+            confirm_dialog = ft.AlertDialog(
+                title=ft.Text("Delete this habit? 🗑️"),
+                content=ft.Text(
+                    f"'{habit['name']}' will be gone for good — "
+                    "there is no undo yet. Are you sure?"),
+                actions=[
+                    ft.TextButton("Keep it 💕",
+                                  on_click=lambda e: _close(confirm_dialog)),
+                    ft.TextButton("Delete 🗑️", on_click=confirm_delete),
+                ])
 
         buttons = [ft.TextButton("Cancel",
                                  on_click=lambda e: _close(dialog))]

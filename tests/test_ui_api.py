@@ -59,6 +59,12 @@ def test_ui_api():
           "ft.run(main)" in source)
     check("edit path also rejects an empty habit name",
           source.count("Please give your habit a name first") == 2)
+    check("delete asks first with a confirm dialog",
+          "Delete this habit?" in source)
+    check("delete happens only from the confirm button",
+          source.count('delete_habit(habits, habit["id"])') == 1)
+    check("confirm dialog offers Keep it",
+          '"Keep it' in source)
 
 
 if __name__ == "__main__":
