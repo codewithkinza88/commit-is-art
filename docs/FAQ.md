@@ -19,6 +19,12 @@ Yes — tap the ✏️ (edit) button on a habit card. You can change its
 name, category, target minutes, icon and colour. You can also
 delete a habit from the same dialog.
 
+## I deleted a habit by mistake — can I get it back?
+No, not yet — there is no undo, so a deleted habit is gone for good.
+That is why the app asks "Delete this habit?" first: a habit is only
+removed when you tap Delete a second time in the confirm dialog. If
+it is gone, just plant it again as a new habit.
+
 ## How do I tick a habit as done?
 Tap the checkbox on its card. Tap again to untick it. You can also
 log minutes: the ＋15 min button adds 15 minutes, or use the timer
