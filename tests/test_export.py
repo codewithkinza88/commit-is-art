@@ -54,8 +54,24 @@ def test_summary_to_text():
     check("summary text has 45 minutes", "45 minutes" in text)
 
 
+def test_summary_best_streak():
+    habits = [new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-01"),
+              new_habit("Read", "Books", 30, "📖", "#FFD6A5", "2026-11-01")]
+    logs = {}
+    for day in ("2026-11-05", "2026-11-06", "2026-11-07"):
+        set_done(logs, habits[0]["id"], day, True)
+    set_done(logs, habits[1]["id"], "2026-11-07", True)
+    text = summary_to_text(logs, habits, "2026-11-07")
+    check("summary text has longest streak of 3 days",
+          "Longest streak: 3 days" in text)
+    check("summary text has no streak without logs",
+          "Longest streak: 0 days"
+          in summary_to_text(logs, [], "2026-11-07"))
+
+
 if __name__ == "__main__":
     test_habits_to_csv()
     test_logs_to_csv()
     test_summary_to_text()
+    test_summary_best_streak()
     print(f"{PASSED} tests passed")

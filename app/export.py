@@ -8,6 +8,7 @@ summary of one day.
 import csv
 import io
 
+from app.streaks import best_streak
 from app.tracker import daily_summary
 
 
@@ -50,4 +51,8 @@ def summary_to_text(logs, habits, date_str):
         lines.append(f"- {name}: {minutes} min")
     if summary["best_habit"]:
         lines.append(f"Best habit: {summary['best_habit']}")
+    longest = max((best_streak(logs, h) for h in (habits or [])),
+                  default=0)
+    lines.append(f"Longest streak: {longest} day"
+                 f"{'s' if longest != 1 else ''}")
     return "\n".join(lines)
