@@ -65,6 +65,10 @@ def test_ui_api():
           source.count('delete_habit(habits, habit["id"])') == 1)
     check("confirm dialog offers Keep it",
           '"Keep it' in source)
+    check("Tonight compares yesterday and today",
+          "Yesterday vs today" in source)
+    check("yesterday summary comes from daily_summary",
+          "daily_summary(logs, habits, yesterday)" in source)
 
 
 if __name__ == "__main__":

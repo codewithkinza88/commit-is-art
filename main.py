@@ -13,6 +13,8 @@ Build the Android APK (needs the Flet CLI + Flutter + Android SDK):
 
 import flet as ft
 
+from datetime import date, timedelta
+
 from app.habits import (
     CATEGORIES, COLOURS, ICONS, add_habit, delete_habit, edit_habit,
     get_habit, new_habit,
@@ -343,6 +345,13 @@ def main(page: ft.Page):
         if not category_rows:
             category_rows.append(ft.Text("No minutes logged yet today ⏱️",
                                         size=14, color=MUTED))
+        yesterday = today_str(date.today() - timedelta(days=1))
+        yday = daily_summary(logs, habits, yesterday)
+        yday_text = (f"Yesterday vs today: {yday['done']}/{yday['total']} "
+                     f"({yday['percent']}%) • {yday['total_minutes']} min → "
+                     f"today {summary['done']}/{summary['total']} "
+                     f"({summary['percent']}%) • "
+                     f"{summary['total_minutes']} min")
         rows = []
         for day in week:
             rows.append(ft.Row([
@@ -370,6 +379,7 @@ def main(page: ft.Page):
                             size=16, color=TEXT),
                     ft.Text(f"Total time: {summary['total_minutes']} minutes",
                             size=15, color=MUTED),
+                    ft.Text(yday_text, size=15, color=MUTED),
                     ft.Text(f"Best habit today: "
                             f"{summary['best_habit'] or '—'} "
                             f"({summary['best_minutes']} min)",
