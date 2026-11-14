@@ -11,7 +11,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.habits import new_habit  # noqa: E402
 from app.tracker import set_done  # noqa: E402
-from app.streaks import best_streak, days_since_last_done, streak_summary  # noqa: E402
+from app.streaks import (best_streak, days_since_last_done,  # noqa: E402
+                         last_done_label, streak_summary)
 
 PASSED = 0
 
@@ -54,8 +55,21 @@ def test_streak_summary():
           summary["days_since_last_done"] == 0)
 
 
+def test_last_done_label():
+    habit = new_habit("Read", "Books", 0, "📖", "#F9A8D4", "2026-11-01")
+    logs = {}
+    set_done(logs, habit["id"], "2026-11-05", True)
+    check("label for two days ago",
+          last_done_label(logs, habit, date(2026, 11, 7)) == "Last done 2 days ago")
+    check("label for done today",
+          last_done_label(logs, habit, date(2026, 11, 5)) == "Done today 🌸")
+    check("label for never done",
+          last_done_label({}, habit, date(2026, 11, 7)) == "Not done yet 🌱")
+
+
 if __name__ == "__main__":
     test_best_streak()
     test_days_since_last_done()
     test_streak_summary()
+    test_last_done_label()
     print(f"{PASSED} tests passed")

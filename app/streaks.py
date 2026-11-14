@@ -62,3 +62,19 @@ def streak_summary(logs, habit, end_date=None):
         "best": best_streak(logs, habit, end_date=end),
         "days_since_last_done": days_since_last_done(logs, habit, end_date=end),
     }
+
+
+def last_done_label(logs, habit, end_date=None):
+    """Short label for when a habit was last done.
+
+    "Done today 🌸" / "Last done yesterday" / "Last done N days ago"
+    / "Not done yet 🌱" when it was never done.
+    """
+    days = days_since_last_done(logs, habit, end_date=end_date)
+    if days is None:
+        return "Not done yet 🌱"
+    if days == 0:
+        return "Done today 🌸"
+    if days == 1:
+        return "Last done yesterday"
+    return f"Last done {days} days ago"

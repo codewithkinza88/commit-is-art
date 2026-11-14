@@ -24,7 +24,7 @@ from app.insights import consistency_message, consistency_score
 from app.notes import count_notes
 from app.ordering import sort_habits
 from app.motivation import nightly_message
-from app.streaks import best_streak
+from app.streaks import best_streak, last_done_label
 from app.achievements import badges_for
 from app.categories import (
     best_category, total_minutes_by_category)
@@ -245,7 +245,8 @@ def main(page: ft.Page):
                                 f"🔥 {streak} day streak • ⏱️ {minutes} min",
                                 size=13, color=MUTED),
                         ft.Text(done_label(done) +
-                                (f" • {note_text}" if note_text else ""),
+                                (f" • {note_text}" if note_text else "") +
+                                f" • {last_done_label(logs, habit)}",
                                 size=12, color=MUTED),
                     ], expand=True, spacing=2),
                     ft.IconButton(icon=ft.Icons.ADD, tooltip="+15 min",
