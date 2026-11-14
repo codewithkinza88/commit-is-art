@@ -17,7 +17,8 @@ from app.tracker import (  # noqa: E402
     current_streak, daily_summary, last_7_days,
 )
 from app.garden import (  # noqa: E402
-    counts_text, growth_stage, garden_summary, empty_garden_message)
+    counts_text, days_to_next_stage, growth_stage, garden_summary,
+    empty_garden_message)
 from app.store import empty_store, seed_store, load_store, save_store  # noqa: E402
 
 PASSED = 0
@@ -104,6 +105,10 @@ def test_garden_stages():
     check("growing at streak 2", growth_stage(2)["stage"] == "growing")
     check("blooming at streak 4", growth_stage(4)["stage"] == "blooming")
     check("full bloom at streak 7", growth_stage(7)["stage"] == "full_bloom")
+    check("one day to sprout from seed", days_to_next_stage(0) == 1)
+    check("one day to growing at streak 1", days_to_next_stage(1) == 1)
+    check("two days to blooming at streak 2", days_to_next_stage(2) == 2)
+    check("no days left in full bloom", days_to_next_stage(7) == 0)
     habits = [new_habit("Study — DSA", "Study", 60, "📚", "#A5D8FF", "2026-11-07")]
     logs = {}
     set_done(logs, habits[0]["id"], "2026-11-07", True)

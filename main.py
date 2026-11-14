@@ -19,7 +19,7 @@ from app.habits import (
     CATEGORIES, COLOURS, ICONS, add_habit, delete_habit, edit_habit,
     get_habit, new_habit,
 )
-from app.garden import counts_text, garden_summary
+from app.garden import counts_text, days_to_next_stage, garden_summary
 from app.notes import count_notes
 from app.ordering import sort_habits
 from app.motivation import nightly_message
@@ -285,6 +285,10 @@ def main(page: ft.Page):
         garden = garden_summary(habits, logs, today)
         plants = []
         for plant in garden["plants"]:
+            days_left = days_to_next_stage(plant["streak"])
+            next_text = ("in full bloom! 🌷" if days_left == 0
+                         else f"next stage in {days_left} day"
+                         + ("s" if days_left != 1 else ""))
             plants.append(ft.Container(
                 content=ft.Column([
                     ft.Text(plant["emoji"], size=56),
@@ -292,6 +296,7 @@ def main(page: ft.Page):
                             weight=ft.FontWeight.BOLD, color=TEXT),
                     ft.Text(f"🌷 {plant['label']} • 🔥 {plant['streak']} days",
                             size=13, color=MUTED),
+                    ft.Text(next_text, size=12, color=PINK),
                     ft.Text(plant["message"], size=12, color=MUTED),
                 ], horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                     spacing=4),

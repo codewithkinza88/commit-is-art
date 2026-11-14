@@ -30,6 +30,18 @@ def growth_stage(streak, done_today=False):
             "message": "A tiny seed, waiting for its first day of care."}
 
 
+def days_to_next_stage(streak):
+    """Days until the plant reaches its next growth stage.
+
+    0 when the plant is already in full bloom (the last stage).
+    """
+    streak = max(0, int(streak or 0))
+    for minimum, _stage, _emoji, _label, _message in reversed(_STAGES):
+        if minimum > streak:
+            return minimum - streak
+    return 0
+
+
 def plant_for(habit, logs, date_str):
     """Full garden entry for one habit on a date."""
     from app.tracker import current_streak, is_done
