@@ -26,7 +26,7 @@ def check(name, condition):
 def test_theme():
     check("background is a soft cream", BG == "#FFF8F0")
     check("cards are nicely rounded", CARD_RADIUS >= 20)
-    check("done card is mint", card_bg("#F9A8D4", done=True) == DONE_BG)
+    check("done card is pink", card_bg("#F9A8D4", done=True) == DONE_BG)
     check("undone card keeps habit colour",
           card_bg("#F9A8D4", done=False).startswith("#F9A8D4"))
     check("undone card falls back to sky", card_bg(None).startswith("#BDE0FE"))

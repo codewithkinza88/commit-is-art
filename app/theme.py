@@ -18,8 +18,8 @@ CREAM = "#FFF3D6"
 BLUSH = "#FBCFE8"
 TEXT = "#5B4B5A"
 MUTED = "#9A8A99"
-DONE_BG = "#E7F9EE"  # soft mint for a ticked-off habit
-DONE_BORDER = "#A8E6C5"
+DONE_BG = "#FDE7F3"  # soft pink for a ticked-off habit
+DONE_BORDER = "#F9A8D4"
 
 # Soft, rounded shapes
 CARD_RADIUS = 22
@@ -48,7 +48,7 @@ PROGRESS_COLOURS = [
 def card_bg(colour, done=False):
     """Soft background for a habit card.
 
-    Done habits get a gentle mint wash so a ticked habit looks
+    Done habits get a gentle pink wash so a ticked habit looks
     finished at a glance; otherwise the habit's own pastel colour
     shows through, softened with a light tint.
     """
