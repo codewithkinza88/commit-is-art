@@ -309,6 +309,10 @@ def main(page: ft.Page):
         if garden["plants"]:
             garden_rows.append(ft.Text(
                 counts_text(garden["counts"]), size=14, color=MUTED))
+            if garden["due_today"]:
+                garden_rows.append(ft.Text(
+                    f"🌱 {garden['due_today']} still to water today",
+                    size=14, color=PINK))
         garden_rows.append(ft.Row(plants, wrap=True, spacing=12))
         return ft.Column(garden_rows, spacing=14)
 

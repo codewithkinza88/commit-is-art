@@ -77,11 +77,15 @@ def empty_garden_message():
 
 
 def garden_summary(habits, logs, date_str):
-    """All plants for a date, plus a count of plants at each stage."""
+    """All plants for a date, plus a count of plants at each stage.
+
+    Also counts how many plants are still due today (not ticked yet).
+    """
     plants = [plant_for(h, logs, date_str) for h in (habits or [])]
     counts = {}
     for plant in plants:
         counts[plant["stage"]] = counts.get(plant["stage"], 0) + 1
+    due_today = sum(1 for plant in plants if not plant["done_today"])
     blooming = counts.get("blooming", 0) + counts.get("full_bloom", 0)
     if not plants:
         message = empty_garden_message()
@@ -91,4 +95,5 @@ def garden_summary(habits, logs, date_str):
         message = f"{blooming} of your plants are blooming! 🌸"
     else:
         message = "Your garden is growing — tick a habit to water it! 💧🌱"
-    return {"plants": plants, "counts": counts, "message": message}
+    return {"plants": plants, "counts": counts, "message": message,
+            "due_today": due_today}

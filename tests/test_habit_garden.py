@@ -111,6 +111,13 @@ def test_garden_stages():
     check("garden summary has one sprout",
           summary["counts"].get("sprout") == 1
           and summary["plants"][0]["label"] == "Sprout")
+    check("due today is zero when the only habit is done",
+          summary["due_today"] == 0)
+    second = new_habit("Read a book", "Books", 30, "📖", "#F9A8D4", "2026-11-07")
+    summary2 = garden_summary(habits + [second], logs, "2026-11-07")
+    check("due today counts undone habits", summary2["due_today"] == 1)
+    check("due today is all when nothing is done",
+          garden_summary(habits + [second], {}, "2026-11-07")["due_today"] == 2)
 
 
 def test_empty_store_and_seed():
