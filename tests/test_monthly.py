@@ -33,6 +33,12 @@ def test_monthly_november():
     check("monthly perfect days is 1", month["perfect_days"] == 1)
     check("monthly best day is 2026-11-07",
           month["best_day_date"] == "2026-11-07")
+    check("minutes by weekday puts 45 on Saturday",
+          month["minutes_by_weekday"]["Sat"] == 45)
+    check("minutes by weekday is zero on Monday",
+          month["minutes_by_weekday"]["Mon"] == 0)
+    check("minutes by weekday adds up to the total",
+          sum(month["minutes_by_weekday"].values()) == month["total_minutes"])
 
 
 def test_monthly_february_leap_year():

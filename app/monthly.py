@@ -25,6 +25,11 @@ def monthly_summary(logs, habits, year, month):
     average_percent = round(sum(d["percent"] for d in days) / len(days)) if days else 0
     perfect_days = sum(1 for d in days if d["total"] and d["percent"] == 100)
     best_day = max(days, key=lambda d: (d["percent"], d["total_minutes"])) if days else None
+    weekday_names = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    minutes_by_weekday = {name: 0 for name in weekday_names}
+    for day in range(1, days_in_month + 1):
+        weekday = date(year, month, day).weekday()
+        minutes_by_weekday[weekday_names[weekday]] += days[day - 1]["total_minutes"]
     return {
         "year": year,
         "month": month,
@@ -35,4 +40,5 @@ def monthly_summary(logs, habits, year, month):
         "perfect_days": perfect_days,
         "best_day": best_day,
         "best_day_date": best_day["date"] if best_day else None,
+        "minutes_by_weekday": minutes_by_weekday,
     }
