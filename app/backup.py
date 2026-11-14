@@ -4,6 +4,15 @@ A backup is one dict with habits, logs and notes, plus the app version.
 """
 
 import json
+from datetime import date
+
+
+def backup_filename(day=None):
+    """Dated filename for a backup, e.g. habit-garden-backup-2026-11-14.json."""
+    day = day or date.today()
+    if isinstance(day, str):
+        day = date.fromisoformat(day)
+    return f"habit-garden-backup-{day.isoformat()}.json"
 
 from app.version import APP_VERSION as VERSION
 

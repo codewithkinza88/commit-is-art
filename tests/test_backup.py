@@ -8,7 +8,8 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from app.backup import backup_to_json, make_backup, restore_from_json  # noqa: E402
+from app.backup import (backup_filename, backup_to_json, make_backup,  # noqa: E402
+                        restore_from_json)
 from app.habits import new_habit  # noqa: E402
 
 PASSED = 0
@@ -43,6 +44,12 @@ def main():
         check("missing keys raises", False)
     except ValueError:
         check("missing keys raises", True)
+    check("dated filename for a given date",
+          backup_filename("2026-11-14") == "habit-garden-backup-2026-11-14.json")
+    check("dated filename ends in .json",
+          backup_filename("2026-11-14").endswith(".json"))
+    check("dated filename defaults to today",
+          backup_filename().startswith("habit-garden-backup-20"))
 
 
 if __name__ == "__main__":
