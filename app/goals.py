@@ -41,3 +41,15 @@ def weekly_goal_progress(logs, habit, weekly_target_minutes, end_date=None):
         "remaining": max(0, target - minutes),
         "met": minutes >= target,
     }
+
+
+def weekly_goal_warning(progress):
+    """Warning line when a weekly goal is not met yet, else ''.
+
+    Takes the dict returned by weekly_goal_progress.
+    """
+    progress = progress or {}
+    if not progress.get("target") or progress.get("met"):
+        return ""
+    remaining = progress.get("remaining", 0)
+    return f"⚠️ {remaining} min left to hit your weekly goal"

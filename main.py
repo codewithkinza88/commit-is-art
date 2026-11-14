@@ -29,7 +29,7 @@ from app.achievements import badges_for
 from app.categories import (
     best_category, total_minutes_by_category)
 from app.monthly import monthly_summary
-from app.goals import weekly_goal_progress
+from app.goals import weekly_goal_progress, weekly_goal_warning
 from app.store import DEFAULT_PATH, load_store, save_store, seed_store
 from app.theme import (
     BG, CARD_RADIUS, CREAM, DONE_BG, DONE_BORDER, GARDEN_CARD_WIDTH,
@@ -342,10 +342,12 @@ def main(page: ft.Page):
             if not target:
                 continue
             progress = weekly_goal_progress(logs, habit, target * 7)
+            warning = weekly_goal_warning(progress)
             goal_rows.append(ft.Text(
                 f"🎯 {habit['name']}: {progress['minutes']}/"
                 f"{progress['target']} min this week "
-                f"({progress['percent']}%)",
+                f"({progress['percent']}%)"
+                + (f" — {warning}" if warning else ""),
                 size=14, color=TEXT))
         if not goal_rows:
             goal_rows.append(ft.Text(
