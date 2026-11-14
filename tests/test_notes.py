@@ -8,7 +8,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from app.notes import MAX_NOTE_LEN, add_note, get_note, has_note  # noqa: E402
+from app.notes import MAX_NOTE_LEN, add_note, count_notes, get_note, has_note  # noqa: E402
 
 PASSED = 0
 
@@ -30,6 +30,9 @@ def main():
     check("trims whitespace", add_note(notes, "h1", "2026-11-11", "  done  ") == "done")
     check("caps long notes", len(add_note(notes, "h1", "2026-11-12", "x" * 500)) == MAX_NOTE_LEN)
     check("blank note clears", add_note(notes, "h1", "2026-11-10", "   ") == "")
+    check("count notes across days", count_notes(notes, "h1") == 2)
+    check("count notes for other habit", count_notes(notes, "h2") == 0)
+    check("count notes with no store", count_notes(None, "h1") == 0)
 
 
 if __name__ == "__main__":

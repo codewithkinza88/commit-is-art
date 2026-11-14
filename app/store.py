@@ -1,7 +1,7 @@
 """Local JSON storage (pure logic, no Flet, no server, no login).
 
 The whole store is one JSON object:
-    {"habits": [...], "logs": {...}}
+    {"habits": [...], "logs": {...}, "notes": {...}}
 
 Default file: habit_garden.json next to the app. It is in .gitignore,
 so real user data is never committed.
@@ -16,7 +16,7 @@ DEFAULT_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)),
 
 
 def empty_store():
-    return {"habits": [], "logs": {}}
+    return {"habits": [], "logs": {}, "notes": {}}
 
 
 def seed_store():
@@ -46,9 +46,11 @@ def load_store(path=DEFAULT_PATH):
         return empty_store()
     habits = data.get("habits")
     logs = data.get("logs")
+    notes = data.get("notes")
     return {
         "habits": habits if isinstance(habits, list) else [],
         "logs": logs if isinstance(logs, dict) else {},
+        "notes": notes if isinstance(notes, dict) else {},
     }
 
 

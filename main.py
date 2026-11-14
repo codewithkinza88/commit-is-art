@@ -20,6 +20,7 @@ from app.habits import (
     get_habit, new_habit,
 )
 from app.garden import counts_text, garden_summary
+from app.notes import count_notes
 from app.ordering import sort_habits
 from app.motivation import nightly_message
 from app.streaks import best_streak
@@ -56,6 +57,7 @@ def main(page: ft.Page):
         save_store(store, DEFAULT_PATH)
     habits = store["habits"]
     logs = store["logs"]
+    notes = store.get("notes", {})
     today = today_str()
     current_view = [0]  # 0 Today, 1 Garden, 2 Tonight
 
@@ -226,6 +228,10 @@ def main(page: ft.Page):
             minutes = minutes_for(logs, habit["id"], today)
             target = habit.get("target_minutes") or 0
             target_text = f"🎯 {target} min" if target else "no target"
+            note_count = count_notes(notes, habit["id"])
+            note_text = (f"📝 {note_count} note" +
+                         ("s" if note_count != 1 else "")
+                         if note_count else "")
             card = ft.Container(
                 content=ft.Row([
                     ft.Checkbox(
@@ -237,7 +243,9 @@ def main(page: ft.Page):
                         ft.Text(f"{habit['category']} • {target_text} • "
                                 f"🔥 {streak} day streak • ⏱️ {minutes} min",
                                 size=13, color=MUTED),
-                        ft.Text(done_label(done), size=12, color=MUTED),
+                        ft.Text(done_label(done) +
+                                (f" • {note_text}" if note_text else ""),
+                                size=12, color=MUTED),
                     ], expand=True, spacing=2),
                     ft.IconButton(icon=ft.Icons.ADD, tooltip="+15 min",
                                   on_click=lambda e, h=habit: _quick_minutes(h)),

@@ -22,3 +22,14 @@ def get_note(notes, habit_id, date_str):
 def has_note(notes, habit_id, date_str):
     """True when a non-empty note exists for the habit on that date."""
     return bool(get_note(notes, habit_id, date_str).strip())
+
+
+def count_notes(notes, habit_id):
+    """How many non-empty notes a habit has across all dates."""
+    total = 0
+    for day_notes in (notes or {}).values():
+        if isinstance(day_notes, dict):
+            text = day_notes.get(habit_id, "")
+            if isinstance(text, str) and text.strip():
+                total += 1
+    return total
