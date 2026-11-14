@@ -20,6 +20,7 @@ from app.habits import (
     get_habit, new_habit,
 )
 from app.garden import counts_text, days_to_next_stage, garden_summary
+from app.insights import consistency_message, consistency_score
 from app.notes import count_notes
 from app.ordering import sort_habits
 from app.motivation import nightly_message
@@ -324,6 +325,10 @@ def main(page: ft.Page):
     def tonight_view():
         summary = daily_summary(logs, habits, today)
         week = last_7_days(logs, habits)
+        week_dates = [d["date"] for d in week]
+        consistency = consistency_score(logs, habits, week_dates)
+        consistency_text = (f"💪 Consistency (last 7 days): {consistency}% — "
+                            f"{consistency_message(consistency)}")
         message = nightly_message(summary)
         longest_streak = max(
             (best_streak(logs, habit) for habit in habits), default=0)
@@ -403,6 +408,7 @@ def main(page: ft.Page):
                             size=15, color=MUTED),
                     ft.Text(f"🔥 Longest streak ever: {longest_streak} days",
                             size=15, color=MUTED),
+                    ft.Text(consistency_text, size=15, color=MUTED),
                 ], spacing=6),
                 bgcolor=CREAM, border=ft.Border.all(1, PEACH),
                 border_radius=CARD_RADIUS, padding=18),

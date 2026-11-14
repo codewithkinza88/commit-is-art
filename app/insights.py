@@ -33,3 +33,17 @@ def needs_attention(logs, habits, date_strs):
         if worst_rate is None or rate < worst_rate:
             worst, worst_rate = h, rate
     return worst
+
+
+def consistency_message(score):
+    """Warm one-liner for a consistency score (0-100)."""
+    score = max(0, min(100, int(score or 0)))
+    if score >= 90:
+        return "Amazingly consistent! 🌸"
+    if score >= 70:
+        return "Really steady — keep it up! 🌷"
+    if score >= 50:
+        return "Halfway there — a little push! 🌱"
+    if score >= 1:
+        return "A slow week — tomorrow is fresh 💧"
+    return "No ticks yet this week — plant one today 🌱"

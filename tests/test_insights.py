@@ -9,7 +9,8 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.habits import new_habit  # noqa: E402
-from app.insights import consistency_score, needs_attention  # noqa: E402
+from app.insights import (consistency_message, consistency_score,  # noqa: E402
+                          needs_attention)
 from app.tracker import set_done  # noqa: E402
 
 PASSED = 0
@@ -37,6 +38,9 @@ def main():
     check("empty days", consistency_score(logs, habits, []) == 0)
     check("needs attention is water", needs_attention(logs, habits, days) is b)
     check("no habits is None", needs_attention(logs, [], days) is None)
+    check("perfect consistency message", "Amazingly" in consistency_message(100))
+    check("steady consistency message", "steady" in consistency_message(75))
+    check("no ticks message", "No ticks" in consistency_message(0))
 
 
 if __name__ == "__main__":
