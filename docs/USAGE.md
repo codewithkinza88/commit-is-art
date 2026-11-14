@@ -16,6 +16,8 @@ A cute daily routine for your habits — morning, day, and night.
 ## During the day ✅ — tick and log
 
 - When you finish a habit, **tick it off** for today. Unticking undoes it.
+  A ticked habit turns soft pink, and its card shows how many notes it
+  has and when you last did it.
 - For study and reading habits, log your time too: tap **+15 min** or
   enter minutes. Reaching your daily target counts as done, even
   without a tick.
@@ -30,6 +32,8 @@ today:
 - Habits done out of total, and your % achieved
 - Total minutes studied / read, and minutes per habit
 - Your streaks, and your best habit of the day
+- Your 7-day consistency score, and a warning if a weekly goal still
+  has minutes left
 - A simple last-7-days view, one % per day
 
 Be kind to yourself: a small % today is still a seed planted. 🌱

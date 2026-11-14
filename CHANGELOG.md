@@ -2,6 +2,23 @@
 
 All notable changes to Habit Garden are listed here.
 
+## 2026-11-14
+
+### Today (14 November)
+- Today cards show how many notes each habit has, and when it was last
+  done ("Done today 🌸" / "Last done N days ago" / "Not done yet 🌱").
+- Garden tab counts habits still due today, and each plant shows how
+  many days until its next stage.
+- Backups get a dated filename: `habit-garden-backup-YYYY-MM-DD.json`.
+- Completed habit cards now have a soft pink shade instead of mint.
+- Tonight shows your 7-day consistency score, and warns when a weekly
+  goal still has minutes left ("⚠️ N min left to hit your weekly goal").
+- Monthly summary breaks minutes down by weekday (Mon–Sun).
+
+Tests: 217 plain-script checks passing across 19 test files
+(`for f in tests/test_*.py; do python3 "$f"; done`, with
+tests/test_ui_api.py run under .venv for Flet).
+
 ## 2026-11-12
 
 ### Today (12 November)
