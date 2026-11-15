@@ -1,5 +1,7 @@
 """Validation for habit names and minutes (pure logic, no Flet)."""
 
+from app.habits import ICONS
+
 MAX_NAME_LEN = 60
 MAX_MINUTES = 1440  # a whole day
 
@@ -12,6 +14,11 @@ def validate_habit_name(name):
     if len(clean) > MAX_NAME_LEN:
         return False, clean[:MAX_NAME_LEN], "Habit name is too long"
     return True, clean, ""
+
+
+def validate_icon(icon):
+    """The icon itself when it is one of the app icons, else a seedling."""
+    return icon if icon in ICONS else "🌱"
 
 
 def validate_minutes(value):
