@@ -9,6 +9,7 @@ A habit is a plain dict:
         "icon": "📚",                     # emoji chosen by the user
         "colour": "#F9A8D4",             # pastel colour chosen by the user
         "created_date": "2026-11-07",    # ISO date YYYY-MM-DD
+        "archived": False,               # True when parked (hidden, not deleted)
     }
 """
 
@@ -45,6 +46,7 @@ def new_habit(name, category="Daily Life", target_minutes=0, icon="🌱",
         "icon": icon if icon in ICONS else "🌱",
         "colour": colour if colour in COLOURS else "#BDE0FE",
         "created_date": created_date or date.today().isoformat(),
+        "archived": False,
     }
 
 
@@ -97,6 +99,24 @@ def delete_habit(habits, habit_id):
             del habits[i]
             return True
     return False
+
+
+def archive_habit(habits, habit_id):
+    """Park a habit (hide it without deleting it). Returns the habit or None."""
+    habit = get_habit(habits, habit_id)
+    if habit is None:
+        return None
+    habit["archived"] = True
+    return habit
+
+
+def active_habits(habits):
+    """Habits that are not archived, in display order.
+
+    Habits saved before archiving existed have no "archived" key
+    and count as active.
+    """
+    return [h for h in (habits or []) if not h.get("archived", False)]
 
 
 def list_habits(habits):
