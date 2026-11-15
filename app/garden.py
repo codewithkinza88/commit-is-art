@@ -61,6 +61,18 @@ def plant_for(habit, logs, date_str):
     }
 
 
+def next_habit_to_water(habits, logs, date_str):
+    """First habit (in creation order) not yet done on a date.
+
+    Returns None when every habit is done (or there are no habits).
+    """
+    from app.tracker import is_done
+    for habit in (habits or []):
+        if not is_done(logs, habit, date_str):
+            return habit
+    return None
+
+
 def counts_text(counts):
     """One short line of how many plants sit at each stage.
 
@@ -98,6 +110,8 @@ def garden_summary(habits, logs, date_str):
     for plant in plants:
         counts[plant["stage"]] = counts.get(plant["stage"], 0) + 1
     due_today = sum(1 for plant in plants if not plant["done_today"])
+    done_count = len(plants) - due_today
+    percent_done = round(100 * done_count / len(plants)) if plants else 0
     blooming = counts.get("blooming", 0) + counts.get("full_bloom", 0)
     if not plants:
         message = empty_garden_message()
@@ -108,4 +122,4 @@ def garden_summary(habits, logs, date_str):
     else:
         message = "Your garden is growing — tick a habit to water it! 💧🌱"
     return {"plants": plants, "counts": counts, "message": message,
-            "due_today": due_today}
+            "due_today": due_today, "percent_done": percent_done}
