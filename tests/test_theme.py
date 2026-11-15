@@ -9,8 +9,8 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.theme import (  # noqa: E402
-    BG, CARD_RADIUS, DONE_BG, card_bg, done_label, progress_colour,
-    stage_colour,
+    BG, CARD_RADIUS, DONE_BG, SKY, card_bg, category_colour, done_label,
+    progress_colour, stage_colour,
 )
 
 PASSED = 0
@@ -39,6 +39,12 @@ def test_theme():
           stage_colour("mystery") == "#E8F5E9")
     check("done label is cute", done_label(True) == "Done 🌸")
     check("not-yet label is gentle", done_label(False) == "Not yet 🌱")
+    check("study has its own colour", category_colour("Study") == "#A5D8FF")
+    check("all five categories have colours",
+          all(category_colour(c)
+              for c in ["Study", "Books", "Health", "Mind", "Daily Life"]))
+    check("unknown category falls back to sky",
+          category_colour("Mystery") == SKY)
 
 
 if __name__ == "__main__":

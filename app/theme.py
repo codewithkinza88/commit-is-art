@@ -45,6 +45,21 @@ PROGRESS_COLOURS = [
 ]
 
 
+# Category colours — one soft tint per category
+CATEGORY_COLOURS = {
+    "Study": "#A5D8FF",
+    "Books": "#F9A8D4",
+    "Health": "#C8F7C5",
+    "Mind": "#E4C1F9",
+    "Daily Life": "#FFD6A5",
+}
+
+
+def category_colour(category):
+    """Soft tint for a category chip (SKY when the category is unknown)."""
+    return CATEGORY_COLOURS.get(category, SKY)
+
+
 def card_bg(colour, done=False):
     """Soft background for a habit card.
 
