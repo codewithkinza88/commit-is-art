@@ -19,12 +19,12 @@ from app.habits import (
     CATEGORIES, COLOURS, ICONS, add_habit, delete_habit, edit_habit,
     get_habit, new_habit,
 )
-from app.garden import counts_text, days_to_next_stage, garden_summary
+from app.garden import counts_text, days_to_next_stage, garden_summary, next_habit_to_water
 from app.insights import consistency_message, consistency_score
-from app.notes import count_notes
+from app.notes import count_notes, latest_note
 from app.ordering import sort_habits
 from app.motivation import nightly_message
-from app.streaks import best_streak, last_done_label
+from app.streaks import last_done_label, longest_streak_overall
 from app.achievements import badges_for
 from app.categories import (
     best_category, total_minutes_by_category)
@@ -34,12 +34,13 @@ from app.store import DEFAULT_PATH, load_store, save_store, seed_store
 from app.theme import (
     BG, CARD_RADIUS, CREAM, DONE_BG, DONE_BORDER, GARDEN_CARD_WIDTH,
     LIGHT_PINK, LILAC, MINT, MUTED, PEACH, PINK, PROGRESS_HEIGHT, SKY, TEXT,
-    card_bg, done_label, progress_colour, stage_colour,
+    card_bg, category_colour, done_label, progress_colour, stage_colour,
 )
+from app.validation import validate_icon
 from app.version import APP_NAME, APP_VERSION
 from app.tracker import (
     current_streak, daily_summary, is_done, last_7_days, log_minutes,
-    minutes_for, set_done, today_str,
+    minutes_for, set_done, today_str, total_minutes_today,
 )
 
 # Pastel palette — soft, cute, friendly 🌸 (see app/theme.py)
@@ -109,14 +110,14 @@ def main(page: ft.Page):
                     return
                 edit_habit(habits, habit["id"], name=name_field.value,
                            category=category_field.value,
-                           target_minutes=target, icon=icon_field.value,
+                           target_minutes=target, icon=validate_icon(icon_field.value),
                            colour=colour_field.value)
                 snack("Habit updated! 💕")
             else:
                 try:
                     add_habit(habits, new_habit(
                         name_field.value, category_field.value, target,
-                        icon_field.value, colour_field.value, today))
+                        validate_icon(icon_field.value), colour_field.value, today))
                 except ValueError:
                     snack("Please give your habit a name first 🌱")
                     return
@@ -212,7 +213,7 @@ def main(page: ft.Page):
                     size=14, color=PINK),
             ft.Text(f"{summary['done']} of {summary['total']} habits done "
                     f"• {summary['percent']}% • "
-                    f"{summary['total_minutes']} min logged",
+                    f"⏱ {total_minutes_today(logs, habits, today)} min today",
                     size=14, color=MUTED),
             ft.ProgressBar(value=summary["percent"] / 100,
                            color=progress_colour(summary["percent"]),
@@ -233,6 +234,9 @@ def main(page: ft.Page):
             note_text = (f"📝 {note_count} note" +
                          ("s" if note_count != 1 else "")
                          if note_count else "")
+            _latest_date, latest_text = latest_note(notes, habit["id"])
+            latest_preview = (f" • “{latest_text[:40]}”"
+                              if latest_text else "")
             card = ft.Container(
                 content=ft.Row([
                     ft.Checkbox(
@@ -241,12 +245,22 @@ def main(page: ft.Page):
                     ft.Column([
                         ft.Text(f"{habit['icon']}  {habit['name']}",
                                 size=16, weight=ft.FontWeight.BOLD, color=TEXT),
-                        ft.Text(f"{habit['category']} • {target_text} • "
-                                f"🔥 {streak} day streak • ⏱️ {minutes} min",
-                                size=13, color=MUTED),
+                        ft.Row([
+                            ft.Container(
+                                content=ft.Text(habit["category"], size=11,
+                                                color=TEXT),
+                                bgcolor=category_colour(habit["category"]),
+                                border_radius=10,
+                                padding=ft.padding.symmetric(horizontal=8,
+                                                             vertical=2)),
+                            ft.Text(f"{target_text} • "
+                                    f"🔥 {streak} day streak • ⏱️ {minutes} min",
+                                    size=13, color=MUTED),
+                        ], spacing=6),
                         ft.Text(done_label(done) +
                                 (f" • {note_text}" if note_text else "") +
-                                f" • {last_done_label(logs, habit)}",
+                                f" • {last_done_label(logs, habit)}" +
+                                latest_preview,
                                 size=12, color=MUTED),
                     ], expand=True, spacing=2),
                     ft.IconButton(icon=ft.Icons.ADD, tooltip="+15 min",
@@ -316,10 +330,18 @@ def main(page: ft.Page):
         if garden["plants"]:
             garden_rows.append(ft.Text(
                 counts_text(garden["counts"]), size=14, color=MUTED))
+            garden_rows.append(ft.Text(
+                f"🌸 {garden['percent_done']}% watered today",
+                size=14, color=PINK))
             if garden["due_today"]:
                 garden_rows.append(ft.Text(
                     f"🌱 {garden['due_today']} still to water today",
                     size=14, color=PINK))
+            next_habit = next_habit_to_water(habits, logs, today)
+            garden_rows.append(ft.Text(
+                f"Next to water: {next_habit['icon']} {next_habit['name']}"
+                if next_habit else "All watered! 🌸",
+                size=14, color=PINK))
         garden_rows.append(ft.Row(plants, wrap=True, spacing=12))
         return ft.Column(garden_rows, spacing=14)
 
@@ -331,8 +353,7 @@ def main(page: ft.Page):
         consistency_text = (f"💪 Consistency (last 7 days): {consistency}% — "
                             f"{consistency_message(consistency)}")
         message = nightly_message(summary)
-        longest_streak = max(
-            (best_streak(logs, habit) for habit in habits), default=0)
+        longest_streak = longest_streak_overall(logs, habits)
         badges = badges_for(logs, habits, today)
         badges_text = (", ".join(
             f"{b['emoji']} {b['label']}" for b in badges)
@@ -409,7 +430,7 @@ def main(page: ft.Page):
                             f"{summary['best_habit'] or '—'} "
                             f"({summary['best_minutes']} min)",
                             size=15, color=MUTED),
-                    ft.Text(f"🔥 Longest streak ever: {longest_streak} days",
+                    ft.Text(f"Longest streak: {longest_streak} days 🌳",
                             size=15, color=MUTED),
                     ft.Text(consistency_text, size=15, color=MUTED),
                 ], spacing=6),

@@ -12,7 +12,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from app.habits import new_habit  # noqa: E402
 from app.tracker import set_done  # noqa: E402
 from app.streaks import (best_streak, days_since_last_done,  # noqa: E402
-                         last_done_label, streak_summary)
+                         last_done_label, longest_streak_overall,
+                         streak_summary)
 
 PASSED = 0
 
@@ -67,9 +68,25 @@ def test_last_done_label():
           last_done_label({}, habit, date(2026, 11, 7)) == "Not done yet 🌱")
 
 
+def test_longest_streak_overall():
+    h1 = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
+    h2 = new_habit("Read", "Books", 0, "📖", "#F9A8D4", "2026-11-01")
+    logs = {}
+    for day in ("2026-11-01", "2026-11-02", "2026-11-03"):
+        set_done(logs, h1["id"], day, True)
+    set_done(logs, h2["id"], "2026-11-03", True)
+    check("longest streak across habits is 3",
+          longest_streak_overall(logs, [h1, h2], date(2026, 11, 3)) == 3)
+    check("longest streak with no habits is 0",
+          longest_streak_overall(logs, [], date(2026, 11, 3)) == 0)
+    check("longest streak with no logs is 0",
+          longest_streak_overall({}, [h1, h2], date(2026, 11, 3)) == 0)
+
+
 if __name__ == "__main__":
     test_best_streak()
     test_days_since_last_done()
     test_streak_summary()
     test_last_done_label()
+    test_longest_streak_overall()
     print(f"{PASSED} tests passed")
