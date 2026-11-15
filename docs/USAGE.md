@@ -17,7 +17,10 @@ A cute daily routine for your habits — morning, day, and night.
 
 - When you finish a habit, **tick it off** for today. Unticking undoes it.
   A ticked habit turns soft pink, and its card shows how many notes it
-  has and when you last did it.
+  has, your latest note, and when you last did it. Each card also has
+  a little coloured chip for its category.
+- The Today header shows your total minutes for the day
+  ("⏱ N min today").
 - For study and reading habits, log your time too: tap **+15 min** or
   enter minutes. Reaching your daily target counts as done, even
   without a tick.
@@ -31,7 +34,8 @@ today:
 
 - Habits done out of total, and your % achieved
 - Total minutes studied / read, and minutes per habit
-- Your streaks, and your best habit of the day
+- Your streaks, your longest streak across all habits, and your best
+  habit of the day
 - Your 7-day consistency score, and a warning if a weekly goal still
   has minutes left
 - A simple last-7-days view, one % per day
@@ -55,4 +59,8 @@ will bloom. 💧
 
 The Garden tab also shows a count line, e.g. "🌱 2 seeds • 🌿 1
 sprout • 🌸 1 blooming", so you can see at a glance how many plants
-sit at each stage.
+sit at each stage. It also tells you the next habit to water, and
+how much of the garden is watered today ("🌸 N% watered today").
+
+A habit you are taking a break from can be archived instead of
+deleted — it hides from the garden but its history stays safe.

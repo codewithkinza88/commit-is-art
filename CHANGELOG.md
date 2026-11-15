@@ -2,6 +2,29 @@
 
 All notable changes to Habit Garden are listed here.
 
+## 2026-11-15
+
+### Today (15 November)
+- Tonight shows your longest streak across all habits
+  ("Longest streak: N days 🌳").
+- Today header shows total minutes for the day ("⏱ N min today").
+- Garden tab shows the next habit to water ("Next to water: 📚 Study")
+  or "All watered! 🌸" when everything is done, plus how much of the
+  garden is watered ("🌸 N% watered today").
+- Today cards preview your latest note, and each category has its own
+  coloured chip (Study sky, Books pink, Health mint, Mind lilac,
+  Daily Life peach).
+- Habits can be archived instead of deleted (`archive_habit` /
+  `active_habits` in app/habits.py); new habits start unarchived.
+- Icons are validated when saving a habit — an unknown icon falls back
+  to 🌱.
+- New helper: which habits are due before the week ends
+  (`due_this_week` in app/schedule.py).
+
+Tests: 246 plain-script checks passing across 19 test files
+(`for f in tests/test_*.py; do python3 "$f"; done`, with
+tests/test_ui_api.py run under .venv for Flet).
+
 ## 2026-11-14
 
 ### Today (14 November)
