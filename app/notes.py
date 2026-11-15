@@ -24,6 +24,22 @@ def has_note(notes, habit_id, date_str):
     return bool(get_note(notes, habit_id, date_str).strip())
 
 
+def latest_note(notes, habit_id):
+    """(date, text) of the habit's most recent non-empty note.
+
+    Returns ("", "") when the habit has no notes.
+    """
+    latest_date = ""
+    latest_text = ""
+    for date_str, day_notes in (notes or {}).items():
+        if not isinstance(day_notes, dict):
+            continue
+        text = day_notes.get(habit_id, "")
+        if isinstance(text, str) and text.strip() and date_str > latest_date:
+            latest_date, latest_text = date_str, text
+    return latest_date, latest_text
+
+
 def count_notes(notes, habit_id):
     """How many non-empty notes a habit has across all dates."""
     total = 0

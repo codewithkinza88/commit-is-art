@@ -8,7 +8,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from app.notes import MAX_NOTE_LEN, add_note, count_notes, get_note, has_note  # noqa: E402
+from app.notes import MAX_NOTE_LEN, add_note, count_notes, get_note, has_note, latest_note  # noqa: E402
 
 PASSED = 0
 
@@ -35,6 +35,21 @@ def main():
     check("count notes with no store", count_notes(None, "h1") == 0)
 
 
+def test_latest_note():
+    notes = {}
+    add_note(notes, "h1", "2026-11-10", "Read chapter 3")
+    add_note(notes, "h1", "2026-11-12", "Finished chapter 4")
+    add_note(notes, "h1", "2026-11-11", "Mid note")
+    check("latest note is the newest",
+          latest_note(notes, "h1") == ("2026-11-12", "Finished chapter 4"))
+    add_note(notes, "h1", "2026-11-13", "   ")
+    check("latest note skips blank notes",
+          latest_note(notes, "h1") == ("2026-11-12", "Finished chapter 4"))
+    check("latest note with no notes is empty",
+          latest_note(notes, "h2") == ("", ""))
+
+
 if __name__ == "__main__":
     main()
+    test_latest_note()
     print(f"{PASSED} tests passed")
