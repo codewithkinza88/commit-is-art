@@ -11,14 +11,15 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.habits import (  # noqa: E402
     new_habit, add_habit, edit_habit, delete_habit, get_habit,
+    archive_habit, active_habits,
 )
 from app.tracker import (  # noqa: E402
     set_done, toggle_done, log_minutes, is_done, minutes_for,
-    current_streak, daily_summary, last_7_days,
+    total_minutes_today, current_streak, daily_summary, last_7_days,
 )
 from app.garden import (  # noqa: E402
     counts_text, days_to_next_stage, growth_stage, garden_summary,
-    empty_garden_message)
+    empty_garden_message, next_habit_to_water)
 from app.store import empty_store, seed_store, load_store, save_store  # noqa: E402
 
 PASSED = 0
@@ -163,6 +164,70 @@ def test_empty_garden_message():
           message == garden_summary([], {}, "2026-11-07")["message"])
 
 
+def test_total_minutes_today():
+    habits = [
+        new_habit("Study — DSA", "Study", 60, "📚", "#A5D8FF", "2026-11-05"),
+        new_habit("Read a book", "Books", 30, "📖", "#F9A8D4", "2026-11-05"),
+    ]
+    logs = {}
+    log_minutes(logs, habits[0]["id"], "2026-11-07", 45)
+    log_minutes(logs, habits[1]["id"], "2026-11-07", 20)
+    check("total minutes today sums habits",
+          total_minutes_today(logs, habits, "2026-11-07") == 65)
+    check("total minutes today is 0 on an empty day",
+          total_minutes_today(logs, habits, "2026-11-08") == 0)
+    check("total minutes today is 0 with no habits",
+          total_minutes_today(logs, [], "2026-11-07") == 0)
+
+
+def test_next_habit_to_water():
+    habits = [
+        new_habit("Study — DSA", "Study", 60, "📚", "#A5D8FF", "2026-11-05"),
+        new_habit("Read a book", "Books", 30, "📖", "#F9A8D4", "2026-11-05"),
+    ]
+    logs = {}
+    check("next to water is the first habit",
+          next_habit_to_water(habits, logs, "2026-11-07") is habits[0])
+    set_done(logs, habits[0]["id"], "2026-11-07", True)
+    check("next to water skips done habits",
+          next_habit_to_water(habits, logs, "2026-11-07") is habits[1])
+    set_done(logs, habits[1]["id"], "2026-11-07", True)
+    check("next to water is None when all done",
+          next_habit_to_water(habits, logs, "2026-11-07") is None)
+
+
+def test_archive_habit():
+    habits = [
+        new_habit("Study — DSA", "Study", 60, "📚", "#A5D8FF", "2026-11-07"),
+        new_habit("Read a book", "Books", 30, "📖", "#F9A8D4", "2026-11-07"),
+    ]
+    check("new habits are not archived", habits[0].get("archived") is False)
+    check("archive_habit archives and returns the habit",
+          archive_habit(habits, habits[0]["id"]) is habits[0]
+          and habits[0]["archived"] is True)
+    check("active_habits hides archived ones",
+          active_habits(habits) == [habits[1]])
+    check("archive_habit unknown id returns None",
+          archive_habit(habits, "nope") is None)
+    check("habits saved before archiving count as active",
+          active_habits([{"id": "old", "name": "Old habit"}])[0]["id"] == "old")
+
+
+def test_garden_percent_done():
+    habits = [
+        new_habit("Study — DSA", "Study", 60, "📚", "#A5D8FF", "2026-11-07"),
+        new_habit("Read a book", "Books", 30, "📖", "#F9A8D4", "2026-11-07"),
+    ]
+    logs = {}
+    check("percent done is 0 with nothing done",
+          garden_summary(habits, logs, "2026-11-07")["percent_done"] == 0)
+    set_done(logs, habits[0]["id"], "2026-11-07", True)
+    check("percent done is 50 with one of two done",
+          garden_summary(habits, logs, "2026-11-07")["percent_done"] == 50)
+    check("percent done is 0 with no plants",
+          garden_summary([], {}, "2026-11-07")["percent_done"] == 0)
+
+
 if __name__ == "__main__":
     test_add_edit_delete_habit()
     test_tick_and_minutes()
@@ -171,4 +236,8 @@ if __name__ == "__main__":
     test_garden_counts_text()
     test_empty_store_and_seed()
     test_empty_garden_message()
+    test_total_minutes_today()
+    test_next_habit_to_water()
+    test_archive_habit()
+    test_garden_percent_done()
     print(f"{PASSED} tests passed")

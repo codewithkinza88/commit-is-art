@@ -55,6 +55,12 @@ def minutes_for(logs, habit_id, date_str):
     return int(logs.get(date_str, {}).get(habit_id, {}).get("minutes", 0) or 0)
 
 
+def total_minutes_today(logs, habits, date_str):
+    """Total minutes logged across all habits on a date (0 when none)."""
+    return sum(minutes_for(logs, habit["id"], date_str)
+               for habit in (habits or []))
+
+
 def is_done(logs, habit, date_str):
     """True if the habit is ticked, or its minutes reached its target."""
     entry = logs.get(date_str, {}).get(habit["id"])
