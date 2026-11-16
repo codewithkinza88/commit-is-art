@@ -9,7 +9,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.habits import new_habit  # noqa: E402
-from app.search import count_matches, find_habits  # noqa: E402
+from app.search import count_matches, find_habits, find_habits_by_icon  # noqa: E402
 
 PASSED = 0
 
@@ -34,6 +34,12 @@ def main():
     check("blank query returns all", len(find_habits(habits, "  ")) == 3)
     check("count matches", count_matches(habits, "study") == 1)
     check("empty list", find_habits([], "study") == [])
+    check("find by icon returns the matching habit",
+          [h["name"] for h in find_habits_by_icon(habits, "📚")] == ["Study - DSA"])
+    check("find by icon with no match is empty",
+          find_habits_by_icon(habits, "🚀") == [])
+    check("find by icon on an empty list is empty",
+          find_habits_by_icon([], "📚") == [])
 
 
 if __name__ == "__main__":

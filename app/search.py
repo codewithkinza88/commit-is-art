@@ -16,3 +16,9 @@ def find_habits(habits, query):
 def count_matches(habits, query):
     """How many habits match the query."""
     return len(find_habits(habits, query))
+
+
+def find_habits_by_icon(habits, icon):
+    """Habits using a given icon, in their original order."""
+    return [h for h in (habits or []) if h.get("icon") == icon]
+
