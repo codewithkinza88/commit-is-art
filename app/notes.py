@@ -49,3 +49,15 @@ def count_notes(notes, habit_id):
             if isinstance(text, str) and text.strip():
                 total += 1
     return total
+
+
+def notes_for_day(notes, date_str):
+    """Non-empty notes for one date, as (habit_id, text) pairs.
+
+    In the order they were stored; [] when the date has no notes.
+    """
+    day_notes = (notes or {}).get(date_str, {})
+    if not isinstance(day_notes, dict):
+        return []
+    return [(habit_id, text) for habit_id, text in day_notes.items()
+            if isinstance(text, str) and text.strip()]
