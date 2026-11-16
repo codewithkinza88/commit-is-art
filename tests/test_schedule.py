@@ -9,7 +9,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.habits import new_habit  # noqa: E402
-from app.schedule import due_this_week, habits_due_on, weekday_name  # noqa: E402
+from app.schedule import due_this_week, habits_due_on, is_due_today, weekday_name  # noqa: E402
 
 PASSED = 0
 
@@ -54,7 +54,20 @@ def test_due_this_week():
           due_this_week(habits, 6) == [daily, weekend])
 
 
+def test_is_due_today():
+    daily = new_habit("Drink water", "Health", 0, "💧", "#BDE0FE", "2026-11-01")
+    weekday_only = new_habit("Study - DSA", "Study", 60, "📚", "#A5D8FF", "2026-11-01")
+    weekday_only["days"] = [0, 1, 2, 3, 4]  # Mon-Fri
+    check("a habit with no days is due every day",
+          is_due_today(daily, 5) is True)
+    check("a Mon-Fri habit is due on Monday",
+          is_due_today(weekday_only, 0) is True)
+    check("a Mon-Fri habit is not due on Saturday",
+          is_due_today(weekday_only, 5) is False)
+
+
 if __name__ == "__main__":
     main()
     test_due_this_week()
+    test_is_due_today()
     print(f"{PASSED} tests passed")

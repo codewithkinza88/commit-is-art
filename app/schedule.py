@@ -19,6 +19,17 @@ def habits_due_on(habits, weekday):
     return due
 
 
+def is_due_today(habit, weekday):
+    """True when the habit is due on weekday (0=Mon .. 6=Sun).
+
+    A habit without a "days" list is due every day.
+    """
+    days = (habit or {}).get("days")
+    if not days:
+        return True
+    return weekday in days
+
+
 def due_this_week(habits, weekday):
     """Habits due on any day from weekday through Sunday.
 
@@ -34,6 +45,7 @@ def due_this_week(habits, weekday):
         elif any(day >= weekday for day in days):
             due.append(h)
     return due
+
 
 
 def weekday_name(weekday):
