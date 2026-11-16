@@ -60,6 +60,11 @@ def total_minutes_today(logs, habits, date_str):
     return sum(minutes_for(logs, habit["id"], date_str)
                for habit in (habits or []))
 
+def done_count_today(logs, habits, date_str):
+    """How many habits are done on a date (0 when none)."""
+    return sum(1 for habit in (habits or [])
+               if is_done(logs, habit, date_str))
+
 
 def is_done(logs, habit, date_str):
     """True if the habit is ticked, or its minutes reached its target."""

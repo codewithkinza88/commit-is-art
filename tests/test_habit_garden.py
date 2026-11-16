@@ -11,15 +11,16 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.habits import (  # noqa: E402
     new_habit, add_habit, edit_habit, delete_habit, get_habit,
-    archive_habit, active_habits,
+    archive_habit, active_habits, habits_by_category,
 )
 from app.tracker import (  # noqa: E402
     set_done, toggle_done, log_minutes, is_done, minutes_for,
-    total_minutes_today, current_streak, daily_summary, last_7_days,
+    total_minutes_today, done_count_today, current_streak, daily_summary,
+    last_7_days,
 )
 from app.garden import (  # noqa: E402
     counts_text, days_to_next_stage, growth_stage, garden_summary,
-    empty_garden_message, next_habit_to_water)
+    empty_garden_message, next_habit_to_water, plants_by_stage)
 from app.store import empty_store, seed_store, load_store, save_store  # noqa: E402
 
 PASSED = 0
@@ -213,6 +214,51 @@ def test_archive_habit():
           active_habits([{"id": "old", "name": "Old habit"}])[0]["id"] == "old")
 
 
+def test_done_count_today():
+    habits = [
+        new_habit("Study — DSA", "Study", 60, "📚", "#A5D8FF", "2026-11-07"),
+        new_habit("Read a book", "Books", 30, "📖", "#F9A8D4", "2026-11-07"),
+    ]
+    logs = {}
+    check("done count is 0 with nothing done",
+          done_count_today(logs, habits, "2026-11-07") == 0)
+    set_done(logs, habits[0]["id"], "2026-11-07", True)
+    check("done count is 1 with one habit done",
+          done_count_today(logs, habits, "2026-11-07") == 1)
+    check("done count is 0 on an empty day",
+          done_count_today(logs, habits, "2026-11-08") == 0)
+
+
+def test_plants_by_stage():
+    habits = [
+        new_habit("Study — DSA", "Study", 60, "📚", "#A5D8FF", "2026-11-05"),
+        new_habit("Read a book", "Books", 30, "📖", "#F9A8D4", "2026-11-05"),
+    ]
+    logs = {}
+    check("plants by stage are seeds with nothing done",
+          plants_by_stage(habits, logs, "2026-11-07") == {"seed": 2})
+    set_done(logs, habits[0]["id"], "2026-11-07", True)
+    check("plants by stage splits done and undone",
+          plants_by_stage(habits, logs, "2026-11-07") == {"sprout": 1, "seed": 1})
+    check("plants by stage is empty with no habits",
+          plants_by_stage([], {}, "2026-11-07") == {})
+
+
+def test_habits_by_category():
+    habits = [
+        new_habit("Study — DSA", "Study", 60, "📚", "#A5D8FF", "2026-11-07"),
+        new_habit("Read a book", "Books", 30, "📖", "#F9A8D4", "2026-11-07"),
+        new_habit("Revise notes", "Study", 30, "✍️", "#FFE5A3", "2026-11-07"),
+    ]
+    check("habits by category returns both Study habits",
+          [h["name"] for h in habits_by_category(habits, "Study")]
+          == ["Study — DSA", "Revise notes"])
+    check("habits by category with no match is empty",
+          habits_by_category(habits, "Health") == [])
+    check("habits by category on an empty list is empty",
+          habits_by_category([], "Study") == [])
+
+
 def test_garden_percent_done():
     habits = [
         new_habit("Study — DSA", "Study", 60, "📚", "#A5D8FF", "2026-11-07"),
@@ -240,4 +286,7 @@ if __name__ == "__main__":
     test_next_habit_to_water()
     test_archive_habit()
     test_garden_percent_done()
+    test_done_count_today()
+    test_plants_by_stage()
+    test_habits_by_category()
     print(f"{PASSED} tests passed")
