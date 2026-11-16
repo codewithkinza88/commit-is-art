@@ -73,6 +73,18 @@ def next_habit_to_water(habits, logs, date_str):
     return None
 
 
+def plants_by_stage(habits, logs, date_str):
+    """How many plants sit at each growth stage on a date.
+
+    Only stages with at least one plant are included.
+    """
+    counts = {}
+    for habit in (habits or []):
+        stage = plant_for(habit, logs, date_str)["stage"]
+        counts[stage] = counts.get(stage, 0) + 1
+    return counts
+
+
 def counts_text(counts):
     """One short line of how many plants sit at each stage.
 
