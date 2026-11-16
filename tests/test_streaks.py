@@ -13,7 +13,7 @@ from app.habits import new_habit  # noqa: E402
 from app.tracker import set_done  # noqa: E402
 from app.streaks import (best_streak, days_since_last_done,  # noqa: E402
                          last_done_label, longest_streak_overall,
-                         streak_summary)
+                         streak_summary, average_streak)
 
 PASSED = 0
 
@@ -83,8 +83,24 @@ def test_longest_streak_overall():
           longest_streak_overall({}, [h1, h2], date(2026, 11, 3)) == 0)
 
 
+def test_average_streak():
+    h1 = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
+    h2 = new_habit("Read", "Books", 0, "📖", "#F9A8D4", "2026-11-01")
+    logs = {}
+    for day in ("2026-11-01", "2026-11-02", "2026-11-03"):
+        set_done(logs, h1["id"], day, True)
+    set_done(logs, h2["id"], "2026-11-03", True)
+    check("average best streak of 3 and 1 is 2.0",
+          average_streak(logs, [h1, h2], date(2026, 11, 3)) == 2.0)
+    check("average streak with no habits is 0.0",
+          average_streak(logs, [], date(2026, 11, 3)) == 0.0)
+    check("average streak with no logs is 0.0",
+          average_streak({}, [h1, h2], date(2026, 11, 3)) == 0.0)
+
+
 if __name__ == "__main__":
     test_best_streak()
+    test_average_streak()
     test_days_since_last_done()
     test_streak_summary()
     test_last_done_label()

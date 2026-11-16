@@ -47,6 +47,15 @@ def longest_streak_overall(logs, habits, end_date=None):
          for habit in (habits or [])),
         default=0)
 
+def average_streak(logs, habits, end_date=None):
+    """Mean best streak across all habits (0.0 when there are none)."""
+    habits = list(habits or [])
+    if not habits:
+        return 0.0
+    total = sum(best_streak(logs, habit, end_date=end_date)
+                for habit in habits)
+    return round(total / len(habits), 1)
+
 
 def days_since_last_done(logs, habit, end_date=None):
     """Days since the habit was last done (0 = done on end_date).

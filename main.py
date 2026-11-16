@@ -19,12 +19,12 @@ from app.habits import (
     CATEGORIES, COLOURS, ICONS, add_habit, delete_habit, edit_habit,
     get_habit, new_habit,
 )
-from app.garden import counts_text, days_to_next_stage, garden_summary, next_habit_to_water
+from app.garden import counts_text, days_to_next_stage, garden_summary, next_habit_to_water, plants_by_stage
 from app.insights import consistency_message, consistency_score
 from app.notes import count_notes, latest_note
 from app.ordering import sort_habits
-from app.motivation import nightly_message
-from app.streaks import last_done_label, longest_streak_overall
+from app.motivation import morning_message, nightly_message
+from app.streaks import average_streak, last_done_label, longest_streak_overall
 from app.achievements import badges_for
 from app.categories import (
     best_category, total_minutes_by_category)
@@ -36,10 +36,10 @@ from app.theme import (
     LIGHT_PINK, LILAC, MINT, MUTED, PEACH, PINK, PROGRESS_HEIGHT, SKY, TEXT,
     card_bg, category_colour, done_label, progress_colour, stage_colour,
 )
-from app.validation import validate_icon
+from app.validation import validate_category, validate_icon
 from app.version import APP_NAME, APP_VERSION
 from app.tracker import (
-    current_streak, daily_summary, is_done, last_7_days, log_minutes,
+    current_streak, daily_summary, done_count_today, is_done, last_7_days, log_minutes,
     minutes_for, set_done, today_str, total_minutes_today,
 )
 
@@ -109,14 +109,14 @@ def main(page: ft.Page):
                     snack("Please give your habit a name first 🌱")
                     return
                 edit_habit(habits, habit["id"], name=name_field.value,
-                           category=category_field.value,
+                           category=validate_category(category_field.value),
                            target_minutes=target, icon=validate_icon(icon_field.value),
                            colour=colour_field.value)
                 snack("Habit updated! 💕")
             else:
                 try:
                     add_habit(habits, new_habit(
-                        name_field.value, category_field.value, target,
+                        name_field.value, validate_category(category_field.value), target,
                         validate_icon(icon_field.value), colour_field.value, today))
                 except ValueError:
                     snack("Please give your habit a name first 🌱")
@@ -211,6 +211,9 @@ def main(page: ft.Page):
             ft.Text("Today 🌞", size=26, weight=ft.FontWeight.BOLD, color=TEXT),
             ft.Text("Water your garden, one tick at a time 🌱",
                     size=14, color=PINK),
+            ft.Text(morning_message(done_count_today(logs, habits, today),
+                                    summary["total"]),
+                    size=14, color=MUTED),
             ft.Text(f"{summary['done']} of {summary['total']} habits done "
                     f"• {summary['percent']}% • "
                     f"⏱ {total_minutes_today(logs, habits, today)} min today",
@@ -329,7 +332,7 @@ def main(page: ft.Page):
         ]
         if garden["plants"]:
             garden_rows.append(ft.Text(
-                counts_text(garden["counts"]), size=14, color=MUTED))
+                counts_text(plants_by_stage(habits, logs, today)), size=14, color=MUTED))
             garden_rows.append(ft.Text(
                 f"🌸 {garden['percent_done']}% watered today",
                 size=14, color=PINK))
@@ -354,6 +357,7 @@ def main(page: ft.Page):
                             f"{consistency_message(consistency)}")
         message = nightly_message(summary)
         longest_streak = longest_streak_overall(logs, habits)
+        avg_streak = average_streak(logs, habits)
         badges = badges_for(logs, habits, today)
         badges_text = (", ".join(
             f"{b['emoji']} {b['label']}" for b in badges)
@@ -431,6 +435,8 @@ def main(page: ft.Page):
                             f"({summary['best_minutes']} min)",
                             size=15, color=MUTED),
                     ft.Text(f"Longest streak: {longest_streak} days 🌳",
+                            size=15, color=MUTED),
+                    ft.Text(f"Average best streak: {avg_streak} days",
                             size=15, color=MUTED),
                     ft.Text(consistency_text, size=15, color=MUTED),
                 ], spacing=6),
