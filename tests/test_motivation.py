@@ -8,7 +8,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from app.motivation import message_for_percent, nightly_message, streak_message  # noqa: E402
+from app.motivation import message_for_percent, morning_message, nightly_message, streak_message  # noqa: E402
 
 PASSED = 0
 
@@ -42,8 +42,20 @@ def test_streak_message():
     check("0 streak encourages starting", "start" in streak_message(0))
 
 
+def test_morning_message():
+    check("morning with no habits suggests planting one",
+          "plant" in morning_message(0, 0))
+    check("morning all done celebrates",
+          "All done" in morning_message(3, 3))
+    check("morning none done counts the habits to water",
+          "3 habits" in morning_message(0, 3))
+    check("morning partly done shows the count",
+          "1 of 3" in morning_message(1, 3))
+
+
 if __name__ == "__main__":
     test_message_for_percent()
     test_nightly_message()
     test_streak_message()
+    test_morning_message()
     print(f"{PASSED} tests passed")

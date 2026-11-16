@@ -45,3 +45,17 @@ def streak_message(streak):
     if streak >= 1:
         return "Day 1 of your streak — water it again tomorrow! 🌱"
     return "No streak yet — today is a good day to start. 🌱"
+
+
+def morning_message(done, total):
+    """A short greeting for the Today view from how much is done already."""
+    done = max(0, int(done or 0))
+    total = max(0, int(total or 0))
+    if total == 0:
+        return "No habits yet — plant one and watch it grow! 🌱"
+    if done >= total:
+        return "All done already — what a lovely start! 🌸"
+    if done == 0:
+        return f"Good morning! {total} habits to water today. 🌱"
+    return f"Good morning! {done} of {total} done — keep going! 🌸"
+
