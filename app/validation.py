@@ -2,6 +2,8 @@
 
 from app.habits import ICONS
 
+from app.habits import CATEGORIES, ICONS
+
 MAX_NAME_LEN = 60
 MAX_MINUTES = 1440  # a whole day
 
@@ -19,6 +21,13 @@ def validate_habit_name(name):
 def validate_icon(icon):
     """The icon itself when it is one of the app icons, else a seedling."""
     return icon if icon in ICONS else "🌱"
+
+
+def validate_category(category):
+    """The category itself when it is one of the app categories,
+    else "Daily Life"."""
+    return category if category in CATEGORIES else "Daily Life"
+
 
 
 def validate_minutes(value):

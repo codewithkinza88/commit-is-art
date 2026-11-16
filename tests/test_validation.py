@@ -8,7 +8,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from app.validation import MAX_NAME_LEN, validate_habit_name, validate_icon, validate_minutes  # noqa: E402
+from app.validation import MAX_NAME_LEN, validate_category, validate_habit_name, validate_icon, validate_minutes  # noqa: E402
 
 PASSED = 0
 
@@ -34,6 +34,11 @@ def main():
     check("good icon passes", validate_icon("📚") == "📚")
     check("unknown icon falls back to seedling", validate_icon("🚀") == "🌱")
     check("blank icon falls back to seedling", validate_icon("") == "🌱")
+    check("good category passes", validate_category("Study") == "Study")
+    check("unknown category falls back to Daily Life",
+          validate_category("Cooking") == "Daily Life")
+    check("blank category falls back to Daily Life",
+          validate_category("") == "Daily Life")
 
 
 if __name__ == "__main__":
