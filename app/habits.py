@@ -122,3 +122,10 @@ def active_habits(habits):
 def list_habits(habits):
     """Return the habits in display order (creation order)."""
     return list(habits or [])
+
+
+def habits_by_category(habits, category):
+    """Habits in one category, in display order ([] when none)."""
+    return [h for h in (habits or [])
+            if (h.get("category") or "") == category]
+
