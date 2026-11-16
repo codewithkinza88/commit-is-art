@@ -2,6 +2,27 @@
 
 All notable changes to Habit Garden are listed here.
 
+## 2026-11-16
+
+### Today (16 November)
+- Today greets you with a morning message ("Good morning! N of M done")
+  and the header counts how many habits are done.
+- Garden tab counts plants by growth stage, and Tonight shows your
+  average best streak as well as your longest streak.
+- New helpers: which habits are due today (`is_due_today` in
+  app/schedule.py), habits in one category (`habits_by_category` in
+  app/habits.py), notes written on one day (`notes_for_day` in
+  app/notes.py), and finding habits by icon (`find_habits_by_icon` in
+  app/search.py).
+- Categories are validated when saving a habit — an unknown category
+  falls back to Daily Life.
+- README now correctly says the APK is run #9, built 15 November 2026
+  from commit `1e6c002` (its text still said run #8).
+
+Tests: 274 plain-script checks passing across 19 test files
+(`for f in tests/test_*.py; do python3 "$f"; done`, with
+tests/test_ui_api.py run under .venv for Flet).
+
 ## 2026-11-15
 
 ### Today (15 November)

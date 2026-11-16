@@ -20,7 +20,9 @@ A cute daily routine for your habits — morning, day, and night.
   has, your latest note, and when you last did it. Each card also has
   a little coloured chip for its category.
 - The Today header shows your total minutes for the day
-  ("⏱ N min today").
+  ("⏱ N min today") and a morning message with how many habits are
+  already done. The Garden tab counts plants by growth stage, and
+  Tonight also shows your average best streak.
 - For study and reading habits, log your time too: tap **+15 min** or
   enter minutes. Reaching your daily target counts as done, even
   without a tick.
