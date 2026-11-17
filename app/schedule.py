@@ -48,6 +48,11 @@ def due_this_week(habits, weekday):
 
 
 
+def habits_due_tomorrow(habits, weekday):
+    """Habits due on the next weekday (wraps Sunday -> Monday)."""
+    return habits_due_on(habits, (weekday + 1) % 7)
+
+
 def weekday_name(weekday):
     """Short name for a weekday number, e.g. 0 -> 'Mon'."""
     if 0 <= weekday <= 6:
