@@ -61,6 +61,18 @@ def test_ui_api():
           "ft.ElevatedButton" not in source)
     check("main.py launches with ft.run(main)",
           "ft.run(main)" in source)
+    check("main.py never assigns the removed page.dialog",
+          "page.dialog" not in source)
+    check("main.py never assigns the removed page.snack_bar",
+          "page.snack_bar" not in source)
+    check("dialogs open with page.show_dialog (habit, delete, minutes)",
+          source.count("page.show_dialog(") == 3)
+    check("snack reuses one SnackBar from page.overlay",
+          "page.overlay" in source)
+    check("garden view shows each plant's own flower",
+          "flower_for(" in source)
+    check("garden view shows the flower bed from the plants",
+          "flower_bed(garden" in source)
     check("edit path also rejects an empty habit name",
           source.count("Please give your habit a name first") == 2)
     check("delete asks first with a confirm dialog",
@@ -73,9 +85,20 @@ def test_ui_api():
           "Yesterday vs today" in source)
     check("yesterday summary comes from daily_summary",
           "daily_summary(logs, habits, yesterday)" in source)
-    check("app version is 1.5.0",
+    check("app version is 1.6.0",
           open(os.path.join(root, "app", "version.py"),
-               encoding="utf-8").read().count('APP_VERSION = "1.5.0"') == 1)
+               encoding="utf-8").read().count('APP_VERSION = "1.6.0"') == 1)
+    check("garden plants show a flower row, not one big emoji",
+          'plant["flowers"]' in source)
+    check("garden opens with a full flower bed on top",
+          "flower_bed(garden[\"plants\"])" in source
+          and "flowers blooming in your garden" in source)
+    check("every habit card has a labelled Edit button",
+          '"✏️ Edit"' in source)
+    check("today view tells you how to edit and add habits",
+          "Tap ✏️ Edit on any habit" in source)
+    check("saving keeps notes instead of dropping them",
+          '"notes": notes' in source)
 
     from app.ui_kit import (  # noqa: E402
         gradient_card, gradient_header, mini_progress, pill, soft_card,

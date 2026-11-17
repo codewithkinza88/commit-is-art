@@ -19,9 +19,9 @@ from app.habits import (
     CATEGORIES, COLOURS, ICONS, add_habit, delete_habit, edit_habit,
     get_habit, new_habit,
 )
-from app.garden import (counts_text, days_to_next_stage, garden_summary,
-                        next_habit_to_water, plants_by_stage,
-                        stage_progress, total_plants)
+from app.garden import (counts_text, days_to_next_stage, flower_bed,
+                        flower_for, garden_summary, next_habit_to_water,
+                        plants_by_stage, stage_progress, total_plants)
 from app.insights import consistency_message, consistency_score
 from app.notes import count_notes, latest_note
 from app.ordering import sort_habits
@@ -74,11 +74,23 @@ def main(page: ft.Page):
     current_view = [0]  # 0 Today, 1 Garden, 2 Tonight
 
     def persist():
-        save_store({"habits": habits, "logs": logs}, DEFAULT_PATH)
+        # Save everything — habits, logs AND notes. (Notes used to be
+        # dropped here, so any note vanished on the next tick or save.)
+        save_store({"habits": habits, "logs": logs, "notes": notes},
+                   DEFAULT_PATH)
+
+    # One reusable SnackBar, kept in page.overlay. Flet 1.0.5 has no
+    # snack-bar attribute on the page and no show_snack_bar — the old
+    # assignment silently did nothing, so no message ever appeared.
+    _snack_bar = [None]
 
     def snack(message):
-        page.snack_bar = ft.SnackBar(ft.Text(message))
-        page.snack_bar.open = True
+        if _snack_bar[0] is None:
+            _snack_bar[0] = ft.SnackBar(ft.Text(message))
+            page.overlay.append(_snack_bar[0])
+        else:
+            _snack_bar[0].content = ft.Text(message)
+        _snack_bar[0].open = True
         page.update()
 
     # ---------- habit form (add / edit) ----------
@@ -144,9 +156,7 @@ def main(page: ft.Page):
             refresh()
 
         def delete_clicked(_e):
-            confirm_dialog.open = True
-            page.dialog = confirm_dialog
-            page.update()
+            page.show_dialog(confirm_dialog)
 
         confirm_dialog = None
         if is_edit:
@@ -177,9 +187,10 @@ def main(page: ft.Page):
                  icon_field, colour_field],
                 tight=True, spacing=12),
             actions=buttons)
-        page.dialog = dialog
-        dialog.open = True
-        page.update()
+        # Flet 1.0.5 has no dialog attribute on the page — the old
+        # assignment silently did nothing, so the add/edit form never
+        # appeared. show_dialog is the call that actually opens it.
+        page.show_dialog(dialog)
 
     def _close(dialog):
         dialog.open = False
@@ -213,9 +224,7 @@ def main(page: ft.Page):
             actions=[ft.TextButton("Cancel",
                                    on_click=lambda e: _close(dialog)),
                      ft.Button("Add ✨", on_click=add_clicked)])
-        page.dialog = dialog
-        dialog.open = True
-        page.update()
+        page.show_dialog(dialog)
 
     # ---------- views ----------
     def today_view():
@@ -252,44 +261,51 @@ def main(page: ft.Page):
             latest_preview = (f" • “{latest_text[:40]}”"
                               if latest_text else "")
             best = best_streak(logs, habit)
+            # Actions sit in their own row under the habit text, with
+            # labels — on a narrow phone the old single row squeezed
+            # the three icon buttons off-screen, so Edit looked missing.
             card = soft_card(
-                content=ft.Row([
-                    ft.Checkbox(
-                        value=done,
-                        on_change=lambda e, h=habit: _tick(h, e.control.value)),
-                    ft.Column([
-                        ft.Row([
-                            ft.Text(f"{habit['icon']}  {habit['name']}",
-                                    size=16, weight=ft.FontWeight.BOLD, color=TEXT),
-                            pill(done_label(done),
-                                 GOLD if done else LIGHT_PINK,
-                                 color="#8A6D1B" if done else TEXT),
-                        ], spacing=8),
-                        ft.Row([
-                            category_pill(habit["category"]),
-                            streak_pill(streak),
-                            ft.Text(f"🏆 best {best} days",
-                                    size=12, color=GOLD),
-                        ], spacing=6),
-                        ft.Text(f"{target_text} • ⏱️ {minutes} min",
-                                size=13, color=MUTED),
-                        (mini_progress(min(1.0, minutes / target),
-                                       progress_colour(
-                                           min(100, round(100 * minutes / target))))
-                         if target else ft.Container(height=0)),
-                        ft.Text(" • ".join(
-                            [p for p in [note_text,
-                                         last_done_label(logs, habit)]
-                             if p]) + latest_preview,
-                                size=12, color=MUTED),
-                    ], expand=True, spacing=4),
-                    ft.IconButton(icon=ft.Icons.ADD, tooltip="+15 min",
-                                  on_click=lambda e, h=habit: _quick_minutes(h)),
-                    ft.IconButton(icon=ft.Icons.TIMER, tooltip="Log minutes",
-                                  on_click=lambda e, h=habit: open_minutes_dialog(h)),
-                    ft.IconButton(icon=ft.Icons.EDIT, tooltip="Edit habit",
-                                  on_click=lambda e, h=habit: open_habit_dialog(h)),
-                ]),
+                content=ft.Column([
+                    ft.Row([
+                        ft.Checkbox(
+                            value=done,
+                            on_change=lambda e, h=habit: _tick(h, e.control.value)),
+                        ft.Column([
+                            ft.Row([
+                                ft.Text(f"{habit['icon']}  {habit['name']}",
+                                        size=16, weight=ft.FontWeight.BOLD, color=TEXT),
+                                pill(done_label(done),
+                                     GOLD if done else LIGHT_PINK,
+                                     color="#8A6D1B" if done else TEXT),
+                            ], spacing=8),
+                            ft.Row([
+                                category_pill(habit["category"]),
+                                streak_pill(streak),
+                                ft.Text(f"🏆 best {best} days",
+                                        size=12, color=GOLD),
+                            ], spacing=6),
+                            ft.Text(f"{target_text} • ⏱️ {minutes} min",
+                                    size=13, color=MUTED),
+                            (mini_progress(min(1.0, minutes / target),
+                                           progress_colour(
+                                               min(100, round(100 * minutes / target))))
+                             if target else ft.Container(height=0)),
+                            ft.Text(" • ".join(
+                                [p for p in [note_text,
+                                             last_done_label(logs, habit)]
+                                 if p]) + latest_preview,
+                                    size=12, color=MUTED),
+                        ], expand=True, spacing=4),
+                    ]),
+                    ft.Row([
+                        ft.TextButton("＋15 min ⏱️",
+                                      on_click=lambda e, h=habit: _quick_minutes(h)),
+                        ft.TextButton("⏱ Minutes",
+                                      on_click=lambda e, h=habit: open_minutes_dialog(h)),
+                        ft.TextButton("✏️ Edit",
+                                      on_click=lambda e, h=habit: open_habit_dialog(h)),
+                    ], alignment=ft.MainAxisAlignment.END, spacing=4),
+                ], spacing=8),
                 bgcolor=card_bg(habit.get("colour", SKY), done=done),
                 border_color=DONE_BORDER if done else LIGHT_PINK)
             cards.append(card)
@@ -299,8 +315,11 @@ def main(page: ft.Page):
                                  size=15, color=MUTED))
         return ft.Column(
             [header,
+             ft.Text("Tap ✏️ Edit on any habit to change it — "
+                     "or plant a brand-new one below 🌱",
+                     size=13, color=MUTED),
              ft.Button("＋ Plant a new habit 🌱",
-                               on_click=lambda e: open_habit_dialog()),
+                       on_click=lambda e: open_habit_dialog()),
              *cards],
             spacing=12)
 
@@ -326,7 +345,9 @@ def main(page: ft.Page):
                          + ("s" if days_left != 1 else ""))
             plants.append(soft_card(
                 content=ft.Column([
-                    ft.Text(plant["emoji"], size=56),
+                    ft.Text(flower_for(plant["stage"], plant["habit_id"]),
+                            size=56),
+                    ft.Text(plant["flowers"], size=22),
                     ft.Text(plant["name"], size=15,
                             weight=ft.FontWeight.BOLD, color=TEXT),
                     pill(f"🌷 {plant['label']}",
@@ -350,6 +371,17 @@ def main(page: ft.Page):
             ])
         garden_rows = [header]
         if garden["plants"]:
+            # A full flower bed right at the top, so lots of flowers
+            # show as soon as the garden opens 🌷🌸🌼
+            bed = flower_bed(garden["plants"])
+            garden_rows.append(soft_card(
+                content=ft.Column([
+                    ft.Text(bed, size=26),
+                    ft.Text(f"🌸 {len(bed)} flowers blooming in your garden",
+                            size=14, color=PINK),
+                ], horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                    spacing=4),
+                bgcolor=LIGHT_PINK, border_color=PINK))
             garden_rows.append(ft.Row([
                 stat_chip("🌱", "plants", total_plants(habits)),
                 stat_chip("🌸", "watered", f"{garden['percent_done']}%"),
