@@ -65,10 +65,62 @@ def test_ui_api():
           "page.dialog" not in source)
     check("main.py never assigns the removed page.snack_bar",
           "page.snack_bar" not in source)
-    check("dialogs open with page.show_dialog (habit, delete, minutes)",
-          source.count("page.show_dialog(") == 3)
+    check("dialogs open with page.show_dialog (habit, delete, minutes,"
+          " notifications)",
+          source.count("page.show_dialog(") == 4)
     check("snack reuses one SnackBar from page.overlay",
           "page.overlay" in source)
+    check("a bell button with a count badge sits in the header",
+          "ft.Icons.NOTIFICATIONS" in source
+          and "ft.Badge(" in source)
+    check("tapping the bell opens the notifications panel",
+          "open_notifications_dialog()" in source
+          and "Notifications 🔔" in source)
+    check("notifications can be marked all read",
+          "Mark all read" in source)
+    check("the most urgent notification banners the Today view",
+          "View all 🔔" in source)
+    check("the app refreshes itself every minute on a daemon thread",
+          "threading.Thread(" in source
+          and "daemon=True" in source
+          and "time.sleep(60)" in source)
+    check("a day rollover reloads the store on refresh",
+          "should_refresh(" in source)
+    workflow = open(os.path.join(root, ".github", "workflows",
+                                 "build-apk.yml"),
+                    encoding="utf-8").read()
+    check("the workflow still uploads the APK as an artifact",
+          "actions/upload-artifact@v4" in workflow
+          and "name: habit-garden-apk" in workflow)
+    check("the workflow publishes the APK as a public release asset",
+          "softprops/action-gh-release@v2" in workflow
+          and "tag_name: latest" in workflow
+          and "files: build/apk/app-release.apk" in workflow)
+    check("a release failure can never fail the run",
+          "continue-on-error: true" in workflow)
+    check("the workflow grants the release step write permission",
+          "contents: write" in workflow)
+    check("the workflow is still manual-only",
+          "workflow_dispatch:" in workflow)
+    check("the app checks GitHub releases for a newer version",
+          "fetch_latest_release(" in source
+          and "is_newer(" in source)
+    check("the update check runs in the background, never blocking startup",
+          "_check_for_update" in source
+          and "threading.Thread(target=_check_for_update" in source)
+    check("Today shows an in-app update banner with Update now",
+          "New version" in source
+          and "Update now ⬇️" in source)
+    check("the update banner sits beside the notifications banner",
+          "[*banner, *update_cards, header," in source)
+    check("the download shows live progress",
+          "Downloading version" in source
+          and "update_progress[0]" in source)
+    check("a failed download shows a friendly retry message",
+          "Couldn't download the update" in source)
+    check("the downloaded APK opens in Android's own installer, no browser",
+          "📲 Install" in source
+          and 'page.launch_url("file://" + update_path[0])' in source)
     check("garden view shows each plant's own flower",
           "flower_for(" in source)
     check("garden view shows the flower bed from the plants",
@@ -85,9 +137,9 @@ def test_ui_api():
           "Yesterday vs today" in source)
     check("yesterday summary comes from daily_summary",
           "daily_summary(logs, habits, yesterday)" in source)
-    check("app version is 1.6.0",
+    check("app version is 1.7.0",
           open(os.path.join(root, "app", "version.py"),
-               encoding="utf-8").read().count('APP_VERSION = "1.6.0"') == 1)
+               encoding="utf-8").read().count('APP_VERSION = "1.7.0"') == 1)
     check("garden plants show a flower row, not one big emoji",
           'plant["flowers"]' in source)
     check("garden opens with a full flower bed on top",

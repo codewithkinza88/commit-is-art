@@ -11,6 +11,9 @@ Build the Android APK (needs the Flet CLI + Flutter + Android SDK):
     flet build apk
 """
 
+import threading
+import time
+
 import flet as ft
 
 from datetime import date, timedelta
@@ -26,6 +29,10 @@ from app.insights import consistency_message, consistency_score
 from app.notes import count_notes, latest_note
 from app.ordering import sort_habits
 from app.motivation import evening_message, morning_message, nightly_message
+from app.notifications import (build_notifications, notification_key,
+                               should_refresh, unread_count)
+from app.updater import (default_apk_path, download_apk,
+                         fetch_latest_release, is_newer)
 from app.streaks import (average_streak, best_streak, last_done_label,
                          longest_streak_overall, median_best_streak)
 from app.achievements import badges_for
@@ -71,7 +78,134 @@ def main(page: ft.Page):
     logs = store["logs"]
     notes = store.get("notes", {})
     today = today_str()
+    last_date = [today]  # the day refresh() last built for
+    read_keys = set()  # notification keys read this session (not saved)
     current_view = [0]  # 0 Today, 1 Garden, 2 Tonight
+
+    # ---------- in-app updater ⬇️ ----------
+    # The app checks GitHub for a newer public release itself and
+    # downloads it right here — no browser, no Play Store. Offline
+    # just means no banner; the check can never crash the app.
+    update_info = [None]  # {"version", "apk_url", "tag"} when newer
+    update_state = ["idle"]  # idle | downloading | downloaded | failed
+    update_progress = [0]  # download percent, 0-100
+    update_path = [None]  # where the downloaded APK was saved
+
+    def _install_update(_e):
+        # The final step is Android's own installer popup — one tap,
+        # inside the app flow, no browser. The APK file is opened
+        # with the system handler, which offers the package installer.
+        if update_path[0]:
+            page.launch_url("file://" + update_path[0])
+
+    def _start_update_download(_e):
+        info = update_info[0]
+        if info is None or update_state[0] == "downloading":
+            return
+        update_state[0] = "downloading"
+        update_progress[0] = 0
+        refresh()
+
+        def _download():
+            try:
+                dest = default_apk_path()
+                last_pct = [-1]
+
+                def _progress(done, total):
+                    if total:
+                        pct = min(100, round(100 * done / total))
+                    else:
+                        pct = update_progress[0]
+                    if pct != last_pct[0]:
+                        last_pct[0] = pct
+                        update_progress[0] = pct
+                        try:
+                            refresh()
+                        except Exception:
+                            pass
+
+                download_apk(info["apk_url"], dest, progress_cb=_progress)
+                update_path[0] = dest
+                update_state[0] = "downloaded"
+                update_progress[0] = 100
+            except Exception:
+                update_state[0] = "failed"
+                snack("Couldn't download the update — check your "
+                      "internet and try again later 📶")
+            try:
+                refresh()
+            except Exception:
+                pass
+            if update_state[0] == "downloaded":
+                snack("Downloaded — tap Install 🌸")
+
+        threading.Thread(target=_download, daemon=True).start()
+
+    # ---------- in-app notifications 🔔 ----------
+    # The bell lives in the header row; the count badge is rebuilt on
+    # every refresh from the live state, so it is never stale.
+
+    def _visible_notifications():
+        return [n for n in build_notifications(habits, logs, notes, today)
+                if notification_key(n) not in read_keys]
+
+    def _rebuild_header():
+        visible = _visible_notifications()
+        count = unread_count(visible)
+        bell = ft.IconButton(icon=ft.Icons.NOTIFICATIONS,
+                             tooltip="Notifications 🔔",
+                             on_click=lambda e: open_notifications_dialog())
+        if count:
+            bell.badge = ft.Badge(label=str(count), bgcolor=DEEP_ROSE,
+                                  text_color="white")
+        header_row.controls = [
+            ft.Text(f"🌸 {APP_NAME}", size=20, weight=ft.FontWeight.BOLD,
+                    color=TEXT, expand=True),
+            bell,
+        ]
+
+    def open_notifications_dialog():
+        visible = _visible_notifications()
+        dlg = [None]
+
+        def _go_today(note):
+            def _handler(_e):
+                read_keys.add(notification_key(note))
+                if dlg[0] is not None:
+                    dlg[0].open = False
+                current_view[0] = 0
+                page.update()
+                refresh()
+            return _handler
+
+        def _mark_all_read(_e):
+            for note in visible:
+                read_keys.add(notification_key(note))
+            if dlg[0] is not None:
+                dlg[0].open = False
+            page.update()
+            refresh()
+
+        if not visible:
+            rows = [ft.Text("All caught up! 🌸 No notifications right now.",
+                            size=15, color=MUTED)]
+        else:
+            rows = []
+            for note in visible:
+                rows.append(ft.TextButton(
+                    f"{note['icon']} {note['title']}\n{note['text']}",
+                    on_click=_go_today(note)))
+        dlg[0] = ft.AlertDialog(
+            title=ft.Text("Notifications 🔔"),
+            bgcolor=CARD_BG,
+            shape=ft.RoundedRectangleBorder(radius=24),
+            content=ft.Column(rows, tight=True, spacing=8,
+                              scroll=ft.ScrollMode.AUTO),
+            actions=[
+                ft.TextButton("Mark all read ✅", on_click=_mark_all_read),
+                ft.TextButton("Close", on_click=lambda e: _close(dlg[0])),
+            ])
+        page.show_dialog(dlg[0])
 
     def persist():
         # Save everything — habits, logs AND notes. (Notes used to be
@@ -313,8 +447,68 @@ def main(page: ft.Page):
         if not habits:
             cards.append(ft.Text("No habits yet — plant your first one! 🌱",
                                  size=15, color=MUTED))
+        # The most urgent notification as a soft banner on top, so the
+        # app itself tells you what needs attention today.
+        banner = []
+        visible = _visible_notifications()
+        if visible:
+            top = visible[0]
+            banner.append(soft_card(
+                content=ft.Column([
+                    ft.Text(f"{top['icon']} {top['title']}", size=15,
+                            weight=ft.FontWeight.BOLD, color=TEXT),
+                    ft.Text(top["text"], size=13, color=MUTED),
+                    ft.TextButton("View all 🔔",
+                                  on_click=lambda e: open_notifications_dialog()),
+                ], spacing=4),
+                bgcolor=LIGHT_PINK, border_color=PINK))
+        # The in-app update banner sits right beside it — a new
+        # version downloads and installs from inside the app.
+        update_cards = []
+        info = update_info[0]
+        if info is not None:
+            state = update_state[0]
+            if state == "downloading":
+                update_cards.append(soft_card(
+                    content=ft.Column([
+                        ft.Text(f"🌸 Downloading version "
+                                f"{info['version']}… "
+                                f"{update_progress[0]}%", size=15,
+                                weight=ft.FontWeight.BOLD, color=TEXT),
+                        ft.ProgressBar(value=update_progress[0] / 100,
+                                       color=PINK, bgcolor=LIGHT_PINK,
+                                       height=PROGRESS_HEIGHT,
+                                       border_radius=8),
+                        ft.Text("Hold on, your new version is on its "
+                                "way 💕", size=13, color=MUTED),
+                    ], spacing=4),
+                    bgcolor=LIGHT_PINK, border_color=PINK))
+            elif state == "downloaded":
+                update_cards.append(soft_card(
+                    content=ft.Column([
+                        ft.Text("🌸 New version downloaded!", size=15,
+                                weight=ft.FontWeight.BOLD, color=TEXT),
+                        ft.Text("Tap Install and Android will do the "
+                                "rest 📲", size=13, color=MUTED),
+                        ft.Button("📲 Install",
+                                  on_click=_install_update),
+                    ], spacing=4),
+                    bgcolor=LIGHT_PINK, border_color=PINK))
+            else:
+                update_cards.append(soft_card(
+                    content=ft.Column([
+                        ft.Text(f"🌸 New version {info['version']} "
+                                "is here!", size=15,
+                                weight=ft.FontWeight.BOLD, color=TEXT),
+                        ft.Text("Fresh flowers, fresh fixes — update "
+                                "from right here, no browser needed 💕",
+                                size=13, color=MUTED),
+                        ft.Button("Update now ⬇️",
+                                  on_click=_start_update_download),
+                    ], spacing=4),
+                    bgcolor=LIGHT_PINK, border_color=PINK))
         return ft.Column(
-            [header,
+            [*banner, *update_cards, header,
              ft.Text("Tap ✏️ Edit on any habit to change it — "
                      "or plant a brand-new one below 🌱",
                      size=13, color=MUTED),
@@ -510,11 +704,59 @@ def main(page: ft.Page):
         ], spacing=12)
 
     content = ft.Column([], spacing=12, scroll=ft.ScrollMode.AUTO, expand=True)
+    header_row = ft.Row(spacing=8,
+                        vertical_alignment=ft.CrossAxisAlignment.CENTER)
 
     def refresh():
+        # The app updates itself: recompute today, and if the day
+        # rolled over since the last build, reload the store from disk
+        # (in case it changed elsewhere) and forget what was read.
+        nonlocal today, habits, logs, notes
+        now = today_str()
+        if should_refresh(last_date[0], now):
+            today = now
+            last_date[0] = now
+            read_keys.clear()
+            fresh = load_store(DEFAULT_PATH)
+            if not fresh["habits"]:
+                fresh = seed_store()
+                save_store(fresh, DEFAULT_PATH)
+            habits = fresh["habits"]
+            logs = fresh["logs"]
+            notes = fresh.get("notes", {})
+        _rebuild_header()
         views = [today_view(), garden_view(), tonight_view()]
         content.controls = [views[current_view[0]]]
         page.update()
+
+    def _check_for_update():
+        # Runs once, in the background, so it can never slow startup
+        # or crash the app: offline just means no banner, silently.
+        try:
+            latest = fetch_latest_release()
+        except Exception:
+            return
+        if latest and is_newer(latest["version"], APP_VERSION):
+            update_info[0] = latest
+            try:
+                refresh()
+            except Exception:
+                pass
+
+    threading.Thread(target=_check_for_update, daemon=True).start()
+
+    def _auto_refresh_loop():
+        # Every minute, rebuild the views so new ticks, a new day or
+        # new notifications show up on their own. A refresh failure
+        # must never crash the app, so everything is guarded.
+        while True:
+            time.sleep(60)
+            try:
+                refresh()
+            except Exception:
+                pass
+
+    threading.Thread(target=_auto_refresh_loop, daemon=True).start()
 
     def on_nav(e):
         current_view[0] = e.control.selected_index
@@ -528,9 +770,7 @@ def main(page: ft.Page):
             ft.NavigationBarDestination(icon=ft.Icons.NIGHTLIGHT_ROUND, label="Tonight"),
         ],
         on_change=on_nav)
-    page.add(
-        ft.Text(f"🌸 {APP_NAME}", size=20, weight=ft.FontWeight.BOLD, color=TEXT),
-        content)
+    page.add(header_row, content)
     refresh()
 
 
