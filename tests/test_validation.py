@@ -8,7 +8,9 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from app.validation import MAX_NAME_LEN, validate_category, validate_habit_name, validate_icon, validate_minutes  # noqa: E402
+from app.validation import (MAX_NAME_LEN, validate_category,  # noqa: E402
+                            validate_habit_name, validate_icon,
+                            validate_minutes, validate_target_minutes)
 
 PASSED = 0
 
@@ -39,6 +41,12 @@ def main():
           validate_category("Cooking") == "Daily Life")
     check("blank category falls back to Daily Life",
           validate_category("") == "Daily Life")
+    check("good target minutes passes", validate_target_minutes(60) == 60)
+    check("blank target minutes is 0", validate_target_minutes("") == 0)
+    check("negative target minutes is 0", validate_target_minutes(-10) == 0)
+    check("text target minutes is 0", validate_target_minutes("lots") == 0)
+    check("huge target minutes caps at a day",
+          validate_target_minutes(9999) == 1440)
 
 
 if __name__ == "__main__":

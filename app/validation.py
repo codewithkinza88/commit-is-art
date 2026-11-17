@@ -30,6 +30,19 @@ def validate_category(category):
 
 
 
+def validate_target_minutes(value):
+    """A daily target in minutes, cleaned to a whole number 0..1440.
+
+    Blank or non-numeric input becomes 0; negatives become 0 and
+    anything over a day is capped at 1440.
+    """
+    try:
+        minutes = int(value or 0)
+    except (TypeError, ValueError):
+        return 0
+    return max(0, min(MAX_MINUTES, minutes))
+
+
 def validate_minutes(value):
     """(is_valid, minutes, error) for a minutes value."""
     try:
