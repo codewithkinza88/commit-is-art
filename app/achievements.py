@@ -20,6 +20,7 @@ def badges_for(logs, habits, date_str):
         is_done(logs, habit, day)
         for habit in habits
         for day in (logs or {})
+        if day <= date_str
     )
     if any_done:
         badges.append({"key": "first_step", "label": "First Step",
