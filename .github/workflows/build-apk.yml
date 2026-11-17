@@ -3,35 +3,57 @@ name: Build Habit Garden APK
 on:
   workflow_dispatch:
 
+# The release step publishes the APK as a public release asset, so
+# the app itself can download updates without a GitHub login (an
+# Actions artifact needs a sign-in and the app could never fetch it).
+permissions:
+  contents: write
+
 jobs:
   build-apk:
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4
+
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+
       - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "17"
+
       - name: Set up Flutter 3.44.8
         uses: subosito/flutter-action@v2
         with:
           flutter-version: "3.44.8"
           channel: stable
+
       - name: Install Flet
         run: pip install -r requirements.txt
+
       - name: Build the Android APK
         run: flet build apk --verbose
-      - name: List APK files
-        run: find build -name "*.apk" -ls; ls -R build/apk || true
+
       - name: Upload the APK
         uses: actions/upload-artifact@v4
         with:
           name: habit-garden-apk
-          path: build/apk/**/*.apk
+          path: build/apk/app-release.apk
           if-no-files-found: error
+
+      # Publish the same APK as a public release asset on the rolling
+      # "latest" release, so the app's in-app updater can download it
+      # with no login. This must never fail the run: if the release
+      # step breaks, the artifact above is still the fallback.
+      - name: Publish the APK as a public release asset
+        uses: softprops/action-gh-release@v2
+        continue-on-error: true
+        with:
+          tag_name: latest
+          name: Habit Garden latest
+          files: build/apk/app-release.apk
