@@ -19,12 +19,15 @@ from app.habits import (
     CATEGORIES, COLOURS, ICONS, add_habit, delete_habit, edit_habit,
     get_habit, new_habit,
 )
-from app.garden import counts_text, days_to_next_stage, garden_summary, next_habit_to_water, plants_by_stage
+from app.garden import (counts_text, days_to_next_stage, garden_summary,
+                        next_habit_to_water, plants_by_stage,
+                        stage_progress, total_plants)
 from app.insights import consistency_message, consistency_score
 from app.notes import count_notes, latest_note
 from app.ordering import sort_habits
-from app.motivation import morning_message, nightly_message
-from app.streaks import average_streak, last_done_label, longest_streak_overall
+from app.motivation import evening_message, morning_message, nightly_message
+from app.streaks import (average_streak, best_streak, last_done_label,
+                         longest_streak_overall, median_best_streak)
 from app.achievements import badges_for
 from app.categories import (
     best_category, total_minutes_by_category)
@@ -32,15 +35,22 @@ from app.monthly import monthly_summary
 from app.goals import weekly_goal_progress, weekly_goal_warning
 from app.store import DEFAULT_PATH, load_store, save_store, seed_store
 from app.theme import (
-    BG, CARD_RADIUS, CREAM, DONE_BG, DONE_BORDER, GARDEN_CARD_WIDTH,
-    LIGHT_PINK, LILAC, MINT, MUTED, PEACH, PINK, PROGRESS_HEIGHT, SKY, TEXT,
-    card_bg, category_colour, done_label, progress_colour, stage_colour,
+    BG, CARD_BG, DONE_BORDER, GARDEN_CARD_WIDTH,
+    GOLD, LIGHT_PINK, MUTED, PINK, PROGRESS_HEIGHT, SKY,
+    TEXT, TONIGHT_GRADIENT, card_bg, done_label, progress_colour,
+    stage_colour, DEEP_ROSE,
 )
-from app.validation import validate_category, validate_icon
+from app.ui_kit import (
+    category_pill, gradient_card, gradient_header, mini_progress, pill,
+    section_title, soft_card, stat_chip, streak_pill,
+)
+from app.validation import (validate_category, validate_icon,
+                            validate_target_minutes)
 from app.version import APP_NAME, APP_VERSION
 from app.tracker import (
     current_streak, daily_summary, done_count_today, is_done, last_7_days, log_minutes,
-    minutes_for, set_done, today_str, total_minutes_today,
+    minutes_for, set_done, today_str, total_minutes_this_week,
+    total_minutes_today,
 )
 
 # Pastel palette — soft, cute, friendly 🌸 (see app/theme.py)
@@ -100,10 +110,7 @@ def main(page: ft.Page):
             border_radius=16)
 
         def save_clicked(_e):
-            try:
-                target = int(target_field.value or 0)
-            except ValueError:
-                target = 0
+            target = validate_target_minutes(target_field.value)
             if is_edit:
                 if not (name_field.value or "").strip():
                     snack("Please give your habit a name first 🌱")
@@ -145,6 +152,8 @@ def main(page: ft.Page):
         if is_edit:
             confirm_dialog = ft.AlertDialog(
                 title=ft.Text("Delete this habit? 🗑️"),
+                bgcolor=CARD_BG,
+                shape=ft.RoundedRectangleBorder(radius=24),
                 content=ft.Text(
                     f"'{habit['name']}' will be gone for good — "
                     "there is no undo yet. Are you sure?"),
@@ -161,6 +170,8 @@ def main(page: ft.Page):
         buttons.append(ft.Button("Save 💾", on_click=save_clicked))
         dialog = ft.AlertDialog(
             title=ft.Text("Edit habit ✏️" if is_edit else "Plant a new habit 🌱"),
+            bgcolor=CARD_BG,
+            shape=ft.RoundedRectangleBorder(radius=24),
             content=ft.Column(
                 [name_field, category_field, target_field,
                  icon_field, colour_field],
@@ -196,6 +207,8 @@ def main(page: ft.Page):
 
         dialog = ft.AlertDialog(
             title=ft.Text(f"Log minutes — {habit['name']} ⏱️"),
+            bgcolor=CARD_BG,
+            shape=ft.RoundedRectangleBorder(radius=24),
             content=field,
             actions=[ft.TextButton("Cancel",
                                    on_click=lambda e: _close(dialog)),
@@ -207,24 +220,22 @@ def main(page: ft.Page):
     # ---------- views ----------
     def today_view():
         summary = daily_summary(logs, habits, today)
-        header = ft.Column([
-            ft.Text("Today 🌞", size=26, weight=ft.FontWeight.BOLD, color=TEXT),
-            ft.Text("Water your garden, one tick at a time 🌱",
-                    size=14, color=PINK),
-            ft.Text(morning_message(done_count_today(logs, habits, today),
-                                    summary["total"]),
-                    size=14, color=MUTED),
-            ft.Text(f"{summary['done']} of {summary['total']} habits done "
-                    f"• {summary['percent']}% • "
-                    f"⏱ {total_minutes_today(logs, habits, today)} min today",
-                    size=14, color=MUTED),
-            ft.ProgressBar(value=summary["percent"] / 100,
-                           color=progress_colour(summary["percent"]),
-                           bgcolor=LIGHT_PINK, height=PROGRESS_HEIGHT,
-                           border_radius=8),
-            ft.Text(f"🌸 {summary['percent']}% of today done",
-                    size=13, color=PINK),
-        ], spacing=6)
+        header = gradient_header(
+            "Today 🌞", "Water your garden, one tick at a time 🌱", [
+                ft.Text(morning_message(done_count_today(logs, habits, today),
+                                        summary["total"]),
+                        size=14, color=MUTED),
+                ft.Text(f"{summary['done']} of {summary['total']} habits done "
+                        f"• {summary['percent']}% • "
+                        f"⏱ {total_minutes_today(logs, habits, today)} min today",
+                        size=14, color=MUTED),
+                ft.ProgressBar(value=summary["percent"] / 100,
+                               color=progress_colour(summary["percent"]),
+                               bgcolor=LIGHT_PINK, height=PROGRESS_HEIGHT,
+                               border_radius=8),
+                ft.Text(f"🌸 {summary['percent']}% of today done",
+                        size=13, color=PINK),
+            ])
 
         cards = []
         for habit in sort_habits(habits, logs, today):
@@ -240,32 +251,38 @@ def main(page: ft.Page):
             _latest_date, latest_text = latest_note(notes, habit["id"])
             latest_preview = (f" • “{latest_text[:40]}”"
                               if latest_text else "")
-            card = ft.Container(
+            best = best_streak(logs, habit)
+            card = soft_card(
                 content=ft.Row([
                     ft.Checkbox(
                         value=done,
                         on_change=lambda e, h=habit: _tick(h, e.control.value)),
                     ft.Column([
-                        ft.Text(f"{habit['icon']}  {habit['name']}",
-                                size=16, weight=ft.FontWeight.BOLD, color=TEXT),
                         ft.Row([
-                            ft.Container(
-                                content=ft.Text(habit["category"], size=11,
-                                                color=TEXT),
-                                bgcolor=category_colour(habit["category"]),
-                                border_radius=10,
-                                padding=ft.padding.symmetric(horizontal=8,
-                                                             vertical=2)),
-                            ft.Text(f"{target_text} • "
-                                    f"🔥 {streak} day streak • ⏱️ {minutes} min",
-                                    size=13, color=MUTED),
+                            ft.Text(f"{habit['icon']}  {habit['name']}",
+                                    size=16, weight=ft.FontWeight.BOLD, color=TEXT),
+                            pill(done_label(done),
+                                 GOLD if done else LIGHT_PINK,
+                                 color="#8A6D1B" if done else TEXT),
+                        ], spacing=8),
+                        ft.Row([
+                            category_pill(habit["category"]),
+                            streak_pill(streak),
+                            ft.Text(f"🏆 best {best} days",
+                                    size=12, color=GOLD),
                         ], spacing=6),
-                        ft.Text(done_label(done) +
-                                (f" • {note_text}" if note_text else "") +
-                                f" • {last_done_label(logs, habit)}" +
-                                latest_preview,
+                        ft.Text(f"{target_text} • ⏱️ {minutes} min",
+                                size=13, color=MUTED),
+                        (mini_progress(min(1.0, minutes / target),
+                                       progress_colour(
+                                           min(100, round(100 * minutes / target))))
+                         if target else ft.Container(height=0)),
+                        ft.Text(" • ".join(
+                            [p for p in [note_text,
+                                         last_done_label(logs, habit)]
+                             if p]) + latest_preview,
                                 size=12, color=MUTED),
-                    ], expand=True, spacing=2),
+                    ], expand=True, spacing=4),
                     ft.IconButton(icon=ft.Icons.ADD, tooltip="+15 min",
                                   on_click=lambda e, h=habit: _quick_minutes(h)),
                     ft.IconButton(icon=ft.Icons.TIMER, tooltip="Log minutes",
@@ -274,8 +291,7 @@ def main(page: ft.Page):
                                   on_click=lambda e, h=habit: open_habit_dialog(h)),
                 ]),
                 bgcolor=card_bg(habit.get("colour", SKY), done=done),
-                border=ft.Border.all(1, DONE_BORDER if done else LIGHT_PINK),
-                border_radius=CARD_RADIUS, padding=12)
+                border_color=DONE_BORDER if done else LIGHT_PINK)
             cards.append(card)
 
         if not habits:
@@ -308,38 +324,37 @@ def main(page: ft.Page):
             next_text = ("in full bloom! 🌷" if days_left == 0
                          else f"next stage in {days_left} day"
                          + ("s" if days_left != 1 else ""))
-            plants.append(ft.Container(
+            plants.append(soft_card(
                 content=ft.Column([
                     ft.Text(plant["emoji"], size=56),
                     ft.Text(plant["name"], size=15,
                             weight=ft.FontWeight.BOLD, color=TEXT),
-                    ft.Text(f"🌷 {plant['label']} • 🔥 {plant['streak']} days",
-                            size=13, color=MUTED),
+                    pill(f"🌷 {plant['label']}",
+                         stage_colour(plant["stage"])),
+                    streak_pill(plant["streak"]),
+                    mini_progress(stage_progress(plant["streak"])),
                     ft.Text(next_text, size=12, color=PINK),
                     ft.Text(plant["message"], size=12, color=MUTED),
                 ], horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                    spacing=4),
+                    spacing=6),
                 bgcolor=stage_colour(plant["stage"]),
-                border=ft.Border.all(1, LIGHT_PINK),
-                border_radius=CARD_RADIUS,
-                padding=16, width=GARDEN_CARD_WIDTH))
+                border_color=LIGHT_PINK,
+                width=GARDEN_CARD_WIDTH))
         if not plants:
             plants.append(ft.Text("Your garden is empty — plant a habit! 🌱",
                                   size=15, color=MUTED))
-        garden_rows = [
-            ft.Text("My Garden 🌷", size=26, weight=ft.FontWeight.BOLD, color=TEXT),
-            ft.Text(garden["message"], size=15, color=MUTED),
-        ]
+        header = gradient_header(
+            "My Garden 🌷", garden["message"], [
+                ft.Text(counts_text(plants_by_stage(habits, logs, today)),
+                        size=14, color=MUTED),
+            ])
+        garden_rows = [header]
         if garden["plants"]:
-            garden_rows.append(ft.Text(
-                counts_text(plants_by_stage(habits, logs, today)), size=14, color=MUTED))
-            garden_rows.append(ft.Text(
-                f"🌸 {garden['percent_done']}% watered today",
-                size=14, color=PINK))
-            if garden["due_today"]:
-                garden_rows.append(ft.Text(
-                    f"🌱 {garden['due_today']} still to water today",
-                    size=14, color=PINK))
+            garden_rows.append(ft.Row([
+                stat_chip("🌱", "plants", total_plants(habits)),
+                stat_chip("🌸", "watered", f"{garden['percent_done']}%"),
+                stat_chip("💧", "to water", garden["due_today"]),
+            ], spacing=10))
             next_habit = next_habit_to_water(habits, logs, today)
             garden_rows.append(ft.Text(
                 f"Next to water: {next_habit['icon']} {next_habit['name']}"
@@ -358,6 +373,9 @@ def main(page: ft.Page):
         message = nightly_message(summary)
         longest_streak = longest_streak_overall(logs, habits)
         avg_streak = average_streak(logs, habits)
+        median_streak = median_best_streak(logs, habits)
+        week_minutes = total_minutes_this_week(logs, habits)
+        evening = evening_message(summary["done"], summary["total"])
         badges = badges_for(logs, habits, today)
         badges_text = (", ".join(
             f"{b['emoji']} {b['label']}" for b in badges)
@@ -418,46 +436,44 @@ def main(page: ft.Page):
             minutes_rows.append(ft.Text(f"⏱️ {name}: {mins} min",
                                         size=14, color=TEXT))
         return ft.Column([
-            ft.Text("Tonight's review 🌙", size=26,
-                    weight=ft.FontWeight.BOLD, color=TEXT),
-            ft.Text(message, size=15, color=MUTED),
-            ft.Container(
-                content=ft.Column([
-                    ft.Text(f"{summary['done']} / {summary['total']} habits",
-                            size=22, weight=ft.FontWeight.BOLD, color=TEXT),
-                    ft.Text(f"{summary['percent']}% achieved today",
-                            size=16, color=TEXT),
-                    ft.Text(f"Total time: {summary['total_minutes']} minutes",
-                            size=15, color=MUTED),
-                    ft.Text(yday_text, size=15, color=MUTED),
-                    ft.Text(f"Best habit today: "
-                            f"{summary['best_habit'] or '—'} "
-                            f"({summary['best_minutes']} min)",
-                            size=15, color=MUTED),
-                    ft.Text(f"Longest streak: {longest_streak} days 🌳",
-                            size=15, color=MUTED),
-                    ft.Text(f"Average best streak: {avg_streak} days",
-                            size=15, color=MUTED),
-                    ft.Text(consistency_text, size=15, color=MUTED),
-                ], spacing=6),
-                bgcolor=CREAM, border=ft.Border.all(1, PEACH),
-                border_radius=CARD_RADIUS, padding=18),
-            ft.Text("Badges earned 🏅", size=17,
-                    weight=ft.FontWeight.BOLD, color=TEXT),
+            gradient_header("Tonight's review 🌙", message, []),
+            gradient_card(ft.Column([
+                ft.Text(f"{summary['done']} / {summary['total']} habits",
+                        size=22, weight=ft.FontWeight.BOLD, color=TEXT),
+                ft.Text(f"{summary['percent']}% achieved today",
+                        size=16, color=TEXT),
+                ft.Text(evening, size=15, weight=ft.FontWeight.BOLD,
+                        color=DEEP_ROSE),
+                ft.Text(f"Total time: {summary['total_minutes']} minutes",
+                        size=15, color=MUTED),
+                ft.Text(yday_text, size=15, color=MUTED),
+                ft.Text(f"Best habit today: "
+                        f"{summary['best_habit'] or '—'} "
+                        f"({summary['best_minutes']} min)",
+                        size=15, color=MUTED),
+                ft.Text(f"Average best streak: {avg_streak} days",
+                        size=15, color=MUTED),
+                ft.Row([
+                    stat_chip("🌳", "longest streak",
+                              f"{longest_streak} days"),
+                    stat_chip("🌸", "median best streak",
+                              f"{median_streak} days"),
+                    stat_chip("⏱️", "minutes this week",
+                              f"{week_minutes} min"),
+                ], spacing=10),
+                ft.Text(consistency_text, size=15, color=MUTED),
+            ], spacing=6), colors=TONIGHT_GRADIENT),
+            section_title("Badges earned 🏅"),
             ft.Text(badges_text, size=14, color=TEXT),
-            ft.Text("Minutes per habit", size=17,
-                    weight=ft.FontWeight.BOLD, color=TEXT),
+            section_title("Minutes per habit"),
             *minutes_rows,
-            ft.Text("Minutes by category 🌿", size=17,
-                    weight=ft.FontWeight.BOLD, color=TEXT),
+            section_title("Minutes by category 🌿"),
             ft.Text(best_cat_text, size=14, color=TEXT),
             *category_rows,
             ft.Text(month_text, size=14, color=TEXT),
-            ft.Text("Weekly goals 🎯", size=17,
-                    weight=ft.FontWeight.BOLD, color=TEXT),
+            section_title("Weekly goals 🎯"),
             *goal_rows,
-            ft.Text("Last 7 days 📅", size=17,
-                    weight=ft.FontWeight.BOLD, color=TEXT),
+            section_title("Last 7 days 📅"),
             *rows,
         ], spacing=12)
 

@@ -13,7 +13,8 @@ from app.habits import new_habit  # noqa: E402
 from app.tracker import set_done  # noqa: E402
 from app.streaks import (best_streak, days_since_last_done,  # noqa: E402
                          last_done_label, longest_streak_overall,
-                         streak_summary, average_streak)
+                         streak_summary, average_streak,
+                         median_best_streak)
 
 PASSED = 0
 
@@ -98,9 +99,26 @@ def test_average_streak():
           average_streak({}, [h1, h2], date(2026, 11, 3)) == 0.0)
 
 
+def test_median_best_streak():
+    h1 = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
+    h2 = new_habit("Read", "Books", 0, "📖", "#F9A8D4", "2026-11-01")
+    h3 = new_habit("Walk", "Health", 0, "🏃", "#C8F7C5", "2026-11-01")
+    logs = {}
+    for day in ("2026-11-01", "2026-11-02", "2026-11-03"):
+        set_done(logs, h1["id"], day, True)
+    set_done(logs, h2["id"], "2026-11-03", True)
+    check("median best streak of 3, 1 and 0 is 1.0",
+          median_best_streak(logs, [h1, h2, h3], date(2026, 11, 3)) == 1.0)
+    check("median best streak with no habits is 0.0",
+          median_best_streak(logs, [], date(2026, 11, 3)) == 0.0)
+    check("median of two streaks averages them",
+          median_best_streak(logs, [h1, h2], date(2026, 11, 3)) == 2.0)
+
+
 if __name__ == "__main__":
     test_best_streak()
     test_average_streak()
+    test_median_best_streak()
     test_days_since_last_done()
     test_streak_summary()
     test_last_done_label()
