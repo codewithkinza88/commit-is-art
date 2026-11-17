@@ -42,6 +42,24 @@ def days_to_next_stage(streak):
     return 0
 
 
+# Growth thresholds: seed 0, sprout 1, growing 2, blooming 4, full bloom 7.
+_STAGE_THRESHOLDS = [0, 1, 2, 4, 7]
+
+
+def stage_progress(streak):
+    """How far a plant is toward its next growth stage (0.0-1.0).
+
+    0.0 at the start of a stage, 1.0 once it is in full bloom.
+    """
+    streak = max(0, int(streak or 0))
+    if streak >= _STAGE_THRESHOLDS[-1]:
+        return 1.0
+    for prev, nxt in zip(_STAGE_THRESHOLDS, _STAGE_THRESHOLDS[1:]):
+        if prev <= streak < nxt:
+            return (streak - prev) / (nxt - prev)
+    return 0.0
+
+
 def plant_for(habit, logs, date_str):
     """Full garden entry for one habit on a date."""
     from app.tracker import current_streak, is_done
@@ -83,6 +101,11 @@ def plants_by_stage(habits, logs, date_str):
         stage = plant_for(habit, logs, date_str)["stage"]
         counts[stage] = counts.get(stage, 0) + 1
     return counts
+
+
+def total_plants(habits):
+    """How many plants are in the garden (0 when there are no habits)."""
+    return len(habits or [])
 
 
 def counts_text(counts):
