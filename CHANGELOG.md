@@ -2,6 +2,25 @@
 
 All notable changes to Habit Garden are listed here.
 
+## 2026-11-17 — Flower garden + add/edit fix (version 1.6.0)
+
+- Garden grows proper flowers now: each plant shows a flower row that
+  gets bigger as it blooms (sprout 🌿🌸 → full bloom 🌷🌸🌼🌺🌻🌷🌸),
+  and the Garden opens with a full flower bed across the top
+  (`flowers_for_stage` / `flower_bed` in app/garden.py).
+- No more parrot-green garden: every stage tint is a floral pastel
+  (cream → blush → lilac → pink) in app/theme.py.
+- Add/edit habits is unmissable now: the habit card's actions moved
+  into their own row with labelled buttons (＋15 min, ⏱ Minutes,
+  ✏️ Edit) — on a narrow phone the old single row squeezed the Edit
+  button off-screen — plus a hint line and the "Plant a new habit"
+  button on Today. The add/edit dialog itself was already wired.
+- Fixed a data-loss bug: saving used to drop notes (`persist` saved
+  only habits + logs), so any note vanished on the next save.
+
+Tests: 359 checks passing (318 plain-script + 41 in
+tests/test_ui_api.py under .venv for Flet).
+
 ## 2026-11-17 — Premium UI (version 1.5.0)
 
 - Premium cute look: blush → lilac → cream gradient headers, soft

@@ -77,3 +77,12 @@ Everything is softer and prettier now: gradient headers, rounded
 soft-shadow cards, gold streak pills (a 7-day streak turns gold 🏆),
 slim progress bars toward each daily target, and a growth bar under
 every plant showing how close it is to its next stage.
+
+## Flower garden 🌷 (version 1.6.0)
+
+The Garden opens with a full flower bed — one flower per streak day,
+so the more you keep at it, the more flowers bloom. Every plant has
+its own flower, and each stage has its own soft colour (no more
+all-green garden). Add and edit work from the labelled buttons on
+each habit card (＋15 min, ⏱ Minutes, ✏️ Edit), and your notes are
+saved together with everything else.
