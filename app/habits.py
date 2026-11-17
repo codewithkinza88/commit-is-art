@@ -129,3 +129,12 @@ def habits_by_category(habits, category):
     return [h for h in (habits or [])
             if (h.get("category") or "") == category]
 
+
+def count_by_category(habits):
+    """How many habits sit in each category (only categories present)."""
+    counts = {}
+    for habit in (habits or []):
+        category = habit.get("category") or "Daily Life"
+        counts[category] = counts.get(category, 0) + 1
+    return counts
+
