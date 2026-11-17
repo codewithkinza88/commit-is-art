@@ -4,6 +4,8 @@ Each habit is a plant. Its stage grows with its streak of consecutive
 completed days, and ticking it today gives it a little boost.
 """
 
+import hashlib
+
 # (minimum streak, stage key, emoji, label, message)
 _STAGES = [
     (7, "full_bloom", "🌷", "Full bloom!", "A beautiful flower — a whole week strong!"),
@@ -12,6 +14,69 @@ _STAGES = [
     (1, "sprout", "🌿", "Sprout", "A little sprout appeared!"),
     (0, "seed", "🌱", "Seed", "A tiny seed, waiting for its first day of care."),
 ]
+
+
+# Flowers per stage — proper flowers that grow in number as the plant
+# blooms, so opening the Garden shows lots of flowers at once instead
+# of one emoji on a green card. A seed is still just a seed (honest),
+# but from the first sprout there are real flowers.
+FLOWERS_BY_STAGE = {
+    "seed": "🌱",
+    "sprout": "🌿🌸",
+    "growing": "🌿🌸🌷",
+    "blooming": "🌸🌷🌼🌸🌷",
+    "full_bloom": "🌷🌸🌼🌺🌻🌷🌸",
+}
+
+
+def flowers_for_stage(stage):
+    """The flower row for a growth stage (more flowers as it blooms)."""
+    return FLOWERS_BY_STAGE.get(stage or "seed", "🌱")
+
+
+# One flower per plant — every plant gets its own flower, picked
+# deterministically from its habit id and stage (never random at
+# runtime), so the same plant always shows the same flower and
+# different plants show different flowers.
+_FLOWERS = ("🌷", "🌸", "🌼", "🌻", "🌺", "💐")
+
+
+def flower_for(stage, habit_id):
+    """A plant's own flower.
+
+    A seed is still just a seed (honest); from the first sprout the
+    flower is picked by hashing the habit id together with the stage,
+    so it is stable for the same plant and varies across plants.
+    """
+    if (stage or "seed") == "seed":
+        return "🌱"
+    key = f"{habit_id}:{stage}".encode("utf-8")
+    index = int(hashlib.md5(key).hexdigest(), 16) % len(_FLOWERS)
+    return _FLOWERS[index]
+
+
+FLOWER_BED_CAP = 40
+
+
+def flower_bed(plants):
+    """One big flower row for the whole garden — lots of flowers.
+
+    Takes the plant dicts from plant_for / garden_summary: one flower
+    per streak day per plant (at least one per plant, so even a new
+    garden blooms), plus 3 extra for a blooming plant and 5 extra for
+    one in full bloom. Capped at 40 flowers so the row stays a row.
+    Empty when there are no plants.
+    """
+    flowers = []
+    for plant in (plants or []):
+        stage = plant.get("stage") or "seed"
+        count = max(1, int(plant.get("streak") or 0))
+        if stage == "blooming":
+            count += 3
+        elif stage == "full_bloom":
+            count += 5
+        flowers.append(flower_for(stage, plant.get("habit_id")) * count)
+    return "".join(flowers)[:FLOWER_BED_CAP]
 
 
 def growth_stage(streak, done_today=False):
@@ -75,6 +140,7 @@ def plant_for(habit, logs, date_str):
         "colour": habit.get("colour", "#BDE0FE"),
         "streak": streak,
         "done_today": done_today,
+        "flowers": flowers_for_stage(stage["stage"]),
         **stage,
     }
 
