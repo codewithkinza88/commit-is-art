@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.theme import (  # noqa: E402
     BG, CARD_RADIUS, DONE_BG, GOLD, HEADER_GRADIENT, SHADOW, SKY,
-    TONIGHT_GRADIENT, card_bg, category_colour, done_label,
+    STAGE_COLOURS, TONIGHT_GRADIENT, card_bg, category_colour, done_label,
     progress_colour, stage_colour,
 )
 
@@ -37,7 +37,17 @@ def test_theme():
     check("full bloom has a pink tint",
           stage_colour("full_bloom") == "#F8BBD0")
     check("unknown stage falls back to seed tint",
-          stage_colour("mystery") == "#E8F5E9")
+          stage_colour("mystery") == "#FFF3D6")
+    check("no stage tint is green — the garden is flowers, not parrot",
+          stage_colour("seed") == "#FFF3D6"
+          and stage_colour("sprout") == "#FDE7F3"
+          and stage_colour("growing") == "#EDE7FB")
+    check("seed, sprout and growing are not all greens",
+          not all(c.upper() in ("#C8E6C9", "#DCEDC8", "#E8F5E9")
+                  for c in (stage_colour("seed"), stage_colour("sprout"),
+                            stage_colour("growing"))))
+    check("every stage has its own distinct tint",
+          len(set(STAGE_COLOURS.values())) == len(STAGE_COLOURS))
     check("done label is cute", done_label(True) == "Done 🌸")
     check("not-yet label is gentle", done_label(False) == "Not yet 🌱")
     check("study has its own colour", category_colour("Study") == "#A5D8FF")

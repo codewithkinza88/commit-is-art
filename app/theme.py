@@ -39,11 +39,14 @@ SMALL_RADIUS = 16
 PROGRESS_HEIGHT = 12
 GARDEN_CARD_WIDTH = 170
 
-# Garden stage colours — each stage gets its own soft tint
+# Garden stage colours — floral pastels, one per stage.
+# Deliberately NO greens here: Kinza asked for proper flowers, not a
+# parrot-green garden — every stage should look like flowers, so the
+# card tint deepens from cream to pink as the plant blooms.
 STAGE_COLOURS = {
-    "seed": "#E8F5E9",
-    "sprout": "#DCEDC8",
-    "growing": "#C8E6C9",
+    "seed": "#FFF3D6",
+    "sprout": "#FDE7F3",
+    "growing": "#EDE7FB",
     "blooming": "#FCE4EC",
     "full_bloom": "#F8BBD0",
 }
@@ -95,7 +98,7 @@ def progress_colour(percent):
 
 def stage_colour(stage):
     """Soft tint for a garden plant card by growth stage."""
-    return STAGE_COLOURS.get(stage or "seed", "#E8F5E9")
+    return STAGE_COLOURS.get(stage or "seed", "#FFF3D6")
 
 
 def done_label(done):
