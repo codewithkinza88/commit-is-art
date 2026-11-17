@@ -49,8 +49,12 @@ def test_ui_api():
     root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     with open(os.path.join(root, "main.py"), encoding="utf-8") as f:
         source = f.read()
-    check("main.py uses ft.Border.all, not ft.border.all",
-          "ft.Border.all" in source and "ft.border.all" not in source)
+    with open(os.path.join(root, "app", "ui_kit.py"),
+              encoding="utf-8") as f:
+        kit_source = f.read()
+    check("the UI uses ft.Border.all, not ft.border.all",
+          "ft.Border.all" in source + kit_source
+          and "ft.border.all" not in source + kit_source)
     check("main.py has no removed ft.app call",
           "ft.app(" not in source)
     check("main.py has no removed ft.ElevatedButton call",
@@ -69,9 +73,45 @@ def test_ui_api():
           "Yesterday vs today" in source)
     check("yesterday summary comes from daily_summary",
           "daily_summary(logs, habits, yesterday)" in source)
-    check("app version is 1.3.0",
+    check("app version is 1.4.0",
           open(os.path.join(root, "app", "version.py"),
-               encoding="utf-8").read().count('APP_VERSION = "1.3.0"') == 1)
+               encoding="utf-8").read().count('APP_VERSION = "1.4.0"') == 1)
+
+    from app.ui_kit import (  # noqa: E402
+        gradient_card, gradient_header, mini_progress, pill, soft_card,
+        stat_chip, streak_pill,
+    )
+    check("pill builds a rounded container",
+          isinstance(pill("Study", "#A5D8FF"), ft.Container)
+          and pill("Study", "#A5D8FF").border_radius == 10)
+    check("streak pill shows the streak",
+          "5" in streak_pill(5).content.value)
+    check("streak pill turns gold at a week",
+          streak_pill(7).content.value.startswith("🔥 7"))
+    check("soft card has a soft shadow",
+          len(soft_card(ft.Text("hi")).shadow) == 1)
+    check("gradient header has a gradient",
+          gradient_header("Today", "hi").gradient is not None
+          and isinstance(gradient_header("Today", "hi").gradient,
+                         ft.LinearGradient))
+    check("gradient card has a gradient",
+          gradient_card(ft.Text("hi")).gradient is not None)
+    check("stat chip shows its value",
+          stat_chip("🌱", "plants", 3).content.controls[1].value == "3")
+    check("mini progress clamps to full",
+          mini_progress(2).value == 1.0)
+    check("main.py uses the ui kit",
+          "from app.ui_kit import" in source)
+    check("main.py shows growth progress in the garden",
+          "stage_progress(" in source)
+    check("ui kit has no removed ft.app call",
+          "ft.app(" not in kit_source)
+    check("ui kit has no removed ft.ElevatedButton call",
+          "ft.ElevatedButton" not in kit_source)
+    check("the UI never uses the removed padding helpers",
+          "ft.padding.symmetric" not in source + kit_source
+          and "ft.padding.only" not in source + kit_source
+          and "ft.padding.all" not in source + kit_source)
 
 
 if __name__ == "__main__":

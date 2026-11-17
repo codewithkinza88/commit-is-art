@@ -2,6 +2,27 @@
 
 All notable changes to Habit Garden are listed here.
 
+## 2026-11-17
+
+### Today (17 November)
+- Tonight shows your median best streak as well as the average, plus
+  total minutes for the week ("Minutes this week: N min") and a
+  gentle evening message.
+- Garden tab counts your plants ("🌱 N plants in your garden").
+- New helpers: minutes in the last 7 days (`total_minutes_this_week`
+  in app/tracker.py), notes written on one day counted
+  (`count_notes_for_day` in app/notes.py), habits counted by category
+  (`count_by_category` in app/habits.py), habits due tomorrow
+  (`habits_due_tomorrow` in app/schedule.py), notes exported as CSV
+  (`notes_to_csv` in app/export.py), and an evening message
+  (`evening_message` in app/motivation.py).
+- Daily targets are cleaned when saving a habit — a blank, negative
+  or over-a-day target becomes a safe 0..1440 minutes
+  (`validate_target_minutes` in app/validation.py).
+
+Tests: 305 checks passing (288 plain-script + 17 in
+tests/test_ui_api.py under .venv for Flet).
+
 ## 2026-11-16
 
 ### Today (16 November)

@@ -66,3 +66,7 @@ how much of the garden is watered today ("🌸 N% watered today").
 
 A habit you are taking a break from can be archived instead of
 deleted — it hides from the garden but its history stays safe.
+
+Tonight also shows the median best streak, total minutes for the
+week, and an evening wind-down message, and notes can be exported
+as CSV alongside habits and logs.
