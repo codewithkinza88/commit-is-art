@@ -9,7 +9,8 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.theme import (  # noqa: E402
-    BG, CARD_RADIUS, DONE_BG, SKY, card_bg, category_colour, done_label,
+    BG, CARD_RADIUS, DONE_BG, GOLD, HEADER_GRADIENT, SHADOW, SKY,
+    TONIGHT_GRADIENT, card_bg, category_colour, done_label,
     progress_colour, stage_colour,
 )
 
@@ -45,6 +46,13 @@ def test_theme():
               for c in ["Study", "Books", "Health", "Mind", "Daily Life"]))
     check("unknown category falls back to sky",
           category_colour("Mystery") == SKY)
+    check("gold is a soft warm gold", GOLD == "#E9B44C")
+    check("header gradient blends blush, lilac and cream",
+          HEADER_GRADIENT == ["#FDE7F3", "#EDE7FB", "#FFF3D6"])
+    check("tonight gradient starts warm and ends lilac",
+          TONIGHT_GRADIENT[0] == "#FFF3D6"
+          and TONIGHT_GRADIENT[-1] == "#EDE7FB")
+    check("card shadow is a soft pink tint", SHADOW == "#EAC9D8")
 
 
 if __name__ == "__main__":

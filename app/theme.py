@@ -21,6 +21,18 @@ MUTED = "#9A8A99"
 DONE_BG = "#FDE7F3"  # soft pink for a ticked-off habit
 DONE_BORDER = "#F9A8D4"
 
+# Premium accents — soft gold for streaks, deep rose for emphasis
+GOLD = "#E9B44C"
+GOLD_SOFT = "#FBEED3"
+DEEP_ROSE = "#E56B8C"
+ROSE = "#F4729B"
+LILAC_SOFT = "#EDE7FB"
+SHADOW = "#EAC9D8"  # soft shadow tint under cards
+
+# Gradient bands — blush -> lilac -> cream, kept soft and cohesive
+HEADER_GRADIENT = ["#FDE7F3", "#EDE7FB", "#FFF3D6"]
+TONIGHT_GRADIENT = ["#FFF3D6", "#FDE7F3", "#EDE7FB"]
+
 # Soft, rounded shapes
 CARD_RADIUS = 22
 SMALL_RADIUS = 16
