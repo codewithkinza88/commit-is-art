@@ -61,3 +61,8 @@ def notes_for_day(notes, date_str):
         return []
     return [(habit_id, text) for habit_id, text in day_notes.items()
             if isinstance(text, str) and text.strip()]
+
+
+def count_notes_for_day(notes, date_str):
+    """How many non-empty notes were written on one date (0 when none)."""
+    return len(notes_for_day(notes, date_str))

@@ -8,7 +8,9 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from app.notes import MAX_NOTE_LEN, add_note, count_notes, get_note, has_note, latest_note, notes_for_day  # noqa: E402
+from app.notes import (MAX_NOTE_LEN, add_note, count_notes,  # noqa: E402
+                       count_notes_for_day, get_note, has_note,
+                       latest_note, notes_for_day)
 
 PASSED = 0
 
@@ -64,8 +66,23 @@ def test_notes_for_day():
           notes_for_day(notes, "2026-11-12") == [])
 
 
+def test_count_notes_for_day():
+    notes = {}
+    add_note(notes, "h1", "2026-11-10", "Read chapter 3")
+    add_note(notes, "h2", "2026-11-10", "Watered the plants")
+    add_note(notes, "h3", "2026-11-10", "   ")
+    add_note(notes, "h1", "2026-11-11", "Finished chapter 4")
+    check("count notes for a day counts two non-empty notes",
+          count_notes_for_day(notes, "2026-11-10") == 2)
+    check("count notes for a day with one note is 1",
+          count_notes_for_day(notes, "2026-11-11") == 1)
+    check("count notes for an empty day is 0",
+          count_notes_for_day(notes, "2026-11-12") == 0)
+
+
 if __name__ == "__main__":
     main()
     test_latest_note()
     test_notes_for_day()
+    test_count_notes_for_day()
     print(f"{PASSED} tests passed")
