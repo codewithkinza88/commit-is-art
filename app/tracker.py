@@ -60,6 +60,19 @@ def total_minutes_today(logs, habits, date_str):
     return sum(minutes_for(logs, habit["id"], date_str)
                for habit in (habits or []))
 
+def total_minutes_this_week(logs, habits, end_date=None):
+    """Total minutes logged across all habits in the 7 days to end_date."""
+    if isinstance(end_date, str):
+        end = date.fromisoformat(end_date)
+    else:
+        end = end_date or date.today()
+    total = 0
+    for i in range(7):
+        day = (end - timedelta(days=i)).isoformat()
+        total += total_minutes_today(logs, habits, day)
+    return total
+
+
 def done_count_today(logs, habits, date_str):
     """How many habits are done on a date (0 when none)."""
     return sum(1 for habit in (habits or [])

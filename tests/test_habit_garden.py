@@ -11,16 +11,17 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.habits import (  # noqa: E402
     new_habit, add_habit, edit_habit, delete_habit, get_habit,
-    archive_habit, active_habits, habits_by_category,
+    archive_habit, active_habits, habits_by_category, count_by_category,
 )
 from app.tracker import (  # noqa: E402
     set_done, toggle_done, log_minutes, is_done, minutes_for,
-    total_minutes_today, done_count_today, current_streak, daily_summary,
-    last_7_days,
+    total_minutes_today, total_minutes_this_week, done_count_today,
+    current_streak, daily_summary, last_7_days,
 )
 from app.garden import (  # noqa: E402
     counts_text, days_to_next_stage, growth_stage, garden_summary,
-    empty_garden_message, next_habit_to_water, plants_by_stage)
+    empty_garden_message, next_habit_to_water, plants_by_stage,
+    stage_progress, total_plants)
 from app.store import empty_store, seed_store, load_store, save_store  # noqa: E402
 
 PASSED = 0
@@ -274,6 +275,50 @@ def test_garden_percent_done():
           garden_summary([], {}, "2026-11-07")["percent_done"] == 0)
 
 
+
+def test_total_minutes_this_week():
+    habits = [new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-05")]
+    logs = {}
+    log_minutes(logs, habits[0]["id"], "2026-11-07", 45)
+    log_minutes(logs, habits[0]["id"], "2026-11-06", 20)
+    log_minutes(logs, habits[0]["id"], "2026-10-30", 99)
+    check("total minutes this week sums the last 7 days",
+          total_minutes_this_week(logs, habits, "2026-11-07") == 65)
+    check("total minutes this week is 0 with no logs",
+          total_minutes_this_week({}, habits, "2026-11-07") == 0)
+    check("total minutes this week is 0 with no habits",
+          total_minutes_this_week(logs, [], "2026-11-07") == 0)
+
+
+def test_total_plants():
+    habits = [new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-05"),
+              new_habit("Read", "Books", 30, "📖", "#F9A8D4", "2026-11-05")]
+    check("total plants counts the habits", total_plants(habits) == 2)
+    check("total plants is 0 with no habits", total_plants([]) == 0)
+    check("total plants is 0 with None", total_plants(None) == 0)
+
+
+def test_count_by_category():
+    habits = [new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-07"),
+              new_habit("Read", "Books", 30, "📖", "#F9A8D4", "2026-11-07"),
+              new_habit("Revise", "Study", 30, "✍️", "#FFE5A3", "2026-11-07")]
+    check("count by category groups Study and Books",
+          count_by_category(habits) == {"Study": 2, "Books": 1})
+    check("count by category is empty with no habits",
+          count_by_category([]) == {})
+    check("count by category is empty with None",
+          count_by_category(None) == {})
+
+
+def test_stage_progress():
+    check("stage progress is 0 at a fresh seed", stage_progress(0) == 0.0)
+    check("stage progress is 0 at the start of sprout",
+          stage_progress(1) == 0.0)
+    check("stage progress is halfway through growing",
+          stage_progress(3) == 0.5)
+    check("stage progress is 1 in full bloom", stage_progress(7) == 1.0)
+    check("stage progress stays 1 past a week", stage_progress(10) == 1.0)
+
 if __name__ == "__main__":
     test_add_edit_delete_habit()
     test_tick_and_minutes()
@@ -289,4 +334,9 @@ if __name__ == "__main__":
     test_done_count_today()
     test_plants_by_stage()
     test_habits_by_category()
+    test_total_minutes_this_week()
+    test_total_plants()
+    test_count_by_category()
+    test_stage_progress()
     print(f"{PASSED} tests passed")
+
