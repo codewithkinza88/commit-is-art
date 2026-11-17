@@ -73,9 +73,9 @@ def test_ui_api():
           "Yesterday vs today" in source)
     check("yesterday summary comes from daily_summary",
           "daily_summary(logs, habits, yesterday)" in source)
-    check("app version is 1.4.0",
+    check("app version is 1.5.0",
           open(os.path.join(root, "app", "version.py"),
-               encoding="utf-8").read().count('APP_VERSION = "1.4.0"') == 1)
+               encoding="utf-8").read().count('APP_VERSION = "1.5.0"') == 1)
 
     from app.ui_kit import (  # noqa: E402
         gradient_card, gradient_header, mini_progress, pill, soft_card,

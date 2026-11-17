@@ -70,3 +70,10 @@ deleted — it hides from the garden but its history stays safe.
 Tonight also shows the median best streak, total minutes for the
 week, and an evening wind-down message, and notes can be exported
 as CSV alongside habits and logs.
+
+## The premium look ✨ (version 1.5.0)
+
+Everything is softer and prettier now: gradient headers, rounded
+soft-shadow cards, gold streak pills (a 7-day streak turns gold 🏆),
+slim progress bars toward each daily target, and a growth bar under
+every plant showing how close it is to its next stage.

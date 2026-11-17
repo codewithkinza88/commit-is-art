@@ -2,6 +2,22 @@
 
 All notable changes to Habit Garden are listed here.
 
+## 2026-11-17 — Premium UI (version 1.5.0)
+
+- Premium cute look: blush → lilac → cream gradient headers, soft
+  gold accents, rounded soft-shadow habit cards, pill badges for
+  streaks and categories, slim progress bars toward each daily
+  target, and a warm gradient Tonight summary card (new
+  `app/ui_kit.py`, richer palette in `app/theme.py`).
+- Garden plants now show a growth bar toward their next stage
+  (`stage_progress` in app/garden.py).
+- Fixed a crash: the old habit card used `ft.padding.symmetric`,
+  which does not exist in Flet 1.0.5 — the Today view would have
+  crashed when building a habit card.
+
+Tests: 327 checks passing (297 plain-script + 30 in
+tests/test_ui_api.py under .venv for Flet).
+
 ## 2026-11-17
 
 ### Today (17 November)
