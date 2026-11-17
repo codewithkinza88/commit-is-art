@@ -86,3 +86,14 @@ its own flower, and each stage has its own soft colour (no more
 all-green garden). Add and edit work from the labelled buttons on
 each habit card (＋15 min, ⏱ Minutes, ✏️ Edit), and your notes are
 saved together with everything else.
+
+## Notifications & in-app updates 🔔 (version 1.7.0)
+
+A bell in the header shows how many things need your attention —
+habits to water, streaks about to break, weekly-goal warnings, the
+evening Tonight review, and new badges. Tap the bell to see them all
+inside the app. The app also refreshes itself every minute and rolls
+over to the new day at midnight on its own. When a newer version is
+out, a pink card appears on Today — tap "Update now ⬇️" and the new
+APK downloads inside the app, then tap Install (Android's own
+installer popup, one tap, no browser).

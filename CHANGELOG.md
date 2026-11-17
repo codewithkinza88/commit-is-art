@@ -2,6 +2,34 @@
 
 All notable changes to Habit Garden are listed here.
 
+## 2026-11-17 — In-app notifications + in-app updates (version 1.7.0)
+
+- Notifications inside the app: a bell 🔔 in the header shows how many
+  things need attention — habits to water, streaks about to break,
+  weekly-goal warnings, the evening Tonight review, and new badges.
+  Tapping the bell opens the list inside the app; tapping a
+  notification goes to Today. A soft banner on Today shows the most
+  urgent one. "Mark all read" clears the bell for this session.
+  (`app/notifications.py`, 31 checks in tests/test_notifications.py.)
+- The app updates itself: every minute it refreshes on its own, and at
+  midnight it rolls over to the new day and reloads, so there is no
+  need to close and reopen it to see fresh notifications.
+- In-app updates: when a newer version exists, a pink card appears on
+  Today — "🌸 New version {v} is here! — Update now ⬇️". Tapping it
+  downloads the new APK inside the app (with a progress bar) and
+  shows an Install button; no browser needed. The final step is
+  Android's own installer popup (one tap). The build workflow now
+  publishes the APK as a public GitHub Release asset ("latest") so the
+  app can download it without a GitHub login; the Actions artifact
+  stays as a fallback. (`app/updater.py`, 26 checks in
+  tests/test_updater.py.)
+- Fixed a small badge bug found while testing: `badges_for` counted
+  ticks on any logged day, so a badge first earned today also counted
+  as earned yesterday and could never be "new".
+
+Tests: 434 checks passing (375 plain-script + 59 in
+tests/test_ui_api.py under .venv for Flet).
+
 ## 2026-11-17 — Flower garden + add/edit fix (version 1.6.0)
 
 - Garden grows proper flowers now: each plant shows a flower row that
