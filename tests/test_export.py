@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.habits import new_habit  # noqa: E402
 from app.tracker import set_done, log_minutes  # noqa: E402
-from app.export import habits_to_csv, logs_to_csv, summary_to_text  # noqa: E402
+from app.export import habits_to_csv, logs_to_csv, notes_to_csv, summary_to_text  # noqa: E402
 
 PASSED = 0
 
@@ -69,9 +69,25 @@ def test_summary_best_streak():
           in summary_to_text(logs, [], "2026-11-07"))
 
 
+def test_notes_to_csv():
+    from app.notes import add_note
+    notes = {}
+    add_note(notes, "h1", "2026-11-10", "Read chapter 3")
+    add_note(notes, "h2", "2026-11-10", "Watered the plants")
+    add_note(notes, "h3", "2026-11-10", "   ")
+    csv_text = notes_to_csv(notes)
+    check("notes csv has header", csv_text.startswith("date,habit_id,note"))
+    check("notes csv has the note text", "Read chapter 3" in csv_text)
+    check("notes csv skips blank notes",
+          len(csv_text.strip().splitlines()) == 3)
+    check("empty notes csv is header only",
+          len(notes_to_csv({}).strip().splitlines()) == 1)
+
+
 if __name__ == "__main__":
     test_habits_to_csv()
     test_logs_to_csv()
     test_summary_to_text()
     test_summary_best_streak()
+    test_notes_to_csv()
     print(f"{PASSED} tests passed")

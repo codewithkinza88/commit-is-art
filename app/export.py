@@ -40,6 +40,21 @@ def logs_to_csv(logs):
     return output.getvalue()
 
 
+def notes_to_csv(notes):
+    """Notes as CSV text (header + one row per non-empty note)."""
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(["date", "habit_id", "note"])
+    for date_str in sorted(notes or {}):
+        day_notes = notes[date_str] or {}
+        if not isinstance(day_notes, dict):
+            continue
+        for habit_id, text in day_notes.items():
+            if isinstance(text, str) and text.strip():
+                writer.writerow([date_str, habit_id, text.strip()])
+    return output.getvalue()
+
+
 def summary_to_text(logs, habits, date_str):
     """One day's summary as short readable text lines."""
     summary = daily_summary(logs, habits, date_str)
