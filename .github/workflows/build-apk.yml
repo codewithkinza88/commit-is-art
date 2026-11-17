@@ -43,7 +43,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: habit-garden-apk
-          path: build/apk/app-release.apk
+          path: build/apk/habit-garden.apk
           if-no-files-found: error
 
       # Publish the same APK as a public release asset on the rolling
@@ -56,4 +56,4 @@ jobs:
         with:
           tag_name: latest
           name: Habit Garden latest
-          files: build/apk/app-release.apk
+          files: build/apk/habit-garden.apk
