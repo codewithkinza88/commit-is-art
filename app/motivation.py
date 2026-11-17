@@ -47,6 +47,19 @@ def streak_message(streak):
     return "No streak yet — today is a good day to start. 🌱"
 
 
+def evening_message(done, total):
+    """A short wind-down message for the Tonight view."""
+    done = max(0, int(done or 0))
+    total = max(0, int(total or 0))
+    if total == 0:
+        return "No habits yet — tomorrow is a fresh seed. 🌱"
+    if done >= total:
+        return "Every habit done — rest well, your garden is blooming! 🌸"
+    if done == 0:
+        return "Nothing ticked today — tomorrow is a fresh start. 🌱"
+    return f"{done} of {total} done today — a good day's growing! 🪴"
+
+
 def morning_message(done, total):
     """A short greeting for the Today view from how much is done already."""
     done = max(0, int(done or 0))
