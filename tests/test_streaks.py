@@ -12,7 +12,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from app.habits import new_habit  # noqa: E402
 from app.tracker import set_done  # noqa: E402
 from app.streaks import (best_streak, days_since_last_done,  # noqa: E402
-                         last_done_label, longest_streak_overall,
+                         last_done_label, longest_gap,
+                         longest_streak_overall,
                          streak_summary, average_streak,
                          median_best_streak)
 
@@ -115,6 +116,20 @@ def test_median_best_streak():
           median_best_streak(logs, [h1, h2], date(2026, 11, 3)) == 2.0)
 
 
+def test_longest_gap():
+    habit = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
+    logs = {}
+    check("never done has no gap", longest_gap(logs, habit) == 0)
+    set_done(logs, habit["id"], "2026-11-01", True)
+    check("done once has no gap", longest_gap(logs, habit) == 0)
+    set_done(logs, habit["id"], "2026-11-02", True)
+    check("back-to-back days have no gap", longest_gap(logs, habit) == 0)
+    set_done(logs, habit["id"], "2026-11-05", True)
+    check("Mon to Thu is a 2-day gap", longest_gap(logs, habit) == 2)
+    set_done(logs, habit["id"], "2026-11-06", True)
+    check("longest gap stays 2", longest_gap(logs, habit) == 2)
+
+
 if __name__ == "__main__":
     test_best_streak()
     test_average_streak()
@@ -123,4 +138,5 @@ if __name__ == "__main__":
     test_streak_summary()
     test_last_done_label()
     test_longest_streak_overall()
+    test_longest_gap()
     print(f"{PASSED} tests passed")

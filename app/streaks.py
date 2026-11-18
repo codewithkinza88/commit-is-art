@@ -40,6 +40,19 @@ def best_streak(logs, habit, end_date=None):
     return best
 
 
+def longest_gap(logs, habit, end_date=None):
+    """Longest run of missed days between two done days.
+
+    E.g. done Mon and Thu means a 2-day gap (Tue, Wed missed).
+    0 when the habit was done fewer than twice.
+    """
+    done = _done_dates(logs, habit, end_date)
+    if len(done) < 2:
+        return 0
+    return max((done[i + 1] - done[i]).days - 1
+               for i in range(len(done) - 1))
+
+
 def longest_streak_overall(logs, habits, end_date=None):
     """Longest best streak across all habits (0 when there are none)."""
     return max(
