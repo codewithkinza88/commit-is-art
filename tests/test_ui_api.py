@@ -203,6 +203,23 @@ def test_ui_api():
           "ft.padding.symmetric" not in source + kit_source
           and "ft.padding.only" not in source + kit_source
           and "ft.padding.all" not in source + kit_source)
+    check("tonight previews tomorrow's due habits",
+          "habits_due_tomorrow(" in source and "Kal:" in source)
+    check("garden shows the plant of the day",
+          "plant_of_the_day(" in source and "Plant of the day" in source)
+    check("garden shows a category legend",
+          "legend_categories(" in source and "Legend:" in source)
+    check("tonight shows the longest gap",
+          "longest_gap(" in source and "Longest gap:" in source)
+    check("tonight shows the busiest weekday",
+          "busiest_weekday(" in source and "busiest:" in source)
+    check("habit cards show effort and age",
+          "effort_text" in source and "planted" in source)
+    check("habit cards offer a copy button",
+          "clone_habit(" in source and "📋 Copy" in source)
+    check("notifications get the last backup date",
+          "_last_backup_date(" in source
+          and "last_backup_date=_last_backup_date()" in source)
 
 
 if __name__ == "__main__":
