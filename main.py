@@ -20,12 +20,14 @@ import flet as ft
 from datetime import date, timedelta
 
 from app.habits import (
-    CATEGORIES, COLOURS, ICONS, add_habit, delete_habit, edit_habit,
-    get_habit, new_habit,
+    CATEGORIES, COLOURS, EFFORTS, EFFORT_EMOJI, ICONS, add_habit,
+    clone_habit, delete_habit, edit_habit, get_habit, habit_age_days,
+    new_habit,
 )
 from app.garden import (counts_text, days_to_next_stage, flower_bed,
                         flower_for, garden_summary, next_habit_to_water,
-                        plants_by_stage, stage_progress, total_plants)
+                        plant_of_the_day, plants_by_stage, stage_progress,
+                        total_plants)
 from app.insights import consistency_message, consistency_score
 from app.notes import count_notes, latest_note
 from app.ordering import sort_habits
@@ -35,19 +37,21 @@ from app.notifications import (build_notifications, notification_key,
 from app.updater import (default_apk_path, download_apk,
                          fetch_latest_release, is_newer)
 from app.streaks import (average_streak, best_streak, last_done_label,
-                         longest_streak_overall, median_best_streak)
+                         longest_gap, longest_streak_overall,
+                         median_best_streak)
 from app.achievements import badges_for
 from app.backup import backup_filename, backup_to_json, restore_from_json
 from app.categories import (
-    best_category, total_minutes_by_category)
-from app.monthly import monthly_summary
+    best_category, legend_categories, total_minutes_by_category)
+from app.monthly import busiest_weekday, monthly_summary
+from app.schedule import habits_due_tomorrow
 from app.goals import weekly_goal_progress, weekly_goal_warning
 from app.store import DEFAULT_PATH, load_store, save_store, seed_store
 from app.theme import (
     BG, CARD_BG, DONE_BORDER, GARDEN_CARD_WIDTH,
     GOLD, LIGHT_PINK, MUTED, PINK, PROGRESS_HEIGHT, SKY,
-    TEXT, TONIGHT_GRADIENT, card_bg, done_label, progress_colour,
-    stage_colour, DEEP_ROSE,
+    TEXT, TONIGHT_GRADIENT, card_bg, category_colour, done_label,
+    progress_colour, stage_colour, DEEP_ROSE,
 )
 from app.ui_kit import (
     category_pill, gradient_card, gradient_header, mini_progress, pill,
@@ -148,7 +152,9 @@ def main(page: ft.Page):
     # every refresh from the live state, so it is never stale.
 
     def _visible_notifications():
-        return [n for n in build_notifications(habits, logs, notes, today)
+        return [n for n in build_notifications(
+                    habits, logs, notes, today,
+                    last_backup_date=_last_backup_date())
                 if notification_key(n) not in read_keys]
 
     def _rebuild_header():
@@ -240,6 +246,22 @@ def main(page: ft.Page):
         downloads = os.path.join(os.path.expanduser("~"), "Download")
         return downloads if os.path.isdir(downloads) else os.getcwd()
 
+    def _last_backup_date():
+        # Newest backup file date in the backup folder (None when no
+        # backup was ever saved) — drives the gentle backup nudge.
+        prefix, suffix = "habit-garden-backup-", ".json"
+        latest = None
+        try:
+            names = os.listdir(_backup_folder())
+        except OSError:
+            return None
+        for name in names:
+            if name.startswith(prefix) and name.endswith(suffix):
+                day = name[len(prefix):-len(suffix)]
+                if len(day) == 10 and (latest is None or day > latest):
+                    latest = day
+        return latest
+
     def _export_backup(_e):
         # Synchronous on purpose: the file must exist before the
         # SnackBar promises it.
@@ -308,6 +330,11 @@ def main(page: ft.Page):
             value=habit["colour"] if is_edit else "#BDE0FE",
             options=[ft.dropdown.Option(c) for c in COLOURS],
             border_radius=16)
+        effort_field = ft.Dropdown(
+            label="Effort 💪",
+            value=habit.get("effort", "Medium") if is_edit else "Medium",
+            options=[ft.dropdown.Option(e) for e in EFFORTS],
+            border_radius=16)
 
         def save_clicked(_e):
             target = validate_target_minutes(target_field.value)
@@ -318,13 +345,15 @@ def main(page: ft.Page):
                 edit_habit(habits, habit["id"], name=name_field.value,
                            category=validate_category(category_field.value),
                            target_minutes=target, icon=validate_icon(icon_field.value),
-                           colour=colour_field.value)
+                           colour=colour_field.value,
+                           effort=effort_field.value)
                 snack("Habit updated! 💕")
             else:
                 try:
                     add_habit(habits, new_habit(
                         name_field.value, validate_category(category_field.value), target,
-                        validate_icon(icon_field.value), colour_field.value, today))
+                        validate_icon(icon_field.value), colour_field.value, today,
+                        effort_field.value))
                 except ValueError:
                     snack("Please give your habit a name first 🌱")
                     return
@@ -372,7 +401,7 @@ def main(page: ft.Page):
             shape=ft.RoundedRectangleBorder(radius=24),
             content=ft.Column(
                 [name_field, category_field, target_field,
-                 icon_field, colour_field],
+                 icon_field, colour_field, effort_field],
                 tight=True, spacing=12),
             actions=buttons)
         # Flet 1.0.5 has no dialog attribute on the page — the old
@@ -449,6 +478,12 @@ def main(page: ft.Page):
             latest_preview = (f" • “{latest_text[:40]}”"
                               if latest_text else "")
             best = best_streak(logs, habit)
+            effort = habit.get("effort") or "Medium"
+            effort_text = (f"{EFFORT_EMOJI.get(effort, '🟡')} {effort}")
+            age = habit_age_days(habit, today)
+            age_text = ("planted today 🌱" if age == 0
+                        else f"planted {age} day"
+                        + ("s" if age != 1 else "") + " ago")
             # Actions sit in their own row under the habit text, with
             # labels — on a narrow phone the old single row squeezed
             # the three icon buttons off-screen, so Edit looked missing.
@@ -469,6 +504,7 @@ def main(page: ft.Page):
                             ft.Row([
                                 category_pill(habit["category"]),
                                 streak_pill(streak),
+                                pill(effort_text, "#FFF3D6"),
                                 ft.Text(f"🏆 best {best} days",
                                         size=12, color=GOLD),
                             ], spacing=6),
@@ -480,7 +516,8 @@ def main(page: ft.Page):
                              if target else ft.Container(height=0)),
                             ft.Text(" • ".join(
                                 [p for p in [note_text,
-                                             last_done_label(logs, habit)]
+                                             last_done_label(logs, habit),
+                                             age_text]
                                  if p]) + latest_preview,
                                     size=12, color=MUTED),
                         ], expand=True, spacing=4),
@@ -492,6 +529,8 @@ def main(page: ft.Page):
                                       on_click=lambda e, h=habit: open_minutes_dialog(h)),
                         ft.TextButton("✏️ Edit",
                                       on_click=lambda e, h=habit: open_habit_dialog(h)),
+                        ft.TextButton("📋 Copy",
+                                      on_click=lambda e, h=habit: _copy_habit(h)),
                     ], alignment=ft.MainAxisAlignment.END, spacing=4),
                 ], spacing=8),
                 bgcolor=card_bg(habit.get("colour", SKY), done=done),
@@ -583,6 +622,13 @@ def main(page: ft.Page):
         snack(f"+15 min for {habit['name']} ⏱️")
         refresh()
 
+    def _copy_habit(habit):
+        copy = clone_habit(habits, habit["id"])
+        if copy is not None:
+            persist()
+            snack(f"Copied! 📋 {copy['name']}")
+            refresh()
+
     def garden_view():
         garden = garden_summary(habits, logs, today)
         plants = []
@@ -640,6 +686,33 @@ def main(page: ft.Page):
                 f"Next to water: {next_habit['icon']} {next_habit['name']}"
                 if next_habit else "All watered! 🌸",
                 size=14, color=PINK))
+            star = plant_of_the_day(habits, logs, today)
+            if star is not None:
+                garden_rows.append(soft_card(
+                    content=ft.Column([
+                        ft.Text(f"🌟 Plant of the day: {star['icon']} "
+                                f"{star['name']}",
+                                size=15, weight=ft.FontWeight.BOLD,
+                                color=TEXT),
+                        ft.Text(f"🔥 {star['streak']}-day streak — "
+                                + ("water it today! 💧"
+                                   if not star["done_today"]
+                                   else "already watered today 🌸"),
+                                size=13, color=MUTED),
+                    ], spacing=4),
+                    bgcolor=LIGHT_PINK, border_color=PINK))
+            legend = legend_categories(habits)
+            if legend:
+                first_icon = {}
+                for habit in habits:
+                    first_icon.setdefault(
+                        habit.get("category") or "Daily Life",
+                        habit.get("icon") or "🌱")
+                garden_rows.append(ft.Row(
+                    [ft.Text("Legend:", size=13, color=MUTED)] +
+                    [ft.Text(f"{first_icon[c]} {c}", size=13,
+                             color=category_colour(c)) for c in legend],
+                    spacing=8, wrap=True))
         garden_rows.append(ft.Row(plants, wrap=True, spacing=12))
         garden_rows.append(soft_card(
             content=ft.Column([
@@ -666,6 +739,7 @@ def main(page: ft.Page):
                             f"{consistency_message(consistency)}")
         message = nightly_message(summary)
         longest_streak = longest_streak_overall(logs, habits)
+        worst_gap = max((longest_gap(logs, h) for h in habits), default=0)
         avg_streak = average_streak(logs, habits)
         median_streak = median_best_streak(logs, habits)
         week_minutes = total_minutes_this_week(logs, habits)
@@ -692,9 +766,11 @@ def main(page: ft.Page):
                 "No daily targets set — add one to track a weekly goal 🎯",
                 size=14, color=MUTED))
         month = monthly_summary(logs, habits, 2026, 11)
+        busiest = busiest_weekday(month)
         month_text = (f"📅 November so far: {month['total_minutes']} min • "
                       f"{month['average_percent']}% average • "
-                      f"{month['perfect_days']} perfect days")
+                      f"{month['perfect_days']} perfect days"
+                      + (f" • busiest: {busiest}" if busiest else ""))
         best_cat = best_category(logs, habits, today)
         best_cat_text = (f"🏆 Best category today: {best_cat['category']} "
                          f"({best_cat['percent']}% • {best_cat['minutes']} min)"
@@ -729,6 +805,10 @@ def main(page: ft.Page):
         for name, mins in summary["minutes_per_habit"].items():
             minutes_rows.append(ft.Text(f"⏱️ {name}: {mins} min",
                                         size=14, color=TEXT))
+        tomorrow_due = habits_due_tomorrow(habits, date.today().weekday())
+        tomorrow_text = ("Kal: " + ", ".join(
+            f"{h.get('icon', '🌱')} {h['name']}" for h in tomorrow_due)
+            if tomorrow_due else "Kal: nothing due — a free morning! 🌸")
         return ft.Column([
             gradient_header("Tonight's review 🌙", message, []),
             gradient_card(ft.Column([
@@ -755,6 +835,8 @@ def main(page: ft.Page):
                     stat_chip("⏱️", "minutes this week",
                               f"{week_minutes} min"),
                 ], spacing=10),
+                ft.Text(f"Longest gap: {worst_gap} days", size=15,
+                        color=MUTED),
                 ft.Text(consistency_text, size=15, color=MUTED),
             ], spacing=6), colors=TONIGHT_GRADIENT),
             section_title("Badges earned 🏅"),
@@ -767,6 +849,8 @@ def main(page: ft.Page):
             ft.Text(month_text, size=14, color=TEXT),
             section_title("Weekly goals 🎯"),
             *goal_rows,
+            section_title("Tomorrow (Kal) 🌅"),
+            ft.Text(tomorrow_text, size=14, color=TEXT),
             section_title("Last 7 days 📅"),
             *rows,
         ], spacing=12)
