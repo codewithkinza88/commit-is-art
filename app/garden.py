@@ -157,6 +157,21 @@ def next_habit_to_water(habits, logs, date_str):
     return None
 
 
+def plant_of_the_day(habits, logs, date_str):
+    """The garden's spotlight plant: the longest streak among plants
+    not yet done today — or the longest streak overall when every
+    plant is already watered. None when there are no habits.
+
+    Ties go to the plant first in creation order.
+    """
+    plants = [plant_for(h, logs, date_str) for h in (habits or [])]
+    if not plants:
+        return None
+    waiting = [p for p in plants if not p["done_today"]]
+    pool = waiting if waiting else plants
+    return max(pool, key=lambda p: p["streak"])
+
+
 def plants_by_stage(habits, logs, date_str):
     """How many plants sit at each growth stage on a date.
 

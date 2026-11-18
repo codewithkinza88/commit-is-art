@@ -14,6 +14,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.garden import (  # noqa: E402
     flower_bed, flower_for, flowers_for_stage, plant_for,
+    plant_of_the_day,
 )
 from app.habits import new_habit  # noqa: E402
 from app.theme import STAGE_COLOURS, stage_colour  # noqa: E402
@@ -94,6 +95,29 @@ def test_garden_flowers():
                            "streak": 30} for i in range(10)])) == 40)
 
 
+def test_plant_of_the_day():
+    h1 = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
+    h2 = new_habit("Read", "Books", 0, "📖", "#F9A8D4", "2026-11-01")
+    check("no habits means no plant of the day",
+          plant_of_the_day([], {}, "2026-11-10") is None)
+    logs = {}
+    set_done(logs, h1["id"], "2026-11-08", True)
+    set_done(logs, h1["id"], "2026-11-09", True)
+    set_done(logs, h2["id"], "2026-11-09", True)
+    star = plant_of_the_day([h1, h2], logs, "2026-11-10")
+    check("longest waiting streak is the star",
+          star["habit_id"] == h1["id"])
+    set_done(logs, h1["id"], "2026-11-10", True)
+    star = plant_of_the_day([h1, h2], logs, "2026-11-10")
+    check("a watered plant loses the spotlight",
+          star["habit_id"] == h2["id"])
+    set_done(logs, h2["id"], "2026-11-10", True)
+    star = plant_of_the_day([h1, h2], logs, "2026-11-10")
+    check("all watered falls back to longest streak",
+          star["habit_id"] == h1["id"])
+
+
 if __name__ == "__main__":
     test_garden_flowers()
+    test_plant_of_the_day()
     print(f"{PASSED} tests passed")
