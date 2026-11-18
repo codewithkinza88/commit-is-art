@@ -104,3 +104,13 @@ In the Garden view, "💾 Backup save karo" saves all your habits,
 logs and notes to a dated backup file (in Downloads when it exists).
 If the app ever has to be reinstalled, tap "📥 Restore karo" and
 pick that file to bring everything back.
+
+## Little extras 🌱 (version 1.9.0)
+
+Every habit card has a "📋 Copy" button for an identical copy, an
+effort pill (🟢 Easy / 🟡 Medium / 🔴 Hard), and "planted N days ago".
+The Garden spotlights a "🌟 Plant of the day" and shows a Legend
+mapping each category to its colour. Tonight previews tomorrow
+("Kal: ..."), shows your longest gap between waterings, and names
+your busiest weekday. If a week passes with no backup, a gentle
+"💾 Backup your garden" notification appears.

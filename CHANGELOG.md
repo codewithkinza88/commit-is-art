@@ -2,6 +2,29 @@
 
 All notable changes to Habit Garden are listed here.
 
+## 2026-11-18 — Duplicate, effort, age and more (version 1.9.0)
+
+- Duplicate habit: every habit card has a "📋 Copy" button that plants
+  an identical copy (" (copy)").
+- Plant of the day: the Garden spotlights one plant — "🌟 Plant of the
+  day" — the longest streak not yet watered today.
+- Busiest weekday: the Monthly view now names your busiest weekday from
+  your minutes.
+- Tomorrow preview: Tonight shows "Kal: ..." with tomorrow's due habits.
+- Effort level: habits have Easy / Medium / Hard (pickable in the
+  add/edit form, default Medium), shown as a 🟢/🟡/🔴 pill on the card.
+- Category legend: the Garden shows "Legend: ..." mapping each category
+  to its colour/icon.
+- Auto-backup nudge: a "💾 Backup your garden" notification appears
+  when no backup exists or the last one is 7+ days old.
+- Notes search: `find_notes()` searches note text case-insensitively.
+- Longest gap: Tonight shows "Longest gap: N days" (longest stretch
+  between waterings).
+- Habit age: habit cards show "planted N days ago" (or "planted today 🌱").
+
+Tests: 511 checks passing (439 plain-script + 72 in
+tests/test_ui_api.py under .venv for Flet).
+
 ## 2026-11-18 — Backup & restore (version 1.8.0)
 
 - Backup & Restore buttons in the Garden view: "💾 Backup save karo"
