@@ -42,3 +42,15 @@ def monthly_summary(logs, habits, year, month):
         "best_day_date": best_day["date"] if best_day else None,
         "minutes_by_weekday": minutes_by_weekday,
     }
+
+
+def busiest_weekday(summary):
+    """Weekday name (Mon..Sun) with the most minutes in a monthly
+    summary, or None when no minutes were logged at all.
+
+    Ties go to the earliest weekday (Mon first).
+    """
+    minutes = (summary or {}).get("minutes_by_weekday") or {}
+    if not minutes or max(minutes.values()) <= 0:
+        return None
+    return max(minutes, key=lambda name: minutes[name])

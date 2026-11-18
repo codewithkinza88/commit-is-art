@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.habits import new_habit  # noqa: E402
 from app.tracker import set_done, log_minutes  # noqa: E402
-from app.monthly import monthly_summary  # noqa: E402
+from app.monthly import busiest_weekday, monthly_summary  # noqa: E402
 
 PASSED = 0
 
@@ -55,8 +55,24 @@ def test_monthly_empty_habits():
           month["best_day_date"] == "2026-11-01")
 
 
+def test_busiest_weekday():
+    habits = [new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-01")]
+    logs = {}
+    log_minutes(logs, habits[0]["id"], "2026-11-02", 30)  # Monday
+    log_minutes(logs, habits[0]["id"], "2026-11-04", 45)  # Wednesday
+    log_minutes(logs, habits[0]["id"], "2026-11-05", 45)  # Thursday
+    month = monthly_summary(logs, habits, 2026, 11)
+    check("busiest weekday is Wednesday (tie goes earliest)",
+          busiest_weekday(month) == "Wed")
+    check("empty month has no busiest weekday",
+          busiest_weekday(monthly_summary({}, [], 2026, 11)) is None)
+    check("no summary has no busiest weekday",
+          busiest_weekday({}) is None)
+
+
 if __name__ == "__main__":
     test_monthly_november()
     test_monthly_february_leap_year()
     test_monthly_empty_habits()
+    test_busiest_weekday()
     print(f"{PASSED} tests passed")
