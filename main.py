@@ -11,6 +11,7 @@ Build the Android APK (needs the Flet CLI + Flutter + Android SDK):
     flet build apk
 """
 
+import os
 import threading
 import time
 
@@ -36,6 +37,7 @@ from app.updater import (default_apk_path, download_apk,
 from app.streaks import (average_streak, best_streak, last_done_label,
                          longest_streak_overall, median_best_streak)
 from app.achievements import badges_for
+from app.backup import backup_filename, backup_to_json, restore_from_json
 from app.categories import (
     best_category, total_minutes_by_category)
 from app.monthly import monthly_summary
@@ -226,6 +228,58 @@ def main(page: ft.Page):
             _snack_bar[0].content = ft.Text(message)
         _snack_bar[0].open = True
         page.update()
+
+    # ---------- backup & restore 💾 ----------
+    # The app already knew how to build a backup (app/backup.py) but
+    # there was no button for it — so before a reinstall the data
+    # could never be saved. Now it can, from the Garden view.
+    _restore_picker = [None]
+
+    def _backup_folder():
+        # Downloads when it exists (Android), else the working dir.
+        downloads = os.path.join(os.path.expanduser("~"), "Download")
+        return downloads if os.path.isdir(downloads) else os.getcwd()
+
+    def _export_backup(_e):
+        # Synchronous on purpose: the file must exist before the
+        # SnackBar promises it.
+        try:
+            text = backup_to_json(habits, logs, notes)
+            filename = backup_filename()
+            dest = os.path.join(_backup_folder(), filename)
+            with open(dest, "w", encoding="utf-8") as f:
+                f.write(text)
+            snack(f"Backup saved: {filename} ✅")
+        except Exception:
+            snack("Backup save nahi hua — dobara try karo")
+
+    def _on_restore_picked(e):
+        nonlocal habits, logs, notes
+        # The picker staying silent on cancel is on purpose: the
+        # user just changed their mind, nothing went wrong.
+        if not e.files:
+            return
+        try:
+            with open(e.files[0].path, "r", encoding="utf-8") as f:
+                text = f.read()
+            data = restore_from_json(text)
+            habits = data["habits"]
+            logs = data["logs"]
+            backup_notes = data.get("notes")
+            notes = backup_notes if isinstance(backup_notes, dict) else {}
+            persist()
+            refresh()
+            snack("Backup restore ho gaya ✅")
+        except Exception:
+            snack("Yeh backup file nahi hai")
+
+    def _import_backup(_e):
+        if _restore_picker[0] is not None:
+            _restore_picker[0].pick_files(
+                allowed_extensions=["json"], allow_multiple=False)
+
+    _restore_picker[0] = ft.FilePicker(on_result=_on_restore_picked)
+    page.overlay.append(_restore_picker[0])
 
     # ---------- habit form (add / edit) ----------
     def open_habit_dialog(habit=None):
@@ -587,6 +641,20 @@ def main(page: ft.Page):
                 if next_habit else "All watered! 🌸",
                 size=14, color=PINK))
         garden_rows.append(ft.Row(plants, wrap=True, spacing=12))
+        garden_rows.append(soft_card(
+            content=ft.Column([
+                section_title("Backup & Restore 💾"),
+                ft.Text("Save your habits before a reinstall, or bring "
+                        "an old backup back.",
+                        size=13, color=MUTED),
+                ft.Row([
+                    ft.Button("💾 Backup save karo",
+                              on_click=_export_backup),
+                    ft.Button("📥 Restore karo",
+                              on_click=_import_backup),
+                ], spacing=10, wrap=True),
+            ], spacing=8),
+            bgcolor=CARD_BG, border_color=LIGHT_PINK))
         return ft.Column(garden_rows, spacing=14)
 
     def tonight_view():

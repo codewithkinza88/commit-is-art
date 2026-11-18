@@ -95,7 +95,7 @@ def test_ui_api():
     check("the workflow publishes the APK as a public release asset",
           "softprops/action-gh-release@v2" in workflow
           and "tag_name: latest" in workflow
-          and "files: build/apk/app-release.apk" in workflow)
+          and "files: build/apk/habit-garden.apk" in workflow)
     check("a release failure can never fail the run",
           "continue-on-error: true" in workflow)
     check("the workflow grants the release step write permission",
@@ -137,9 +137,9 @@ def test_ui_api():
           "Yesterday vs today" in source)
     check("yesterday summary comes from daily_summary",
           "daily_summary(logs, habits, yesterday)" in source)
-    check("app version is 1.7.0",
+    check("app version is 1.8.0",
           open(os.path.join(root, "app", "version.py"),
-               encoding="utf-8").read().count('APP_VERSION = "1.7.0"') == 1)
+               encoding="utf-8").read().count('APP_VERSION = "1.8.0"') == 1)
     check("garden plants show a flower row, not one big emoji",
           'plant["flowers"]' in source)
     check("garden opens with a full flower bed on top",
@@ -151,6 +151,22 @@ def test_ui_api():
           "Tap ✏️ Edit on any habit" in source)
     check("saving keeps notes instead of dropping them",
           '"notes": notes' in source)
+    check("the Garden view has Backup & Restore buttons",
+          "💾 Backup save karo" in source
+          and "📥 Restore karo" in source
+          and "Backup & Restore 💾" in source)
+    check("restore picks a json file with a FilePicker",
+          "ft.FilePicker(" in source
+          and 'allowed_extensions=["json"]' in source)
+    check("a bad backup file is rejected with a friendly message",
+          "Yeh backup file nahi hai" in source)
+    check("export saves the backup and says so",
+          "Backup saved:" in source
+          and "backup_to_json(" in source
+          and "backup_filename()" in source)
+    check("restore replaces the store, saves it and refreshes",
+          "restore_from_json(" in source
+          and "persist()" in source)
 
     from app.ui_kit import (  # noqa: E402
         gradient_card, gradient_header, mini_progress, pill, soft_card,
