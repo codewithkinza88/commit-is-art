@@ -36,8 +36,14 @@ jobs:
       - name: Install Flet
         run: pip install -r requirements.txt
 
+      # Decode the persistent release keystore (stored as a base64
+      # GitHub secret). Every build must use this SAME keystore, or
+      # Android refuses to install the new APK over the old one.
+      - name: Decode the release keystore
+        run: echo "${{ secrets.ANDROID_SIGNING_KEY_STORE_BASE64 }}" | base64 -d > $RUNNER_TEMP/release.jks
+
       - name: Build the Android APK
-        run: flet build apk --verbose
+        run: flet build apk --verbose --android-signing-key-store $RUNNER_TEMP/release.jks --android-signing-key-store-password "${{ secrets.ANDROID_SIGNING_KEY_STORE_PASSWORD }}" --android-signing-key-password "${{ secrets.ANDROID_SIGNING_KEY_PASSWORD }}" --android-signing-key-alias "${{ secrets.ANDROID_SIGNING_KEY_ALIAS }}"
 
       - name: Upload the APK
         uses: actions/upload-artifact@v4
