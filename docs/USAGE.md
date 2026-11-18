@@ -97,3 +97,10 @@ over to the new day at midnight on its own. When a newer version is
 out, a pink card appears on Today — tap "Update now ⬇️" and the new
 APK downloads inside the app, then tap Install (Android's own
 installer popup, one tap, no browser).
+
+## Backup & restore 💾 (version 1.8.0)
+
+In the Garden view, "💾 Backup save karo" saves all your habits,
+logs and notes to a dated backup file (in Downloads when it exists).
+If the app ever has to be reinstalled, tap "📥 Restore karo" and
+pick that file to bring everything back.

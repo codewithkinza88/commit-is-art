@@ -2,6 +2,25 @@
 
 All notable changes to Habit Garden are listed here.
 
+## 2026-11-18 — Backup & restore (version 1.8.0)
+
+- Backup & Restore buttons in the Garden view: "💾 Backup save karo"
+  writes a dated habit-garden-backup-YYYY-MM-DD.json with all habits,
+  logs and notes (to Downloads when it exists, else the app folder),
+  and "📥 Restore karo" picks a backup file and brings everything
+  back. A bad file is rejected with "Yeh backup file nahi hai" and
+  changes nothing; cancelling the picker stays silent.
+- Why now: every GitHub Actions build so far was signed with a fresh
+  throwaway key, so the new APK could not update the installed app —
+  Kinza has to uninstall once and reinstall, which wipes the app's
+  data. The backup logic (app/backup.py) already existed but had no
+  button, so the data could never be saved. From this version on,
+  save a backup first and restore it after any reinstall.
+  (16 checks in tests/test_backup_ui.py.)
+
+Tests: 455 checks passing (391 plain-script + 64 in
+tests/test_ui_api.py under .venv for Flet).
+
 ## 2026-11-17 — In-app notifications + in-app updates (version 1.7.0)
 
 - Notifications inside the app: a bell 🔔 in the header shows how many
