@@ -59,13 +59,14 @@ def test_notifications():
           build_notifications([], {}, {}, "2026-11-17", hour=14) == [])
     check("unread count is just the count",
           unread_count(build_notifications(_plain_habits(), {}, {},
-                                           "2026-11-17", hour=14)) == 2)
+                                           "2026-11-17", hour=14,
+                                           last_backup_date="2026-11-17")) == 2)
     check("unread count of nothing is 0", unread_count([]) == 0)
 
     habits = _plain_habits()
     notes = build_notifications(habits, {}, {}, "2026-11-17", hour=14)
     check("each undone habit gets a water reminder",
-          _kinds(notes) == ["due", "due"])
+          len(_of_kind(notes, "due")) == 2)
     check("a due reminder names its habit",
           notes[0]["title"] == "Water Drink water"
           and notes[0]["habit_id"] == habits[0]["id"])
@@ -110,8 +111,10 @@ def test_notifications():
           "morning" in _kinds(build_notifications(
               _habits(), {}, {}, "2026-11-17", hour=9)))
     check("morning prompt counts the waiting habits",
-          "2 habits waiting" in build_notifications(
-              _habits(), {}, {}, "2026-11-17", hour=9)[-1]["text"])
+          "2 habits waiting" in
+          [n for n in build_notifications(
+              _habits(), {}, {}, "2026-11-17", hour=9)
+           if n["kind"] == "morning"][0]["text"])
     habits = _habits()
     logs = {"2026-11-17": {habits[0]["id"]: {"done": True, "minutes": 0}}}
     check("no morning prompt once something is done",
@@ -180,6 +183,19 @@ def test_notifications():
                                 hour=14)
     check("different habits get different keys",
           notification_key(plain[0]) != notification_key(plain[1]))
+
+    backup_habits = _plain_habits()
+    check("no backup ever nudges",
+          any(n["kind"] == "backup" for n in build_notifications(
+              backup_habits, {}, {}, "2026-11-17", hour=14)))
+    check("recent backup does not nudge",
+          not any(n["kind"] == "backup" for n in build_notifications(
+              backup_habits, {}, {}, "2026-11-17", hour=14,
+              last_backup_date="2026-11-16")))
+    check("old backup nudges",
+          any(n["kind"] == "backup" for n in build_notifications(
+              backup_habits, {}, {}, "2026-11-17", hour=14,
+              last_backup_date="2026-11-01")))
 
     check("same day needs no refresh",
           should_refresh("2026-11-17", "2026-11-17") is False)

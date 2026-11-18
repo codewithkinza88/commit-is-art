@@ -9,7 +9,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.backup import (backup_filename, backup_to_json, make_backup,  # noqa: E402
-                        restore_from_json)
+                        restore_from_json, should_auto_backup)
 from app.habits import new_habit  # noqa: E402
 
 PASSED = 0
@@ -50,6 +50,16 @@ def main():
           backup_filename("2026-11-14").endswith(".json"))
     check("dated filename defaults to today",
           backup_filename().startswith("habit-garden-backup-20"))
+    check("never backed up needs a backup",
+          should_auto_backup(None, "2026-11-18") is True)
+    check("backup 6 days ago is fine",
+          should_auto_backup("2026-11-12", "2026-11-18") is False)
+    check("backup 7 days ago is overdue",
+          should_auto_backup("2026-11-11", "2026-11-18") is True)
+    check("backup yesterday is fine",
+          should_auto_backup("2026-11-17", "2026-11-18") is False)
+    check("bad last date needs a backup",
+          should_auto_backup("soon", "2026-11-18") is True)
 
 
 if __name__ == "__main__":

@@ -7,12 +7,13 @@ they are always fresh — no server, no Play Store, no system push.
 A notification is a plain dict:
     {"kind", "icon", "title", "text"} and "habit_id" when it names one
     habit. Kinds: "streak", "due", "goal", "evening", "morning",
-    "badge". Most urgent first, capped at 10.
+    "badge", "backup". Most urgent first, capped at 10.
 """
 
 from datetime import date, datetime, timedelta
 
 from app.achievements import badges_for
+from app.backup import should_auto_backup
 from app.goals import weekly_goal_progress, weekly_goal_warning
 from app.habits import active_habits
 from app.schedule import is_due_today
@@ -45,13 +46,16 @@ def _note(kind, icon, title, text, habit_id=None):
     return note
 
 
-def build_notifications(habits, logs, notes, date_str, hour=None):
+def build_notifications(habits, logs, notes, date_str, hour=None,
+                        last_backup_date=None):
     """Notifications for one day, most urgent first, capped at 10.
 
     hour is the hour of day (0-23); when None it is read from the
     clock, so tests pass it in instead of depending on the real time.
     `notes` is accepted for future note-based reminders; the rules
-    below only need habits and logs.
+    below only need habits and logs. `last_backup_date` (None, a date
+    or an ISO string) adds a gentle backup nudge when the last backup
+    was 7+ days ago.
     """
     if hour is None:
         hour = datetime.now().hour
@@ -119,5 +123,13 @@ def build_notifications(habits, logs, notes, date_str, hour=None):
                     "badge", "🏅", f"New badge: {badge['label']}",
                     f"You earned the {badge['label']} badge!"))
 
-    ordered = streak_notes + due_notes + goal_notes + time_notes + badge_notes
+    backup_notes = []
+    if habits and should_auto_backup(last_backup_date, day):
+        backup_notes.append(_note(
+            "backup", "💾", "Backup your garden",
+            "It's been a while since your last backup — save one "
+            "from the Garden so your habits are safe 💾"))
+
+    ordered = (streak_notes + due_notes + goal_notes + time_notes
+               + badge_notes + backup_notes)
     return ordered[:MAX_NOTIFICATIONS]
