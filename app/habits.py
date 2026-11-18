@@ -10,6 +10,7 @@ A habit is a plain dict:
         "colour": "#F9A8D4",             # pastel colour chosen by the user
         "created_date": "2026-11-07",    # ISO date YYYY-MM-DD
         "archived": False,               # True when parked (hidden, not deleted)
+        "effort": "Medium",              # Easy, Medium or Hard
     }
 """
 
@@ -18,6 +19,15 @@ from datetime import date
 
 CATEGORIES = ["Study", "Books", "Health", "Mind", "Daily Life"]
 
+EFFORTS = ["Easy", "Medium", "Hard"]
+
+EFFORT_EMOJI = {"Easy": "🟢", "Medium": "🟡", "Hard": "🔴"}
+
+
+def validate_effort(effort):
+    """Effort level, falling back to Medium for anything unknown."""
+    return effort if effort in EFFORTS else "Medium"
+
 ICONS = ["📚", "📖", "💧", "🧘", "🏃", "🌱", "✍️", "🎵", "😴", "🍎", "💻", "🌸"]
 
 COLOURS = ["#F9A8D4", "#FBCFE8", "#A5D8FF", "#BDE0FE", "#C8F7C5",
@@ -25,7 +35,7 @@ COLOURS = ["#F9A8D4", "#FBCFE8", "#A5D8FF", "#BDE0FE", "#C8F7C5",
 
 
 def new_habit(name, category="Daily Life", target_minutes=0, icon="🌱",
-              colour="#BDE0FE", created_date=None):
+              colour="#BDE0FE", created_date=None, effort="Medium"):
     """Build a new habit dict. Raises ValueError on a blank name."""
     name = (name or "").strip()
     if not name:
@@ -47,6 +57,7 @@ def new_habit(name, category="Daily Life", target_minutes=0, icon="🌱",
         "colour": colour if colour in COLOURS else "#BDE0FE",
         "created_date": created_date or date.today().isoformat(),
         "archived": False,
+        "effort": validate_effort(effort),
     }
 
 
@@ -67,8 +78,8 @@ def get_habit(habits, habit_id):
 def edit_habit(habits, habit_id, **changes):
     """Update a habit's fields. Returns True if found, else False.
 
-    Allowed changes: name, category, target_minutes, icon, colour.
-    A blank new name is ignored (the old name is kept).
+    Allowed changes: name, category, target_minutes, icon, colour,
+    effort. A blank new name is ignored (the old name is kept).
     """
     habit = get_habit(habits, habit_id)
     if habit is None:
@@ -89,6 +100,8 @@ def edit_habit(habits, habit_id, **changes):
         habit["icon"] = changes["icon"]
     if "colour" in changes and changes["colour"] in COLOURS:
         habit["colour"] = changes["colour"]
+    if "effort" in changes:
+        habit["effort"] = validate_effort(changes["effort"])
     return True
 
 
@@ -108,6 +121,48 @@ def archive_habit(habits, habit_id):
         return None
     habit["archived"] = True
     return habit
+
+
+def clone_habit(habits, habit_id):
+    """Copy a habit: same category/target/icon/colour/effort, new id,
+    " (copy)" name, fresh created_date, not archived.
+
+    Appends the copy to the list and returns it (None when the habit
+    is not found).
+    """
+    habit = get_habit(habits, habit_id)
+    if habit is None:
+        return None
+    copy = dict(habit)
+    copy["id"] = uuid.uuid4().hex[:8]
+    copy["name"] = habit["name"] + " (copy)"
+    copy["created_date"] = date.today().isoformat()
+    copy["archived"] = False
+    habits.append(copy)
+    return copy
+
+
+def habit_age_days(habit, today=None):
+    """Days since the habit was planted (0 when planted today, or
+    when its created_date is missing or invalid).
+
+    `today` is a date or an ISO string; when None it is today.
+    """
+    created = (habit or {}).get("created_date") or ""
+    try:
+        born = date.fromisoformat(created)
+    except ValueError:
+        return 0
+    if today is None:
+        day = date.today()
+    elif isinstance(today, str):
+        try:
+            day = date.fromisoformat(today)
+        except ValueError:
+            return 0
+    else:
+        day = today
+    return max(0, (day - born).days)
 
 
 def active_habits(habits):

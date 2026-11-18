@@ -12,6 +12,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from app.habits import (  # noqa: E402
     new_habit, add_habit, edit_habit, delete_habit, get_habit,
     archive_habit, active_habits, habits_by_category, count_by_category,
+    clone_habit, habit_age_days, validate_effort,
 )
 from app.tracker import (  # noqa: E402
     set_done, toggle_done, log_minutes, is_done, minutes_for,
@@ -319,6 +320,62 @@ def test_stage_progress():
     check("stage progress is 1 in full bloom", stage_progress(7) == 1.0)
     check("stage progress stays 1 past a week", stage_progress(10) == 1.0)
 
+
+def test_clone_habit():
+    habits = []
+    habit = new_habit("Study — DSA", "Study", 60, "📚", "#A5D8FF",
+                      "2026-11-07")
+    add_habit(habits, habit)
+    copy = clone_habit(habits, habit["id"])
+    check("clone is a different habit",
+          copy is not None and copy["id"] != habit["id"])
+    check("clone name has (copy)",
+          copy["name"] == "Study — DSA (copy)")
+    check("clone keeps category", copy["category"] == "Study")
+    check("clone keeps target", copy["target_minutes"] == 60)
+    check("clone keeps icon and colour",
+          copy["icon"] == "📚" and copy["colour"] == "#A5D8FF")
+    check("clone is added to the list", len(habits) == 2)
+    check("clone is not archived", copy["archived"] is False)
+    check("cloning a missing habit is None",
+          clone_habit(habits, "nope") is None)
+
+
+def test_effort_level():
+    habit = new_habit("Read", "Books", 30, "📖", "#F9A8D4", "2026-11-07")
+    check("new habit defaults to Medium effort",
+          habit["effort"] == "Medium")
+    hard = new_habit("Run", "Health", 0, "🏃", "#BDE0FE", "2026-11-07",
+                     "Hard")
+    check("new habit keeps Hard effort", hard["effort"] == "Hard")
+    weird = new_habit("Nap", "Health", 0, "😴", "#BDE0FE", "2026-11-07",
+                      "Impossible")
+    check("unknown effort falls back to Medium",
+          weird["effort"] == "Medium")
+    check("validate_effort passes Easy", validate_effort("Easy") == "Easy")
+    check("validate_effort rejects junk",
+          validate_effort("extreme") == "Medium")
+    habits = [habit]
+    edit_habit(habits, habit["id"], effort="Easy")
+    check("edit changes effort", habit["effort"] == "Easy")
+    edit_habit(habits, habit["id"], effort="nope")
+    check("edit rejects bad effort", habit["effort"] == "Medium")
+
+
+def test_habit_age_days():
+    habit = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-07")
+    check("age on the planted day is 0",
+          habit_age_days(habit, "2026-11-07") == 0)
+    check("age counts days",
+          habit_age_days(habit, "2026-11-17") == 10)
+    check("age never goes negative",
+          habit_age_days(habit, "2026-11-01") == 0)
+    check("missing created_date is 0",
+          habit_age_days({}, "2026-11-17") == 0)
+    check("bad created_date is 0",
+          habit_age_days({"created_date": "soon"}, "2026-11-17") == 0)
+
+
 if __name__ == "__main__":
     test_add_edit_delete_habit()
     test_tick_and_minutes()
@@ -338,5 +395,8 @@ if __name__ == "__main__":
     test_total_plants()
     test_count_by_category()
     test_stage_progress()
+    test_clone_habit()
+    test_effort_level()
+    test_habit_age_days()
     print(f"{PASSED} tests passed")
 
