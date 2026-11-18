@@ -9,7 +9,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.notes import (MAX_NOTE_LEN, add_note, count_notes,  # noqa: E402
-                       count_notes_for_day, get_note, has_note,
+                       count_notes_for_day, find_notes, get_note, has_note,
                        latest_note, notes_for_day)
 
 PASSED = 0
@@ -80,9 +80,30 @@ def test_count_notes_for_day():
           count_notes_for_day(notes, "2026-11-12") == 0)
 
 
+def test_find_notes():
+    notes = {}
+    add_note(notes, "h1", "2026-11-10", "Read chapter 3 of the book")
+    add_note(notes, "h2", "2026-11-11", "Chapter 4 was hard")
+    add_note(notes, "h1", "2026-11-12", "Watered the plants")
+    found = find_notes(notes, "chapter")
+    check("find_notes matches case-insensitively", len(found) == 2)
+    check("find_notes returns date, habit and text",
+          found[0] == ("2026-11-10", "h1", "Read chapter 3 of the book"))
+    check("find_notes matches an uppercase query",
+          len(find_notes(notes, "CHAPTER")) == 2)
+    check("find_notes finds one match",
+          find_notes(notes, "plants") ==
+          [("2026-11-12", "h1", "Watered the plants")])
+    check("find_notes finds nothing for no match",
+          find_notes(notes, "banana") == [])
+    check("blank query finds nothing",
+          find_notes(notes, "   ") == [])
+
+
 if __name__ == "__main__":
     main()
     test_latest_note()
     test_notes_for_day()
     test_count_notes_for_day()
+    test_find_notes()
     print(f"{PASSED} tests passed")

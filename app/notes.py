@@ -66,3 +66,23 @@ def notes_for_day(notes, date_str):
 def count_notes_for_day(notes, date_str):
     """How many non-empty notes were written on one date (0 when none)."""
     return len(notes_for_day(notes, date_str))
+
+
+def find_notes(notes, query):
+    """(date, habit_id, text) for notes whose text contains the query,
+    case-insensitive. [] for a blank query. Ordered by date, then
+    habit id.
+    """
+    query = (query or "").strip().lower()
+    if not query:
+        return []
+    found = []
+    for date_str in sorted((notes or {}).keys()):
+        day_notes = notes.get(date_str) or {}
+        if not isinstance(day_notes, dict):
+            continue
+        for habit_id in sorted(day_notes.keys()):
+            text = day_notes.get(habit_id) or ""
+            if isinstance(text, str) and text.strip() and query in text.lower():
+                found.append((date_str, habit_id, text))
+    return found
