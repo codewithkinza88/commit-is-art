@@ -38,6 +38,20 @@ def best_category(logs, habits, date_str):
                key=lambda e: (e["percent"], e["minutes"], e["category"]))
 
 
+def legend_categories(habits):
+    """Categories present in the garden, in first-appearance order.
+
+    Used for the garden's legend line, so every colour in the garden
+    means something. [] when there are no habits.
+    """
+    seen = []
+    for habit in (habits or []):
+        category = habit.get("category") or "Daily Life"
+        if category not in seen:
+            seen.append(category)
+    return seen
+
+
 def total_minutes_by_category(logs, habits, date_str):
     """Minutes logged per category on a date (uses daily_summary data)."""
     summary = daily_summary(logs, habits, date_str)

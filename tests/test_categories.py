@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.habits import new_habit  # noqa: E402
 from app.tracker import set_done, log_minutes  # noqa: E402
-from app.categories import best_category, category_summary, total_minutes_by_category  # noqa: E402
+from app.categories import best_category, category_summary, legend_categories, total_minutes_by_category  # noqa: E402
 
 PASSED = 0
 
@@ -63,8 +63,19 @@ def test_total_minutes_by_category():
     check("health minutes is 0", minutes["Health"] == 0)
 
 
+def test_legend_categories():
+    habits = [new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01"),
+              new_habit("Read", "Books", 0, "📖", "#F9A8D4", "2026-11-01"),
+              new_habit("Revise", "Study", 0, "✍️", "#FFE5A3", "2026-11-01")]
+    check("legend lists each present category once",
+          legend_categories(habits) == ["Study", "Books"])
+    check("legend is empty with no habits",
+          legend_categories([]) == [])
+
+
 if __name__ == "__main__":
     test_category_summary()
     test_best_category()
     test_total_minutes_by_category()
+    test_legend_categories()
     print(f"{PASSED} tests passed")
