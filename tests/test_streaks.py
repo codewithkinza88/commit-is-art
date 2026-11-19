@@ -11,7 +11,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.habits import new_habit  # noqa: E402
 from app.tracker import set_done  # noqa: E402
-from app.streaks import (best_streak, days_since_last_done,  # noqa: E402
+from app.streaks import (average_best_streak, best_streak,
+                         days_since_last_done,  # noqa: E402
                          last_done_label, longest_gap,
                          longest_streak_overall,
                          streak_summary, average_streak,
@@ -116,6 +117,21 @@ def test_median_best_streak():
           median_best_streak(logs, [h1, h2], date(2026, 11, 3)) == 2.0)
 
 
+def test_average_best_streak():
+    h1 = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
+    h2 = new_habit("Read", "Books", 0, "📖", "#F9A8D4", "2026-11-01")
+    logs = {}
+    for day in ("2026-11-01", "2026-11-02", "2026-11-03"):
+        set_done(logs, h1["id"], day, True)
+    set_done(logs, h2["id"], "2026-11-03", True)
+    check("average best streak of 3 and 1 is 2.0",
+          average_best_streak(logs, [h1, h2], date(2026, 11, 3)) == 2.0)
+    check("average best streak with no habits is 0.0",
+          average_best_streak(logs, [], date(2026, 11, 3)) == 0.0)
+    check("average best streak of a never-done habit is 0.0",
+          average_best_streak({}, [h2], date(2026, 11, 3)) == 0.0)
+
+
 def test_longest_gap():
     habit = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
     logs = {}
@@ -134,6 +150,7 @@ if __name__ == "__main__":
     test_best_streak()
     test_average_streak()
     test_median_best_streak()
+    test_average_best_streak()
     test_days_since_last_done()
     test_streak_summary()
     test_last_done_label()

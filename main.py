@@ -26,17 +26,20 @@ from app.habits import (
 )
 from app.garden import (counts_text, days_to_next_stage, flower_bed,
                         flower_for, garden_summary, next_habit_to_water,
-                        plant_of_the_day, plants_by_stage, stage_progress,
+                        plant_of_the_day, plant_with_longest_streak,
+                        plants_by_stage, stage_progress,
                         total_plants)
 from app.insights import consistency_message, consistency_score
 from app.notes import count_notes, latest_note
 from app.ordering import sort_habits
-from app.motivation import evening_message, morning_message, nightly_message
+from app.motivation import (comeback_message, evening_message,
+                            morning_message, nightly_message)
 from app.notifications import (build_notifications, notification_key,
                                should_refresh, unread_count)
 from app.updater import (default_apk_path, download_apk,
                          fetch_latest_release, is_newer)
-from app.streaks import (average_streak, best_streak, last_done_label,
+from app.streaks import (average_best_streak, average_streak, best_streak,
+                         days_since_last_done, last_done_label,
                          longest_gap, longest_streak_overall,
                          median_best_streak)
 from app.achievements import badges_for
@@ -63,7 +66,7 @@ from app.version import APP_NAME, APP_VERSION
 from app.tracker import (
     current_streak, daily_summary, done_count_today, is_done, last_7_days, log_minutes,
     minutes_for, set_done, today_str, total_minutes_this_week,
-    total_minutes_today,
+    total_minutes_today, total_minutes_yesterday,
 )
 
 # Pastel palette — soft, cute, friendly 🌸 (see app/theme.py)
@@ -701,6 +704,12 @@ def main(page: ft.Page):
                                 size=13, color=MUTED),
                     ], spacing=4),
                     bgcolor=LIGHT_PINK, border_color=PINK))
+            longest = plant_with_longest_streak(habits, logs, today)
+            if longest is not None:
+                garden_rows.append(ft.Text(
+                    f"🏆 Longest streak: {longest['icon']} "
+                    f"{longest['name']} — {longest['streak']} days",
+                    size=14, color=PINK))
             legend = legend_categories(habits)
             if legend:
                 first_icon = {}
@@ -740,7 +749,13 @@ def main(page: ft.Page):
         message = nightly_message(summary)
         longest_streak = longest_streak_overall(logs, habits)
         worst_gap = max((longest_gap(logs, h) for h in habits), default=0)
+        absences = [days_since_last_done(logs, h) for h in habits]
+        longest_absence = max((a for a in absences if a is not None),
+                              default=0)
+        comeback = (comeback_message(longest_absence)
+                    if longest_absence >= 2 else "")
         avg_streak = average_streak(logs, habits)
+        avg_best = average_best_streak(logs, habits)
         median_streak = median_best_streak(logs, habits)
         week_minutes = total_minutes_this_week(logs, habits)
         evening = evening_message(summary["done"], summary["total"])
@@ -785,6 +800,7 @@ def main(page: ft.Page):
                                         size=14, color=MUTED))
         yesterday = today_str(date.today() - timedelta(days=1))
         yday = daily_summary(logs, habits, yesterday)
+        yday_minutes = total_minutes_yesterday(logs, habits)
         yday_text = (f"Yesterday vs today: {yday['done']}/{yday['total']} "
                      f"({yday['percent']}%) • {yday['total_minutes']} min → "
                      f"today {summary['done']}/{summary['total']} "
@@ -818,7 +834,10 @@ def main(page: ft.Page):
                         size=16, color=TEXT),
                 ft.Text(evening, size=15, weight=ft.FontWeight.BOLD,
                         color=DEEP_ROSE),
+                ft.Text(comeback, size=15, color=PINK) if comeback else ft.Container(),
                 ft.Text(f"Total time: {summary['total_minutes']} minutes",
+                        size=15, color=MUTED),
+                ft.Text(f"Yesterday: {yday_minutes} min",
                         size=15, color=MUTED),
                 ft.Text(yday_text, size=15, color=MUTED),
                 ft.Text(f"Best habit today: "
@@ -826,6 +845,8 @@ def main(page: ft.Page):
                         f"({summary['best_minutes']} min)",
                         size=15, color=MUTED),
                 ft.Text(f"Average best streak: {avg_streak} days",
+                        size=15, color=MUTED),
+                ft.Text(f"Average best streak ever: {avg_best} days",
                         size=15, color=MUTED),
                 ft.Row([
                     stat_chip("🌳", "longest streak",

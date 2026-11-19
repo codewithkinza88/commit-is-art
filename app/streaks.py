@@ -82,6 +82,15 @@ def median_best_streak(logs, habits, end_date=None):
     return round((values[n // 2 - 1] + values[n // 2]) / 2, 1)
 
 
+def average_best_streak(logs, habits, end_date=None):
+    """Mean best streak across all habits (0.0 when there are none)."""
+    values = [best_streak(logs, habit, end_date=end_date)
+              for habit in (habits or [])]
+    if not values:
+        return 0.0
+    return round(sum(values) / len(values), 1)
+
+
 def days_since_last_done(logs, habit, end_date=None):
     """Days since the habit was last done (0 = done on end_date).
 
