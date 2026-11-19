@@ -114,3 +114,10 @@ mapping each category to its colour. Tonight previews tomorrow
 ("Kal: ..."), shows your longest gap between waterings, and names
 your busiest weekday. If a week passes with no backup, a gentle
 "💾 Backup your garden" notification appears.
+
+## Averages, yesterday and more 🌱 (version 1.10.0)
+
+Tonight shows your average best streak ever and yesterday's minutes,
+and welcomes you back warmly if you have been away for 2 or more
+days. The Garden names your longest-streak plant, and streaks can be
+exported as CSV (habit_id, best_streak, current_streak).

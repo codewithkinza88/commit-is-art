@@ -2,6 +2,30 @@
 
 All notable changes to Habit Garden are listed here.
 
+## 2026-11-19 — Averages, yesterday and more (version 1.10.0)
+
+- Fixed a stale version check: the 1.9.0 bump changed APP_VERSION but
+  tests/test_ui_api.py still expected 1.8.0, so the UI suite failed.
+  The check now matches the version (and the 1.10.0 bump updates it
+  together, so this cannot drift again unnoticed).
+- Average best streak: Tonight now shows "Average best streak ever"
+  (mean of every habit's best streak).
+- Minutes yesterday: Tonight shows "Yesterday: N min".
+- Longest-streak plant: the Garden names the plant with the longest
+  current streak — "🏆 Longest streak: ...".
+- Notes for one habit: `notes_for_habit()` lists a habit's notes,
+  oldest first.
+- Due-today count: `count_due_today()` counts habits due on a weekday.
+- Note validation: `validate_note_text()` trims and caps notes at 200
+  characters.
+- Streaks as CSV: `streaks_to_csv()` exports habit_id, best_streak and
+  current_streak.
+- Comeback message: Tonight welcomes you back ("... days away — come
+  back and water your garden!") when the longest absence is 2+ days.
+
+Tests: 541 checks passing (465 plain-script + 76 in
+tests/test_ui_api.py under .venv for Flet).
+
 ## 2026-11-18 — Duplicate, effort, age and more (version 1.9.0)
 
 - Duplicate habit: every habit card has a "📋 Copy" button that plants
