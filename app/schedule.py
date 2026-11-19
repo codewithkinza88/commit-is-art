@@ -53,6 +53,11 @@ def habits_due_tomorrow(habits, weekday):
     return habits_due_on(habits, (weekday + 1) % 7)
 
 
+def count_due_today(habits, weekday):
+    """How many habits are due on weekday (0 when none)."""
+    return len(habits_due_on(habits or [], weekday))
+
+
 def weekday_name(weekday):
     """Short name for a weekday number, e.g. 0 -> 'Mon'."""
     if 0 <= weekday <= 6:
