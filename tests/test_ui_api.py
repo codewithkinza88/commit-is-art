@@ -137,9 +137,21 @@ def test_ui_api():
           "Yesterday vs today" in source)
     check("yesterday summary comes from daily_summary",
           "daily_summary(logs, habits, yesterday)" in source)
-    check("app version is 1.8.0",
+    check("Tonight welcomes you back after days away",
+          "comeback_message(longest_absence)" in source
+          and "days_since_last_done(logs, h)" in source)
+    check("Garden shows the longest-streak plant",
+          "🏆 Longest streak:" in source
+          and "plant_with_longest_streak(habits, logs, today)" in source)
+    check("Tonight shows yesterday's minutes",
+          "Yesterday: {yday_minutes} min" in source
+          and "total_minutes_yesterday(logs, habits)" in source)
+    check("Tonight shows the average best streak ever",
+          "Average best streak ever" in source
+          and "average_best_streak(logs, habits)" in source)
+    check("app version is 1.10.0",
           open(os.path.join(root, "app", "version.py"),
-               encoding="utf-8").read().count('APP_VERSION = "1.8.0"') == 1)
+               encoding="utf-8").read().count('APP_VERSION = "1.10.0"') == 1)
     check("garden plants show a flower row, not one big emoji",
           'plant["flowers"]' in source)
     check("garden opens with a full flower bed on top",
