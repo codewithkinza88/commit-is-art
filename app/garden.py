@@ -172,6 +172,16 @@ def plant_of_the_day(habits, logs, date_str):
     return max(pool, key=lambda p: p["streak"])
 
 
+def plant_with_longest_streak(habits, logs, date_str):
+    """The plant with the longest current streak (first-created wins
+    ties). None when there are no habits.
+    """
+    plants = [plant_for(h, logs, date_str) for h in (habits or [])]
+    if not plants:
+        return None
+    return max(plants, key=lambda p: p["streak"])
+
+
 def plants_by_stage(habits, logs, date_str):
     """How many plants sit at each growth stage on a date.
 

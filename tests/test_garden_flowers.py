@@ -14,7 +14,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.garden import (  # noqa: E402
     flower_bed, flower_for, flowers_for_stage, plant_for,
-    plant_of_the_day,
+    plant_of_the_day, plant_with_longest_streak,
 )
 from app.habits import new_habit  # noqa: E402
 from app.theme import STAGE_COLOURS, stage_colour  # noqa: E402
@@ -117,7 +117,28 @@ def test_plant_of_the_day():
           star["habit_id"] == h1["id"])
 
 
+def test_plant_with_longest_streak():
+    h1 = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
+    h2 = new_habit("Read", "Books", 0, "📖", "#F9A8D4", "2026-11-01")
+    check("no habits means no longest-streak plant",
+          plant_with_longest_streak([], {}, "2026-11-09") is None)
+    logs = {}
+    set_done(logs, h1["id"], "2026-11-08", True)
+    set_done(logs, h1["id"], "2026-11-09", True)
+    set_done(logs, h2["id"], "2026-11-09", True)
+    check("longest current streak wins",
+          plant_with_longest_streak([h1, h2], logs, "2026-11-09")["habit_id"]
+          == h1["id"])
+    logs = {}
+    set_done(logs, h1["id"], "2026-11-09", True)
+    set_done(logs, h2["id"], "2026-11-09", True)
+    check("a tie goes to the first-created plant",
+          plant_with_longest_streak([h1, h2], logs, "2026-11-09")["habit_id"]
+          == h1["id"])
+
+
 if __name__ == "__main__":
     test_garden_flowers()
     test_plant_of_the_day()
+    test_plant_with_longest_streak()
     print(f"{PASSED} tests passed")
