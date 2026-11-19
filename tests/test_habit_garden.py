@@ -16,7 +16,8 @@ from app.habits import (  # noqa: E402
 )
 from app.tracker import (  # noqa: E402
     set_done, toggle_done, log_minutes, is_done, minutes_for,
-    total_minutes_today, total_minutes_this_week, done_count_today,
+    total_minutes_today, total_minutes_this_week, total_minutes_yesterday,
+    done_count_today,
     current_streak, daily_summary, last_7_days,
 )
 from app.garden import (  # noqa: E402
@@ -291,6 +292,19 @@ def test_total_minutes_this_week():
           total_minutes_this_week(logs, [], "2026-11-07") == 0)
 
 
+def test_total_minutes_yesterday():
+    habits = [new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-05")]
+    logs = {}
+    log_minutes(logs, habits[0]["id"], "2026-11-06", 20)
+    log_minutes(logs, habits[0]["id"], "2026-11-07", 45)
+    check("total minutes yesterday reads the day before",
+          total_minutes_yesterday(logs, habits, "2026-11-07") == 20)
+    check("total minutes yesterday is 0 with no logs",
+          total_minutes_yesterday({}, habits, "2026-11-07") == 0)
+    check("total minutes yesterday is 0 with no habits",
+          total_minutes_yesterday(logs, [], "2026-11-07") == 0)
+
+
 def test_total_plants():
     habits = [new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-05"),
               new_habit("Read", "Books", 30, "📖", "#F9A8D4", "2026-11-05")]
@@ -392,6 +406,7 @@ if __name__ == "__main__":
     test_plants_by_stage()
     test_habits_by_category()
     test_total_minutes_this_week()
+    test_total_minutes_yesterday()
     test_total_plants()
     test_count_by_category()
     test_stage_progress()
