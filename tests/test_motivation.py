@@ -8,9 +8,9 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from app.motivation import (evening_message, message_for_percent,  # noqa: E402
-                            morning_message, nightly_message,
-                            streak_message)
+from app.motivation import (comeback_message, evening_message,  # noqa: E402
+                            message_for_percent, morning_message,
+                            nightly_message, streak_message)
 
 PASSED = 0
 
@@ -66,10 +66,23 @@ def test_evening_message():
           "fresh seed" in evening_message(0, 0))
 
 
+def test_comeback_message():
+    check("comeback with no days away is a fresh start",
+          "fresh start" in comeback_message(0))
+    check("comeback after one day missed you",
+          "missed you" in comeback_message(1))
+    check("comeback after three days names the count",
+          "3 days away" in comeback_message(3))
+    check("comeback after a week waits patiently",
+          "7 days away" in comeback_message(7)
+          and "waiting" in comeback_message(7))
+
+
 if __name__ == "__main__":
     test_message_for_percent()
     test_nightly_message()
     test_streak_message()
     test_morning_message()
     test_evening_message()
+    test_comeback_message()
     print(f"{PASSED} tests passed")

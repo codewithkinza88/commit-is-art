@@ -60,6 +60,19 @@ def evening_message(done, total):
     return f"{done} of {total} done today — a good day's growing! 🪴"
 
 
+def comeback_message(days_since):
+    """A warm welcome back after days away from a habit (0 = just here)."""
+    days = max(0, int(days_since or 0))
+    if days == 0:
+        return "Welcome back — today is a fresh start. 🌱"
+    if days == 1:
+        return "One day away — your garden missed you! 🌱"
+    if days <= 6:
+        return f"{days} days away — come back and water your garden! 🌷"
+    return (f"{days} days away — your garden is waiting, "
+            "one small step today! 🌸")
+
+
 def morning_message(done, total):
     """A short greeting for the Today view from how much is done already."""
     done = max(0, int(done or 0))
