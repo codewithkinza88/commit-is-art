@@ -9,7 +9,7 @@ import csv
 import io
 
 from app.streaks import best_streak
-from app.tracker import daily_summary
+from app.tracker import current_streak, daily_summary
 
 
 def habits_to_csv(habits):
@@ -37,6 +37,19 @@ def logs_to_csv(logs):
             writer.writerow([date_str, habit_id,
                              bool(entry.get("done", False)),
                              int(entry.get("minutes", 0) or 0)])
+    return output.getvalue()
+
+
+def streaks_to_csv(logs, habits, end_date=None):
+    """Best + current streak per habit as CSV text (header + one row
+    per habit, in habit order)."""
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(["habit_id", "best_streak", "current_streak"])
+    for habit in habits or []:
+        writer.writerow([habit.get("id", ""),
+                         best_streak(logs, habit, end_date=end_date),
+                         current_streak(logs, habit, end_date=end_date)])
     return output.getvalue()
 
 

@@ -10,7 +10,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.habits import new_habit  # noqa: E402
 from app.tracker import set_done, log_minutes  # noqa: E402
-from app.export import habits_to_csv, logs_to_csv, notes_to_csv, summary_to_text  # noqa: E402
+from app.export import (habits_to_csv, logs_to_csv, notes_to_csv,  # noqa: E402
+                        streaks_to_csv, summary_to_text)
 
 PASSED = 0
 
@@ -84,10 +85,29 @@ def test_notes_to_csv():
           len(notes_to_csv({}).strip().splitlines()) == 1)
 
 
+def test_streaks_to_csv():
+    from datetime import date
+    h1 = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
+    h2 = new_habit("Read", "Books", 0, "📖", "#F9A8D4", "2026-11-01")
+    logs = {}
+    set_done(logs, h1["id"], "2026-11-08", True)
+    set_done(logs, h1["id"], "2026-11-09", True)
+    set_done(logs, h2["id"], "2026-11-09", True)
+    csv_text = streaks_to_csv(logs, [h1, h2], date(2026, 11, 9))
+    lines = csv_text.strip().splitlines()
+    check("streaks csv has header",
+          lines[0] == "habit_id,best_streak,current_streak")
+    check("streaks csv lists best and current streaks",
+          lines[1] == f"{h1['id']},2,2" and lines[2] == f"{h2['id']},1,1")
+    check("streaks csv with no habits is header only",
+          len(streaks_to_csv(logs, [], date(2026, 11, 9)).strip().splitlines()) == 1)
+
+
 if __name__ == "__main__":
     test_habits_to_csv()
     test_logs_to_csv()
     test_summary_to_text()
     test_summary_best_streak()
     test_notes_to_csv()
+    test_streaks_to_csv()
     print(f"{PASSED} tests passed")
