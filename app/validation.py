@@ -3,6 +3,7 @@
 from app.habits import ICONS
 
 from app.habits import CATEGORIES, ICONS
+from app.notes import MAX_NOTE_LEN
 
 MAX_NAME_LEN = 60
 MAX_MINUTES = 1440  # a whole day
@@ -41,6 +42,16 @@ def validate_target_minutes(value):
     except (TypeError, ValueError):
         return 0
     return max(0, min(MAX_MINUTES, minutes))
+
+
+def validate_note_text(text):
+    """A note cleaned for saving: stripped, capped at MAX_NOTE_LEN.
+
+    Blank or non-text input becomes "".
+    """
+    if not isinstance(text, str):
+        return ""
+    return text.strip()[:MAX_NOTE_LEN]
 
 
 def validate_minutes(value):

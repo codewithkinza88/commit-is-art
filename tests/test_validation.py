@@ -10,7 +10,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.validation import (MAX_NAME_LEN, validate_category,  # noqa: E402
                             validate_habit_name, validate_icon,
-                            validate_minutes, validate_target_minutes)
+                            validate_minutes, validate_note_text,
+                            validate_target_minutes)
 
 PASSED = 0
 
@@ -49,6 +50,18 @@ def main():
           validate_target_minutes(9999) == 1440)
 
 
+def test_validate_note_text():
+    check("note text is trimmed",
+          validate_note_text("  Read chapter 3  ") == "Read chapter 3")
+    check("blank note text becomes empty",
+          validate_note_text("   ") == "")
+    check("long note text is capped at 200 chars",
+          len(validate_note_text("x" * 250)) == 200)
+    check("non-text note becomes empty",
+          validate_note_text(None) == "")
+
+
 if __name__ == "__main__":
     main()
+    test_validate_note_text()
     print(f"{PASSED} tests passed")
