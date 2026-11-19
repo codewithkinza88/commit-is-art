@@ -40,6 +40,22 @@ def latest_note(notes, habit_id):
     return latest_date, latest_text
 
 
+def notes_for_habit(notes, habit_id):
+    """(date, text) pairs for one habit, oldest date first.
+
+    Non-empty notes only; [] when the habit has no notes.
+    """
+    found = []
+    for date_str in sorted((notes or {}).keys()):
+        day_notes = notes.get(date_str) or {}
+        if not isinstance(day_notes, dict):
+            continue
+        text = day_notes.get(habit_id, "")
+        if isinstance(text, str) and text.strip():
+            found.append((date_str, text))
+    return found
+
+
 def count_notes(notes, habit_id):
     """How many non-empty notes a habit has across all dates."""
     total = 0
