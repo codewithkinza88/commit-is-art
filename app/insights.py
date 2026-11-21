@@ -35,6 +35,23 @@ def needs_attention(logs, habits, date_strs):
     return worst
 
 
+def most_consistent_habit(logs, habits, date_strs):
+    """The habit done most often over the dates, or None when no habits.
+
+    First habit wins a tie (creation order), mirroring needs_attention.
+    """
+    if not habits or not date_strs:
+        return None
+    best = None
+    best_rate = None
+    for h in habits:
+        done = sum(1 for d in date_strs if is_done(logs, h, d))
+        rate = done / len(date_strs)
+        if best_rate is None or rate > best_rate:
+            best, best_rate = h, rate
+    return best
+
+
 def consistency_message(score):
     """Warm one-liner for a consistency score (0-100)."""
     score = max(0, min(100, int(score or 0)))
