@@ -10,7 +10,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.notes import (MAX_NOTE_LEN, add_note, count_notes,  # noqa: E402
                        count_notes_for_day, find_notes, get_note, has_note,
-                       latest_note, notes_for_day, notes_for_habit)
+                       latest_note, longest_note, notes_for_day,
+                       notes_for_habit, notes_in_range)
 
 PASSED = 0
 
@@ -116,6 +117,40 @@ def test_notes_for_habit():
           len(notes_for_habit(notes, "h1")) == 2)
 
 
+def test_longest_note():
+    notes = {}
+    add_note(notes, "h1", "2026-11-10", "Read chapter 3")
+    add_note(notes, "h1", "2026-11-12", "Finished chapter 4 and started 5")
+    add_note(notes, "h2", "2026-11-11", "A very long note indeed, longer")
+    check("longest note is the longest text",
+          longest_note(notes, "h1")
+          == ("2026-11-12", "Finished chapter 4 and started 5"))
+    add_note(notes, "h1", "2026-11-13", "Finished chapter 4 and started 5")
+    check("a tie goes to the most recent note",
+          longest_note(notes, "h1")[0] == "2026-11-13")
+    check("a habit with no notes has no longest note",
+          longest_note(notes, "h9") == ("", ""))
+
+
+def test_notes_in_range():
+    notes = {}
+    add_note(notes, "h1", "2026-11-10", "Read chapter 3")
+    add_note(notes, "h2", "2026-11-10", "Watered the plants")
+    add_note(notes, "h1", "2026-11-12", "Finished chapter 4")
+    add_note(notes, "h1", "2026-11-11", "   ")
+    check("notes in range cover both days in order",
+          notes_in_range(notes, "2026-11-10", "2026-11-11") ==
+          [("2026-11-10", "h1", "Read chapter 3"),
+           ("2026-11-10", "h2", "Watered the plants")])
+    check("notes in range skip days outside it",
+          notes_in_range(notes, "2026-11-12", "2026-11-12") ==
+          [("2026-11-12", "h1", "Finished chapter 4")])
+    check("notes in range skip blank notes",
+          len(notes_in_range(notes, "2026-11-10", "2026-11-12")) == 3)
+    check("an empty range has no notes",
+          notes_in_range(notes, "2026-11-13", "2026-11-14") == [])
+
+
 if __name__ == "__main__":
     main()
     test_latest_note()
@@ -123,4 +158,6 @@ if __name__ == "__main__":
     test_count_notes_for_day()
     test_find_notes()
     test_notes_for_habit()
+    test_longest_note()
+    test_notes_in_range()
     print(f"{PASSED} tests passed")

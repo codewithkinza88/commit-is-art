@@ -56,6 +56,40 @@ def notes_for_habit(notes, habit_id):
     return found
 
 
+def longest_note(notes, habit_id):
+    """(date, text) of the habit's longest non-empty note.
+
+    The most recent note wins a tie. Returns ("", "") when the habit
+    has no notes.
+    """
+    best_date, best_text = "", ""
+    for date_str, text in notes_for_habit(notes, habit_id):
+        if len(text) > len(best_text) or (
+                len(text) == len(best_text) and date_str > best_date):
+            best_date, best_text = date_str, text
+    return best_date, best_text
+
+
+def notes_in_range(notes, start_date, end_date):
+    """(date, habit_id, text) for non-empty notes in a date range, inclusive.
+
+    Ordered by date, then habit id; [] when nothing was written in
+    the range.
+    """
+    found = []
+    for date_str in sorted((notes or {}).keys()):
+        if date_str < start_date or date_str > end_date:
+            continue
+        day_notes = notes.get(date_str) or {}
+        if not isinstance(day_notes, dict):
+            continue
+        for habit_id in sorted(day_notes.keys()):
+            text = day_notes.get(habit_id) or ""
+            if isinstance(text, str) and text.strip():
+                found.append((date_str, habit_id, text))
+    return found
+
+
 def count_notes(notes, habit_id):
     """How many non-empty notes a habit has across all dates."""
     total = 0
