@@ -44,6 +44,22 @@ def validate_target_minutes(value):
     return max(0, min(MAX_MINUTES, minutes))
 
 
+MAX_WEEKLY_MINUTES = 10080  # a whole week (7 x 1440)
+
+
+def validate_weekly_target(value):
+    """A weekly target in minutes, cleaned to a whole number 0..10080.
+
+    Blank or non-numeric input becomes 0; negatives become 0 and
+    anything over a week is capped at 10080.
+    """
+    try:
+        minutes = int(value or 0)
+    except (TypeError, ValueError):
+        return 0
+    return max(0, min(MAX_WEEKLY_MINUTES, minutes))
+
+
 def validate_note_text(text):
     """A note cleaned for saving: stripped, capped at MAX_NOTE_LEN.
 
@@ -52,6 +68,22 @@ def validate_note_text(text):
     if not isinstance(text, str):
         return ""
     return text.strip()[:MAX_NOTE_LEN]
+
+
+def validate_date_str(text):
+    """A date cleaned to ISO YYYY-MM-DD, or "" when it is not a date.
+
+    Whitespace is stripped; impossible dates like 2026-02-30 and
+    non-date text are rejected. Handy before a date is saved anywhere.
+    """
+    from datetime import date as _date
+
+    if not isinstance(text, str):
+        return ""
+    try:
+        return _date.fromisoformat(text.strip()).isoformat()
+    except ValueError:
+        return ""
 
 
 def validate_minutes(value):

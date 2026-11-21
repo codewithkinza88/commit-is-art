@@ -9,9 +9,10 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.validation import (MAX_NAME_LEN, validate_category,  # noqa: E402
-                            validate_habit_name, validate_icon,
-                            validate_minutes, validate_note_text,
-                            validate_target_minutes)
+                            validate_date_str, validate_habit_name,
+                            validate_icon, validate_minutes,
+                            validate_note_text, validate_target_minutes,
+                            validate_weekly_target)
 
 PASSED = 0
 
@@ -61,7 +62,35 @@ def test_validate_note_text():
           validate_note_text(None) == "")
 
 
+def test_validate_date_str():
+    check("a good date passes through",
+          validate_date_str("2026-11-21") == "2026-11-21")
+    check("a date with spaces is trimmed",
+          validate_date_str("  2026-11-21  ") == "2026-11-21")
+    check("an impossible date becomes empty",
+          validate_date_str("2026-02-30") == "")
+    check("non-date text becomes empty",
+          validate_date_str("tomorrow") == "")
+    check("a non-text date becomes empty",
+          validate_date_str(None) == "")
+
+
+def test_validate_weekly_target():
+    check("a normal weekly target passes through",
+          validate_weekly_target(300) == 300)
+    check("a blank weekly target becomes 0",
+          validate_weekly_target("") == 0)
+    check("a negative weekly target becomes 0",
+          validate_weekly_target(-50) == 0)
+    check("a weekly target over a week is capped at 10080",
+          validate_weekly_target(20000) == 10080)
+    check("a non-numeric weekly target becomes 0",
+          validate_weekly_target("soon") == 0)
+
+
 if __name__ == "__main__":
     main()
     test_validate_note_text()
+    test_validate_date_str()
+    test_validate_weekly_target()
     print(f"{PASSED} tests passed")
