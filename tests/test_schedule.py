@@ -9,9 +9,9 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.habits import new_habit  # noqa: E402
-from app.schedule import (count_due_today, due_this_week,  # noqa: E402
-                          habits_due_on, habits_due_tomorrow, is_due_today,
-                          weekday_name)
+from app.schedule import (count_due_this_week, count_due_today,  # noqa: E402
+                          due_this_week, habits_due_on, habits_due_tomorrow,
+                          is_due_today, next_due_weekday, weekday_name)
 
 PASSED = 0
 
@@ -98,10 +98,43 @@ def test_count_due_today():
           count_due_today([], 0) == 0)
 
 
+def test_count_due_this_week():
+    daily = new_habit("Drink water", "Health", 0, "💧", "#BDE0FE", "2026-11-01")
+    weekday_only = new_habit("Study - DSA", "Study", 60, "📚", "#A5D8FF", "2026-11-01")
+    weekday_only["days"] = [0, 1, 2, 3, 4]  # Mon-Fri
+    weekend = new_habit("Long walk", "Health", 0, "🏃", "#C8F7C5", "2026-11-01")
+    weekend["days"] = [5, 6]
+    habits = [daily, weekday_only, weekend]
+    check("all three are due at some point from Monday",
+          count_due_this_week(habits, 0) == 3)
+    check("only the daily and weekend habits are due from Saturday",
+          count_due_this_week(habits, 5) == 2)
+    check("no habits due this week means 0",
+          count_due_this_week([], 0) == 0)
+
+
+def test_next_due_weekday():
+    weekday_only = new_habit("Study - DSA", "Study", 60, "📚", "#A5D8FF",
+                             "2026-11-01")
+    weekday_only["days"] = [0, 2, 4]  # Mon, Wed, Fri
+    daily = new_habit("Drink water", "Health", 0, "💧", "#BDE0FE",
+                      "2026-11-01")
+    check("due today stays on today",
+          next_due_weekday(weekday_only, 2) == 2)
+    check("Tuesday waits until Wednesday",
+          next_due_weekday(weekday_only, 1) == 2)
+    check("Saturday wraps around to Monday",
+          next_due_weekday(weekday_only, 5) == 0)
+    check("a daily habit is due on the given weekday",
+          next_due_weekday(daily, 3) == 3)
+
+
 if __name__ == "__main__":
     main()
     test_due_this_week()
     test_is_due_today()
     test_habits_due_tomorrow()
     test_count_due_today()
+    test_count_due_this_week()
+    test_next_due_weekday()
     print(f"{PASSED} tests passed")
