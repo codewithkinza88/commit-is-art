@@ -15,6 +15,7 @@ from app.streaks import (average_best_streak, best_streak,
                          days_since_last_done,  # noqa: E402
                          last_done_label, longest_gap,
                          longest_streak_overall,
+                         median_current_streak, streak_leaderboard,
                          streak_summary, average_streak,
                          median_best_streak)
 
@@ -146,14 +147,51 @@ def test_longest_gap():
     check("longest gap stays 2", longest_gap(logs, habit) == 2)
 
 
+def test_streak_leaderboard():
+    h1 = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
+    h2 = new_habit("Read", "Reading", 0, "📖", "#FFC6FF", "2026-11-01")
+    h3 = new_habit("Walk", "Health", 0, "🚶", "#BDE0FE", "2026-11-01")
+    logs = {}
+    for day in ("2026-11-04", "2026-11-05", "2026-11-06"):
+        set_done(logs, h1["id"], day, True)
+    set_done(logs, h2["id"], "2026-11-06", True)
+    board = streak_leaderboard(logs, [h1, h2, h3], date(2026, 11, 6))
+    check("longest streak leads the board", board[0]["name"] == "Study")
+    check("leaderboard streak is 3", board[0]["current"] == 3)
+    check("never-done habit sits last with 0",
+          board[-1]["name"] == "Walk" and board[-1]["current"] == 0)
+    check("empty habits give an empty board",
+          streak_leaderboard(logs, []) == [])
+
+
+def test_median_current_streak():
+    h1 = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
+    h2 = new_habit("Read", "Reading", 0, "📖", "#FFC6FF", "2026-11-01")
+    h3 = new_habit("Walk", "Health", 0, "🚶", "#BDE0FE", "2026-11-01")
+    logs = {}
+    for day in ("2026-11-04", "2026-11-05", "2026-11-06"):
+        set_done(logs, h1["id"], day, True)
+    set_done(logs, h2["id"], "2026-11-06", True)
+    # Current streaks on 2026-11-06 are 3, 1, 0 -> median 1.
+    check("median current streak is 1",
+          median_current_streak(logs, [h1, h2, h3], date(2026, 11, 6)) == 1.0)
+    # A broken streak counts as 0: Study's streak ends 2026-11-07.
+    check("a broken streak counts as 0 in the median",
+          median_current_streak(logs, [h1, h2, h3], date(2026, 11, 7)) == 0.0)
+    check("no habits give a 0.0 median current streak",
+          median_current_streak(logs, []) == 0.0)
+
+
 if __name__ == "__main__":
     test_best_streak()
     test_average_streak()
     test_median_best_streak()
+    test_median_current_streak()
     test_average_best_streak()
     test_days_since_last_done()
     test_streak_summary()
     test_last_done_label()
     test_longest_streak_overall()
     test_longest_gap()
+    test_streak_leaderboard()
     print(f"{PASSED} tests passed")

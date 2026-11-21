@@ -24,16 +24,19 @@ from app.habits import (
     clone_habit, delete_habit, edit_habit, get_habit, habit_age_days,
     new_habit,
 )
-from app.garden import (counts_text, days_to_next_stage, flower_bed,
-                        flower_for, garden_summary, next_habit_to_water,
+from app.garden import (count_blooming, counts_text, days_to_next_stage,
+                        flower_bed, flower_count, flower_for, garden_summary,
+                        next_habit_to_water,
                         plant_of_the_day, plant_with_longest_streak,
                         plants_by_stage, stage_progress,
                         total_plants)
-from app.insights import consistency_message, consistency_score
+from app.insights import (consistency_message, consistency_score,
+                          most_consistent_habit)
 from app.notes import count_notes, latest_note
 from app.ordering import sort_habits
 from app.motivation import (comeback_message, evening_message,
-                            morning_message, nightly_message)
+                            morning_message, nightly_message, weekly_cheer,
+                            welcome_message)
 from app.notifications import (build_notifications, notification_key,
                                should_refresh, unread_count)
 from app.updater import (default_apk_path, download_apk,
@@ -41,13 +44,16 @@ from app.updater import (default_apk_path, download_apk,
 from app.streaks import (average_best_streak, average_streak, best_streak,
                          days_since_last_done, last_done_label,
                          longest_gap, longest_streak_overall,
-                         median_best_streak)
+                         median_best_streak, median_current_streak,
+                         streak_leaderboard)
 from app.achievements import badges_for
 from app.backup import backup_filename, backup_to_json, restore_from_json
 from app.categories import (
     best_category, legend_categories, total_minutes_by_category)
-from app.monthly import busiest_weekday, monthly_summary
-from app.schedule import habits_due_tomorrow
+from app.monthly import (average_minutes_per_day, busiest_weekday,
+                         monthly_summary, quietest_weekday)
+from app.schedule import count_due_this_week, habits_due_tomorrow
+from app.celebration import days_to_next_milestone
 from app.goals import weekly_goal_progress, weekly_goal_warning
 from app.store import DEFAULT_PATH, load_store, save_store, seed_store
 from app.theme import (
@@ -64,9 +70,9 @@ from app.validation import (validate_category, validate_icon,
                             validate_target_minutes)
 from app.version import APP_NAME, APP_VERSION
 from app.tracker import (
-    current_streak, daily_summary, done_count_today, is_done, last_7_days, log_minutes,
-    minutes_for, set_done, today_str, total_minutes_this_week,
-    total_minutes_today, total_minutes_yesterday,
+    best_day_by_minutes, current_streak, daily_summary, done_count_today,
+    is_done, last_7_days, log_minutes, minutes_for, set_done, today_str,
+    total_minutes_this_week, total_minutes_today, total_minutes_yesterday,
 )
 
 # Pastel palette — soft, cute, friendly 🌸 (see app/theme.py)
@@ -360,7 +366,7 @@ def main(page: ft.Page):
                 except ValueError:
                     snack("Please give your habit a name first 🌱")
                     return
-                snack("New habit planted! 🌱")
+                snack(welcome_message(name_field.value))
             persist()
             dialog.open = False
             page.update()
@@ -710,6 +716,14 @@ def main(page: ft.Page):
                     f"🏆 Longest streak: {longest['icon']} "
                     f"{longest['name']} — {longest['streak']} days",
                     size=14, color=PINK))
+            garden_rows.append(ft.Text(
+                f"🌸 {flower_count(habits, logs, today)} flowers blooming "
+                "in your garden",
+                size=14, color=PINK))
+            garden_rows.append(ft.Text(
+                f"🌸 {count_blooming(habits, logs, today)} plants blooming "
+                "right now",
+                size=14, color=PINK))
             legend = legend_categories(habits)
             if legend:
                 first_icon = {}
@@ -757,7 +771,30 @@ def main(page: ft.Page):
         avg_streak = average_streak(logs, habits)
         avg_best = average_best_streak(logs, habits)
         median_streak = median_best_streak(logs, habits)
+        median_now = median_current_streak(logs, habits)
         week_minutes = total_minutes_this_week(logs, habits)
+        best_week_day = best_day_by_minutes(logs, habits)
+        if best_week_day:
+            best_week_text = (
+                f"Best day this week: "
+                f"{date.fromisoformat(best_week_day['date']).strftime('%a')} "
+                f"{best_week_day['date']} ({best_week_day['minutes']} min)")
+        else:
+            best_week_text = "Best day this week: —"
+        next_milestone = days_to_next_milestone(longest_streak)
+        if next_milestone:
+            milestone_text = (f"Next milestone: {next_milestone[0]}-day "
+                              f"streak in {next_milestone[1]} day"
+                              + ("s" if next_milestone[1] != 1 else ""))
+        else:
+            milestone_text = "Next milestone: all milestones reached! 🌳"
+        board = streak_leaderboard(logs, habits)
+        board_text = (", ".join(
+            f"{entry['name']} ({entry['current']}d)"
+            for entry in board[:3]) if board else "—")
+        steady = most_consistent_habit(logs, habits, week_dates)
+        steady_text = (f"🌟 Most consistent: {steady['name']}"
+                       if steady else "🌟 Most consistent: —")
         evening = evening_message(summary["done"], summary["total"])
         badges = badges_for(logs, habits, today)
         badges_text = (", ".join(
@@ -770,11 +807,13 @@ def main(page: ft.Page):
                 continue
             progress = weekly_goal_progress(logs, habit, target * 7)
             warning = weekly_goal_warning(progress)
+            cheer = weekly_cheer(progress["minutes"], progress["target"])
             goal_rows.append(ft.Text(
                 f"🎯 {habit['name']}: {progress['minutes']}/"
                 f"{progress['target']} min this week "
                 f"({progress['percent']}%)"
-                + (f" — {warning}" if warning else ""),
+                + (f" — {warning}" if warning else "")
+                + f" — {cheer}",
                 size=14, color=TEXT))
         if not goal_rows:
             goal_rows.append(ft.Text(
@@ -782,10 +821,13 @@ def main(page: ft.Page):
                 size=14, color=MUTED))
         month = monthly_summary(logs, habits, 2026, 11)
         busiest = busiest_weekday(month)
+        quietest = quietest_weekday(month)
         month_text = (f"📅 November so far: {month['total_minutes']} min • "
                       f"{month['average_percent']}% average • "
                       f"{month['perfect_days']} perfect days"
-                      + (f" • busiest: {busiest}" if busiest else ""))
+                      f" • avg {average_minutes_per_day(month)} min/day"
+                      + (f" • busiest: {busiest}" if busiest else "")
+                      + (f" • quietest: {quietest}" if quietest else ""))
         best_cat = best_category(logs, habits, today)
         best_cat_text = (f"🏆 Best category today: {best_cat['category']} "
                          f"({best_cat['percent']}% • {best_cat['minutes']} min)"
@@ -825,6 +867,9 @@ def main(page: ft.Page):
         tomorrow_text = ("Kal: " + ", ".join(
             f"{h.get('icon', '🌱')} {h['name']}" for h in tomorrow_due)
             if tomorrow_due else "Kal: nothing due — a free morning! 🌸")
+        due_week = count_due_this_week(habits, date.today().weekday())
+        due_week_text = (f"Due this week: {due_week} habit"
+                         + ("s" if due_week != 1 else ""))
         return ft.Column([
             gradient_header("Tonight's review 🌙", message, []),
             gradient_card(ft.Column([
@@ -844,10 +889,16 @@ def main(page: ft.Page):
                         f"{summary['best_habit'] or '—'} "
                         f"({summary['best_minutes']} min)",
                         size=15, color=MUTED),
+                ft.Text(best_week_text, size=15, color=MUTED),
                 ft.Text(f"Average best streak: {avg_streak} days",
                         size=15, color=MUTED),
                 ft.Text(f"Average best streak ever: {avg_best} days",
                         size=15, color=MUTED),
+                ft.Text(f"Median current streak: {median_now} days",
+                        size=15, color=MUTED),
+                ft.Text(f"🏆 Streak leaderboard: {board_text}",
+                        size=15, color=MUTED),
+                ft.Text(steady_text, size=15, color=MUTED),
                 ft.Row([
                     stat_chip("🌳", "longest streak",
                               f"{longest_streak} days"),
@@ -858,6 +909,7 @@ def main(page: ft.Page):
                 ], spacing=10),
                 ft.Text(f"Longest gap: {worst_gap} days", size=15,
                         color=MUTED),
+                ft.Text(milestone_text, size=15, color=MUTED),
                 ft.Text(consistency_text, size=15, color=MUTED),
             ], spacing=6), colors=TONIGHT_GRADIENT),
             section_title("Badges earned 🏅"),
@@ -872,6 +924,7 @@ def main(page: ft.Page):
             *goal_rows,
             section_title("Tomorrow (Kal) 🌅"),
             ft.Text(tomorrow_text, size=14, color=TEXT),
+            ft.Text(due_week_text, size=14, color=TEXT),
             section_title("Last 7 days 📅"),
             *rows,
         ], spacing=12)

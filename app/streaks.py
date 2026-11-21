@@ -82,6 +82,22 @@ def median_best_streak(logs, habits, end_date=None):
     return round((values[n // 2 - 1] + values[n // 2]) / 2, 1)
 
 
+def median_current_streak(logs, habits, end_date=None):
+    """Median current streak across all habits (0.0 when there are none).
+
+    Different from median_best_streak: this is about streaks alive
+    right now, so a habit whose streak broke yesterday counts as 0.
+    """
+    values = sorted(current_streak(logs, habit, end_date=end_date)
+                    for habit in (habits or []))
+    if not values:
+        return 0.0
+    n = len(values)
+    if n % 2:
+        return float(values[n // 2])
+    return round((values[n // 2 - 1] + values[n // 2]) / 2, 1)
+
+
 def average_best_streak(logs, habits, end_date=None):
     """Mean best streak across all habits (0.0 when there are none)."""
     values = [best_streak(logs, habit, end_date=end_date)
@@ -113,6 +129,22 @@ def streak_summary(logs, habit, end_date=None):
         "best": best_streak(logs, habit, end_date=end),
         "days_since_last_done": days_since_last_done(logs, habit, end_date=end),
     }
+
+
+def streak_leaderboard(logs, habits, end_date=None):
+    """Habits ranked by current streak, longest first.
+
+    Each entry is {"habit_id", "name", "current"}. Ties keep creation
+    order (stable sort); [] when there are no habits.
+    """
+    end = end_date or date.today()
+    board = [{
+        "habit_id": habit["id"],
+        "name": habit["name"],
+        "current": current_streak(logs, habit, end_date=end),
+    } for habit in (habits or [])]
+    board.sort(key=lambda entry: -entry["current"])
+    return board
 
 
 def last_done_label(logs, habit, end_date=None):
