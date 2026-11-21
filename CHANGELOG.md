@@ -2,6 +2,29 @@
 
 All notable changes to Habit Garden are listed here.
 
+## 2026-11-20 — Leaderboard, ranges and more (version 1.11.0)
+
+- Streak leaderboard: habits ranked by current streak, longest first.
+- Minutes in a range: `total_minutes_in_range()` totals minutes
+  between any two dates, inclusive.
+- Flower count: the Garden can now count every flower it is showing
+  (streak days plus blooming bonuses, no display cap).
+- Notes in a range: `notes_in_range()` lists notes written between
+  two dates, oldest first.
+- Next due weekday: `next_due_weekday()` finds the next day a habit
+  is due, wrapping Sunday back to Monday.
+- Weekly target validation: `validate_weekly_target()` cleans a
+  weekly minutes goal to 0..10080 (a whole week).
+- Weekly cheer: `weekly_cheer()` cheers progress towards a weekly
+  minutes goal — halfway, met, or just getting started.
+- Quietest weekday: the Monthly view can now name the quietest
+  weekday alongside the busiest one.
+- Most consistent habit: `most_consistent_habit()` finds the habit
+  done most often over recent days, mirroring needs-attention.
+
+Tests: 582 checks passing (501 plain-script + 81 in
+tests/test_ui_api.py under .venv for Flet).
+
 ## 2026-11-19 — Averages, yesterday and more (version 1.10.0)
 
 - Fixed a stale version check: the 1.9.0 bump changed APP_VERSION but

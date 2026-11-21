@@ -149,9 +149,40 @@ def test_ui_api():
     check("Tonight shows the average best streak ever",
           "Average best streak ever" in source
           and "average_best_streak(logs, habits)" in source)
-    check("app version is 1.10.0",
+    check("Tonight shows the streak leaderboard",
+          "Streak leaderboard" in source
+          and "streak_leaderboard(logs, habits)" in source)
+    check("Tonight shows the most consistent habit",
+          "Most consistent" in source
+          and "most_consistent_habit(logs, habits" in source)
+    check("Garden shows how many flowers are blooming",
+          "flowers blooming" in source
+          and "flower_count(habits, logs, today)" in source)
+    check("Monthly text names the quietest weekday",
+          "quietest:" in source
+          and "quietest_weekday(month)" in source)
+    check("Weekly goal rows cheer the progress",
+          "weekly_cheer(progress" in source)
+    check("Tonight shows the median current streak",
+          "Median current streak" in source
+          and "median_current_streak(logs, habits)" in source)
+    check("Tonight shows the best day this week by minutes",
+          "Best day this week" in source
+          and "best_day_by_minutes(logs, habits)" in source)
+    check("Tonight shows how many habits are due this week",
+          "Due this week" in source
+          and "count_due_this_week(habits" in source)
+    check("Garden shows how many plants are blooming",
+          "plants blooming" in source
+          and "count_blooming(habits, logs, today)" in source)
+    check("Tonight shows the next milestone",
+          "Next milestone" in source
+          and "days_to_next_milestone(longest_streak)" in source)
+    check("a new habit gets a welcome message",
+          "welcome_message(name_field.value)" in source)
+    check("app version is 1.11.0",
           open(os.path.join(root, "app", "version.py"),
-               encoding="utf-8").read().count('APP_VERSION = "1.10.0"') == 1)
+               encoding="utf-8").read().count('APP_VERSION = "1.11.0"') == 1)
     check("garden plants show a flower row, not one big emoji",
           'plant["flowers"]' in source)
     check("garden opens with a full flower bed on top",

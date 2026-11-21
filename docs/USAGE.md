@@ -38,8 +38,10 @@ today:
 - Total minutes studied / read, and minutes per habit
 - Your streaks, your longest streak across all habits, and your best
   habit of the day
-- Your 7-day consistency score, and a warning if a weekly goal still
-  has minutes left
+- A streak leaderboard (longest current streak first), the total
+  flowers blooming in your garden, and a cheer for your weekly goal
+- Your 7-day consistency score, your most consistent habit, and a
+  warning if a weekly goal still has minutes left
 - A simple last-7-days view, one % per day
 
 Be kind to yourself: a small % today is still a seed planted. 🌱
