@@ -32,7 +32,7 @@ see `docs/UI.md` for the full guide.
   account or sign-in.
 - **Android APK (latest built version):**
   [Download Habit Garden APK — 60.4 MB](https://github.com/codewithkinza88/commit-is-art/actions/runs/44884197603/artifacts/14699940313)
-  — built 16 November 2026 from commit `fc5f65b` (GitHub Actions run #10).
+  — built 21 November 2026 from commit `cfc00f2` (GitHub Actions run #18).
   Sign in to GitHub as `codewithkinza88` first (otherwise the link
   shows a 404), download the ZIP, unzip it, and install the APK inside.
   Do not install older APKs — they crash on launch. This APK has not
