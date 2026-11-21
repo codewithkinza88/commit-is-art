@@ -44,6 +44,20 @@ def monthly_summary(logs, habits, year, month):
     }
 
 
+def quietest_weekday(summary):
+    """Weekday name (Mon..Sun) with the fewest minutes in a monthly
+    summary, or None when no minutes were logged at all.
+
+    Ties go to the earliest weekday (Mon first). A weekday with no
+    minutes at all still counts as the quietest when some other day
+    has minutes.
+    """
+    minutes = (summary or {}).get("minutes_by_weekday") or {}
+    if not minutes or max(minutes.values()) <= 0:
+        return None
+    return min(minutes, key=lambda name: minutes[name])
+
+
 def busiest_weekday(summary):
     """Weekday name (Mon..Sun) with the most minutes in a monthly
     summary, or None when no minutes were logged at all.
@@ -54,3 +68,16 @@ def busiest_weekday(summary):
     if not minutes or max(minutes.values()) <= 0:
         return None
     return max(minutes, key=lambda name: minutes[name])
+
+
+def average_minutes_per_day(summary):
+    """Average minutes per day across a monthly summary (0 when empty).
+
+    Uses the month's real length, so February counts fewer days than
+    January.
+    """
+    summary = summary or {}
+    days = summary.get("days_in_month") or 0
+    if not days:
+        return 0
+    return round((summary.get("total_minutes") or 0) / days)
