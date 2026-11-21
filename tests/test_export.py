@@ -11,7 +11,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from app.habits import new_habit  # noqa: E402
 from app.tracker import set_done, log_minutes  # noqa: E402
 from app.export import (habits_to_csv, logs_to_csv, notes_to_csv,  # noqa: E402
-                        streaks_to_csv, summary_to_text)
+                        streaks_to_csv, summary_to_text, week_to_text)
 
 PASSED = 0
 
@@ -103,6 +103,25 @@ def test_streaks_to_csv():
           len(streaks_to_csv(logs, [], date(2026, 11, 9)).strip().splitlines()) == 1)
 
 
+def test_week_to_text():
+    from datetime import date
+    h1 = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
+    logs = {}
+    set_done(logs, h1["id"], "2026-11-08", True)
+    set_done(logs, h1["id"], "2026-11-09", True)
+    log_minutes(logs, h1["id"], "2026-11-09", 45)
+    text = week_to_text(logs, [h1], date(2026, 11, 9))
+    lines = text.splitlines()
+    check("week text starts with a header",
+          lines[0] == "Habit Garden — last 7 days")
+    check("week text has one line per day plus a total",
+          len(lines) == 9)
+    check("week text shows the minutes on the right days",
+          "2026-11-09: 1/1 (100%) • 45 min" in lines)
+    check("week text ends with the week total",
+          lines[-1] == "Week total: 45 minutes")
+
+
 if __name__ == "__main__":
     test_habits_to_csv()
     test_logs_to_csv()
@@ -110,4 +129,5 @@ if __name__ == "__main__":
     test_summary_best_streak()
     test_notes_to_csv()
     test_streaks_to_csv()
+    test_week_to_text()
     print(f"{PASSED} tests passed")

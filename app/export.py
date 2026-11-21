@@ -9,7 +9,7 @@ import csv
 import io
 
 from app.streaks import best_streak
-from app.tracker import current_streak, daily_summary
+from app.tracker import current_streak, daily_summary, last_7_days
 
 
 def habits_to_csv(habits):
@@ -83,4 +83,21 @@ def summary_to_text(logs, habits, date_str):
                   default=0)
     lines.append(f"Longest streak: {longest} day"
                  f"{'s' if longest != 1 else ''}")
+    return "\n".join(lines)
+
+
+def week_to_text(logs, habits, end_date=None):
+    """The last 7 days as short readable text lines, oldest first.
+
+    One line per day (date, done/total, percent, minutes) plus a
+    total line at the end — the same shape as summary_to_text, but
+    for a whole week, so it can be copied into a message.
+    """
+    days = last_7_days(logs, habits, end_date=end_date)
+    lines = ["Habit Garden — last 7 days"]
+    for day in days:
+        lines.append(f"{day['date']}: {day['done']}/{day['total']} "
+                     f"({day['percent']}%) • {day['total_minutes']} min")
+    total = sum(day["total_minutes"] for day in days)
+    lines.append(f"Week total: {total} minutes")
     return "\n".join(lines)
