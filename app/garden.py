@@ -79,6 +79,38 @@ def flower_bed(plants):
     return "".join(flowers)[:FLOWER_BED_CAP]
 
 
+def flower_count(habits, logs, date_str):
+    """How many flowers the whole garden is showing on a date.
+
+    Same count as flower_bed() but without the 40-flower display cap:
+    one flower per streak day per plant (at least one per plant), plus
+    3 extra for a blooming plant and 5 extra for one in full bloom.
+    0 when there are no habits.
+    """
+    plants = [plant_for(h, logs, date_str) for h in (habits or [])]
+    total = 0
+    for plant in plants:
+        count = max(1, int(plant.get("streak") or 0))
+        if plant.get("stage") == "blooming":
+            count += 3
+        elif plant.get("stage") == "full_bloom":
+            count += 5
+        total += count
+    return total
+
+
+def count_blooming(habits, logs, date_str):
+    """How many plants are blooming or in full bloom on a date.
+
+    A plant counts once its streak reaches the blooming stage (4 days)
+    — a sprout or a growing plant does not count yet. 0 when there
+    are no habits.
+    """
+    plants = [plant_for(h, logs, date_str) for h in (habits or [])]
+    return sum(1 for plant in plants
+               if plant.get("stage") in ("blooming", "full_bloom"))
+
+
 def growth_stage(streak, done_today=False):
     """Stage for a habit from its streak (and today's tick).
 

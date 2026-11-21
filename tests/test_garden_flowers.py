@@ -13,8 +13,8 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.garden import (  # noqa: E402
-    flower_bed, flower_for, flowers_for_stage, plant_for,
-    plant_of_the_day, plant_with_longest_streak,
+    count_blooming, flower_bed, flower_count, flower_for, flowers_for_stage,
+    plant_for, plant_of_the_day, plant_with_longest_streak,
 )
 from app.habits import new_habit  # noqa: E402
 from app.theme import STAGE_COLOURS, stage_colour  # noqa: E402
@@ -137,8 +137,44 @@ def test_plant_with_longest_streak():
           == h1["id"])
 
 
+def test_flower_count():
+    h1 = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
+    h2 = new_habit("Read", "Reading", 0, "📖", "#FFC6FF", "2026-11-01")
+    logs = {}
+    for day in ("2026-11-03", "2026-11-04", "2026-11-05", "2026-11-06",
+                "2026-11-07", "2026-11-08", "2026-11-09"):
+        set_done(logs, h1["id"], day, True)
+    check("a full-bloom plant counts streak plus 5",
+          flower_count([h1], logs, "2026-11-09") == 7 + 5)
+    check("a fresh plant still counts one flower",
+          flower_count([h2], logs, "2026-11-09") == 1)
+    check("two plants add up",
+          flower_count([h1, h2], logs, "2026-11-09") == 13)
+    check("no habits means no flowers",
+          flower_count([], logs, "2026-11-09") == 0)
+
+
+def test_count_blooming():
+    h1 = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
+    h2 = new_habit("Read", "Reading", 0, "📖", "#FFC6FF", "2026-11-01")
+    h3 = new_habit("Walk", "Health", 0, "🚶", "#BDE0FE", "2026-11-01")
+    logs = {}
+    for day in ("2026-11-06", "2026-11-07", "2026-11-08", "2026-11-09"):
+        set_done(logs, h1["id"], day, True)
+    set_done(logs, h2["id"], "2026-11-09", True)
+    # h1 streak 4 -> blooming; h2 streak 1 -> sprout; h3 seed.
+    check("one blooming plant counts as 1",
+          count_blooming([h1, h2, h3], logs, "2026-11-09") == 1)
+    check("a sprout does not count as blooming",
+          count_blooming([h2], logs, "2026-11-09") == 0)
+    check("no habits means nothing blooming",
+          count_blooming([], logs, "2026-11-09") == 0)
+
+
 if __name__ == "__main__":
     test_garden_flowers()
     test_plant_of_the_day()
     test_plant_with_longest_streak()
+    test_flower_count()
+    test_count_blooming()
     print(f"{PASSED} tests passed")
