@@ -6,6 +6,7 @@ Run:  python3 tests/test_habit_garden.py
 import os
 import sys
 import tempfile
+from datetime import date
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -17,6 +18,7 @@ from app.habits import (  # noqa: E402
 from app.tracker import (  # noqa: E402
     set_done, toggle_done, log_minutes, is_done, minutes_for,
     total_minutes_today, total_minutes_this_week, total_minutes_yesterday,
+    total_minutes_in_range, best_day_by_minutes,
     done_count_today,
     current_streak, daily_summary, last_7_days,
 )
@@ -292,6 +294,43 @@ def test_total_minutes_this_week():
           total_minutes_this_week(logs, [], "2026-11-07") == 0)
 
 
+def test_total_minutes_in_range():
+    habits = [new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-05")]
+    logs = {}
+    log_minutes(logs, habits[0]["id"], "2026-11-06", 20)
+    log_minutes(logs, habits[0]["id"], "2026-11-07", 45)
+    log_minutes(logs, habits[0]["id"], "2026-11-09", 10)
+    check("range total adds both days in the range",
+          total_minutes_in_range(logs, habits, "2026-11-06",
+                                 "2026-11-07") == 65)
+    check("range total skips days outside the range",
+          total_minutes_in_range(logs, habits, "2026-11-06",
+                                 "2026-11-06") == 20)
+    check("a reversed range is 0",
+          total_minutes_in_range(logs, habits, "2026-11-09",
+                                 "2026-11-06") == 0)
+    check("an empty log range is 0",
+          total_minutes_in_range({}, habits, "2026-11-06",
+                                 "2026-11-07") == 0)
+
+
+def test_best_day_by_minutes():
+    habits = [new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-05")]
+    logs = {}
+    log_minutes(logs, habits[0]["id"], "2026-11-06", 20)
+    log_minutes(logs, habits[0]["id"], "2026-11-07", 45)
+    log_minutes(logs, habits[0]["id"], "2026-11-09", 10)
+    best = best_day_by_minutes(logs, habits, date(2026, 11, 9))
+    check("best day by minutes is 2026-11-07",
+          best == {"date": "2026-11-07", "minutes": 45})
+    check("no minutes logged means no best day",
+          best_day_by_minutes({}, habits, date(2026, 11, 9)) is None)
+    log_minutes(logs, habits[0]["id"], "2026-11-09", 35)
+    check("a tie goes to the most recent day",
+          best_day_by_minutes(logs, habits, date(2026, 11, 9))["date"]
+          == "2026-11-09")
+
+
 def test_total_minutes_yesterday():
     habits = [new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-05")]
     logs = {}
@@ -407,6 +446,8 @@ if __name__ == "__main__":
     test_habits_by_category()
     test_total_minutes_this_week()
     test_total_minutes_yesterday()
+    test_total_minutes_in_range()
+    test_best_day_by_minutes()
     test_total_plants()
     test_count_by_category()
     test_stage_progress()

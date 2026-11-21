@@ -73,6 +73,30 @@ def total_minutes_this_week(logs, habits, end_date=None):
     return total
 
 
+def total_minutes_in_range(logs, habits, start_date, end_date):
+    """Total minutes logged across all habits between two dates, inclusive.
+
+    start_date / end_date may be date objects or ISO strings. 0 when
+    the range is empty or reversed.
+    """
+    if isinstance(start_date, str):
+        start = date.fromisoformat(start_date)
+    else:
+        start = start_date
+    if isinstance(end_date, str):
+        end = date.fromisoformat(end_date)
+    else:
+        end = end_date
+    if end < start:
+        return 0
+    total = 0
+    day = start
+    while day <= end:
+        total += total_minutes_today(logs, habits, day.isoformat())
+        day += timedelta(days=1)
+    return total
+
+
 def total_minutes_yesterday(logs, habits, end_date=None):
     """Total minutes logged across all habits on the day before end_date."""
     if isinstance(end_date, str):
@@ -176,3 +200,21 @@ def weekly_summary(logs, habits, end_date=None):
         "best_day": best_day,
         "best_day_date": best_day["date"] if best_day else None,
     }
+
+
+def best_day_by_minutes(logs, habits, end_date=None):
+    """The day in the last 7 days with the most minutes logged.
+
+    Returns {"date", "minutes"} or None when no minutes were logged
+    at all. Different from weekly_summary's best day, which ranks by
+    achievement percent first — this one is purely about minutes.
+    Ties go to the most recent day.
+    """
+    days = last_7_days(logs, habits, end_date=end_date)
+    best = None
+    for day in days:
+        if day["total_minutes"] <= 0:
+            continue
+        if best is None or day["total_minutes"] >= best["minutes"]:
+            best = {"date": day["date"], "minutes": day["total_minutes"]}
+    return best
