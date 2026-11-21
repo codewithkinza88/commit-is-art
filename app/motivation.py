@@ -73,6 +73,27 @@ def comeback_message(days_since):
             "one small step today! 🌸")
 
 
+def weekly_cheer(minutes, target):
+    """Cheer for progress towards a weekly minutes goal.
+
+    No goal set (target 0) cheers the minutes alone; a met goal gets
+    a celebration, and the rest scale with how far along the week is.
+    """
+    minutes = max(0, int(minutes or 0))
+    target = max(0, int(target or 0))
+    if target == 0:
+        if minutes == 0:
+            return "No weekly goal yet — set one and grow! 🌱"
+        return f"{minutes} minutes this week — lovely growing! 🌸"
+    if minutes >= target:
+        return f"Weekly goal met — {minutes} of {target} minutes! 🌷✨"
+    if minutes * 2 >= target:
+        return f"Over halfway to your weekly goal — {minutes} of {target} minutes! 🌸"
+    if minutes > 0:
+        return f"{minutes} of {target} minutes — keep watering! 🪴"
+    return f"Weekly goal: {target} minutes — a fresh week to grow! 🌱"
+
+
 def morning_message(done, total):
     """A short greeting for the Today view from how much is done already."""
     done = max(0, int(done or 0))
@@ -84,4 +105,12 @@ def morning_message(done, total):
     if done == 0:
         return f"Good morning! {total} habits to water today. 🌱"
     return f"Good morning! {done} of {total} done — keep going! 🌸"
+
+
+def welcome_message(name):
+    """A warm welcome when a new habit is planted in the garden."""
+    clean = (name or "").strip()
+    if not clean:
+        return "Welcome to the garden — a new seed is planted! 🌱"
+    return f"Welcome to the garden, {clean}! 🌱"
 

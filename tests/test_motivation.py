@@ -10,7 +10,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.motivation import (comeback_message, evening_message,  # noqa: E402
                             message_for_percent, morning_message,
-                            nightly_message, streak_message)
+                            nightly_message, streak_message, weekly_cheer,
+                            welcome_message)
 
 PASSED = 0
 
@@ -78,6 +79,28 @@ def test_comeback_message():
           and "waiting" in comeback_message(7))
 
 
+def test_weekly_cheer():
+    check("a met weekly goal celebrates",
+          "met" in weekly_cheer(300, 300))
+    check("over halfway mentions halfway",
+          "halfway" in weekly_cheer(180, 300))
+    check("a little progress mentions the minutes",
+          "60" in weekly_cheer(60, 300))
+    check("no minutes yet mentions the goal",
+          "300" in weekly_cheer(0, 300))
+    check("no goal set still cheers the minutes",
+          "45" in weekly_cheer(45, 0))
+
+
+def test_welcome_message():
+    check("a new habit is welcomed by name",
+          welcome_message("Study") == "Welcome to the garden, Study! 🌱")
+    check("a name with spaces is trimmed",
+          welcome_message("  Read  ") == "Welcome to the garden, Read! 🌱")
+    check("a blank name gets a plain welcome",
+          welcome_message("   ") == "Welcome to the garden — a new seed is planted! 🌱")
+
+
 if __name__ == "__main__":
     test_message_for_percent()
     test_nightly_message()
@@ -85,4 +108,6 @@ if __name__ == "__main__":
     test_morning_message()
     test_evening_message()
     test_comeback_message()
+    test_weekly_cheer()
+    test_welcome_message()
     print(f"{PASSED} tests passed")
