@@ -123,3 +123,11 @@ Tonight shows your average best streak ever and yesterday's minutes,
 and welcomes you back warmly if you have been away for 2 or more
 days. The Garden names your longest-streak plant, and streaks can be
 exported as CSV (habit_id, best_streak, current_streak).
+
+## Medians, milestones and more 🌱 (version 1.12.0)
+
+Tonight shows your median current streak, your best day this week by
+minutes, how many habits are due this week, your average minutes per
+day for the month, and how many days remain until your next streak
+milestone. The Garden counts how many plants are blooming right now,
+and a new habit is welcomed by name — "Welcome to the garden, Study! 🌱".

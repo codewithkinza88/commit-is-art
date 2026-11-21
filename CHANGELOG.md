@@ -2,6 +2,32 @@
 
 All notable changes to Habit Garden are listed here.
 
+## 2026-11-21 — Medians, milestones and more (version 1.12.0)
+
+- Median current streak: Tonight shows the median of all live
+  streaks, so one long streak cannot hide the rest.
+- Best day this week by minutes: Tonight names the highest-minutes
+  day of the last 7 days.
+- Blooming plants count: the Garden shows how many plants are
+  blooming right now.
+- Longest note: `longest_note()` finds a habit's longest note,
+  most recent winning ties.
+- Due this week: Tonight counts the habits due this week under the
+  Tomorrow (Kal) section.
+- Validate a date string: `validate_date_str()` accepts an ISO
+  date or a blank, and rejects impossible dates like 2026-02-30.
+- Welcome message: a new habit is greeted with "Welcome to the
+  garden, <name>! 🌱" instead of a generic message.
+- Average minutes per day: the Tonight month line now includes
+  "avg N min/day".
+- A week as readable text: `week_to_text()` writes the last 7 days
+  as copyable lines plus a week total.
+- Days to the next milestone: Tonight shows how many days remain
+  until the next streak milestone (7, 14, 30, 60 or 100 days).
+
+Tests: 621 checks passing (534 plain-script + 87 in
+tests/test_ui_api.py under .venv for Flet).
+
 ## 2026-11-20 — Leaderboard, ranges and more (version 1.11.0)
 
 - Streak leaderboard: habits ranked by current streak, longest first.
