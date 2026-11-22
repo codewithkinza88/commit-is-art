@@ -109,6 +109,15 @@ def weekday_of(date_str):
         return -1
 
 
+def habits_due_every_day(habits):
+    """Habits with no "days" list, i.e. due every single day.
+
+    Creation order is kept; [] when every habit has set days (or
+    there are no habits).
+    """
+    return [h for h in (habits or []) if not h.get("days")]
+
+
 def weekday_name(weekday):
     """Short name for a weekday number, e.g. 0 -> 'Mon'."""
     if 0 <= weekday <= 6:
