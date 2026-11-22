@@ -187,6 +187,9 @@ def test_ui_api():
     check("Today shows how many due habits are still to do",
           "Still to do today:" in source
           and "count_due_today_undone(habits, logs" in source)
+    check("Tonight month line counts days logged",
+          "days logged" in source
+          and "days_logged_this_month(month)" in source)
     check("Tonight shows the done rate this week",
           "Done rate this week:" in source
           and "weekly_done_rate(logs, habits)" in source)

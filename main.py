@@ -53,7 +53,8 @@ from app.backup import backup_filename, backup_to_json, restore_from_json
 from app.categories import (
     best_category, legend_categories, total_minutes_by_category)
 from app.monthly import (average_minutes_per_day, busiest_weekday,
-                         monthly_summary, quietest_weekday)
+                         days_logged_this_month, monthly_summary,
+                         quietest_weekday)
 from app.schedule import (count_due_this_week, count_due_today_undone,
                           habits_due_tomorrow)
 from app.celebration import days_to_next_milestone
@@ -836,6 +837,7 @@ def main(page: ft.Page):
         month_text = (f"📅 November so far: {month['total_minutes']} min • "
                       f"{month['average_percent']}% average • "
                       f"{month['perfect_days']} perfect days"
+                      f" • {days_logged_this_month(month)} days logged"
                       f" • avg {average_minutes_per_day(month)} min/day"
                       + (f" • busiest: {busiest}" if busiest else "")
                       + (f" • quietest: {quietest}" if quietest else ""))

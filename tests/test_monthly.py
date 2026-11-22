@@ -11,7 +11,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from app.habits import new_habit  # noqa: E402
 from app.tracker import set_done, log_minutes  # noqa: E402
 from app.monthly import (average_minutes_per_day, busiest_weekday,  # noqa: E402
-                         monthly_summary, quietest_weekday)
+                         days_logged_this_month, monthly_summary,
+                         quietest_weekday)
 
 PASSED = 0
 
@@ -102,6 +103,21 @@ def test_average_minutes_per_day():
           average_minutes_per_day({}) == 0)
 
 
+def test_days_logged_this_month():
+    habits = [new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-01")]
+    logs = {}
+    log_minutes(logs, habits[0]["id"], "2026-11-02", 30)
+    log_minutes(logs, habits[0]["id"], "2026-11-04", 45)
+    log_minutes(logs, habits[0]["id"], "2026-11-05", 45)
+    month = monthly_summary(logs, habits, 2026, 11)
+    check("three days logged in November",
+          days_logged_this_month(month) == 3)
+    check("an empty month logs 0 days",
+          days_logged_this_month(monthly_summary({}, [], 2026, 11)) == 0)
+    check("no summary logs 0 days",
+          days_logged_this_month(None) == 0)
+
+
 if __name__ == "__main__":
     test_monthly_november()
     test_monthly_february_leap_year()
@@ -109,4 +125,5 @@ if __name__ == "__main__":
     test_busiest_weekday()
     test_quietest_weekday()
     test_average_minutes_per_day()
+    test_days_logged_this_month()
     print(f"{PASSED} tests passed")

@@ -70,6 +70,18 @@ def busiest_weekday(summary):
     return max(minutes, key=lambda name: minutes[name])
 
 
+def days_logged_this_month(summary):
+    """How many days in a monthly summary had minutes logged (> 0).
+
+    Different from perfect_days, which needs 100%: any day with
+    even a few minutes counts as logged. 0 when the summary is
+    empty or nothing was logged.
+    """
+    days = (summary or {}).get("days") or []
+    return sum(1 for day in days
+               if int(day.get("total_minutes") or 0) > 0)
+
+
 def average_minutes_per_day(summary):
     """Average minutes per day across a monthly summary (0 when empty).
 
