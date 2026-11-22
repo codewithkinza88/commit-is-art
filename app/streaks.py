@@ -107,6 +107,17 @@ def average_best_streak(logs, habits, end_date=None):
     return round(sum(values) / len(values), 1)
 
 
+def habits_on_streak(logs, habits, end_date=None):
+    """How many habits have a live streak right now (current >= 1).
+
+    A habit whose streak broke yesterday counts as 0, so this is
+    the number of plants still growing today. 0 when there are
+    no habits (or none on a streak).
+    """
+    return sum(1 for habit in (habits or [])
+               if current_streak(logs, habit, end_date=end_date) >= 1)
+
+
 def days_since_last_done(logs, habit, end_date=None):
     """Days since the habit was last done (0 = done on end_date).
 

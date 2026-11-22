@@ -42,7 +42,8 @@ from app.notifications import (build_notifications, notification_key,
 from app.updater import (default_apk_path, download_apk,
                          fetch_latest_release, is_newer)
 from app.streaks import (average_best_streak, average_streak, best_streak,
-                         days_since_last_done, last_done_label,
+                         days_since_last_done, habits_on_streak,
+                         last_done_label,
                          longest_gap, longest_streak_overall,
                          median_best_streak, median_current_streak,
                          streak_leaderboard)
@@ -895,6 +896,8 @@ def main(page: ft.Page):
                 ft.Text(f"Average best streak ever: {avg_best} days",
                         size=15, color=MUTED),
                 ft.Text(f"Median current streak: {median_now} days",
+                        size=15, color=MUTED),
+                ft.Text(f"🔥 {habits_on_streak(logs, habits)} habits on a streak",
                         size=15, color=MUTED),
                 ft.Text(f"🏆 Streak leaderboard: {board_text}",
                         size=15, color=MUTED),

@@ -166,6 +166,9 @@ def test_ui_api():
     check("Tonight shows the median current streak",
           "Median current streak" in source
           and "median_current_streak(logs, habits)" in source)
+    check("Tonight shows how many habits are on a streak",
+          "habits on a streak" in source
+          and "habits_on_streak(logs, habits)" in source)
     check("Tonight shows the best day this week by minutes",
           "Best day this week" in source
           and "best_day_by_minutes(logs, habits)" in source)
