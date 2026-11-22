@@ -9,7 +9,8 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.validation import (MAX_NAME_LEN, validate_category,  # noqa: E402
-                            validate_date_str, validate_habit_name,
+                            validate_date_str, validate_habit_days,
+                            validate_habit_name,
                             validate_icon, validate_minutes,
                             validate_note_text, validate_target_minutes,
                             validate_weekly_target)
@@ -88,9 +89,22 @@ def test_validate_weekly_target():
           validate_weekly_target("soon") == 0)
 
 
+def test_validate_habit_days():
+    check("a normal weekday list passes through sorted",
+          validate_habit_days([4, 0, 2]) == [0, 2, 4])
+    check("duplicate weekdays are kept once",
+          validate_habit_days([1, 1, 3]) == [1, 3])
+    check("out-of-range weekdays are dropped",
+          validate_habit_days([0, 7, -1, 6]) == [0, 6])
+    check("junk entries are dropped, a non-list becomes []",
+          validate_habit_days(["soon", None, True, 2.5, "3", 2]) == [2, 3]
+          and validate_habit_days("Mon") == [])
+
+
 if __name__ == "__main__":
     main()
     test_validate_note_text()
     test_validate_date_str()
     test_validate_weekly_target()
+    test_validate_habit_days()
     print(f"{PASSED} tests passed")

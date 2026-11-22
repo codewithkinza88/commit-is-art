@@ -86,6 +86,30 @@ def validate_date_str(text):
         return ""
 
 
+def validate_habit_days(days):
+    """A habit's weekday list, cleaned to sorted unique ints 0..6.
+
+    Monday=0 .. Sunday=6; invalid entries (out of range, bools,
+    floats, non-numeric text) are dropped; a non-list becomes [].
+    Keeps the habit's due days safe before they are saved anywhere.
+    """
+    if not isinstance(days, list):
+        return []
+    clean = set()
+    for day in days:
+        if isinstance(day, bool):
+            continue
+        if isinstance(day, int):
+            value = day
+        elif isinstance(day, str) and day.strip().isdigit():
+            value = int(day.strip())
+        else:
+            continue
+        if 0 <= value <= 6:
+            clean.add(value)
+    return sorted(clean)
+
+
 def validate_minutes(value):
     """(is_valid, minutes, error) for a minutes value."""
     try:
