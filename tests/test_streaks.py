@@ -14,7 +14,7 @@ from app.tracker import set_done  # noqa: E402
 from app.streaks import (average_best_streak, best_streak,
                          days_since_last_done,  # noqa: E402
                          habits_on_streak, last_done_label, longest_gap,
-                         longest_streak_overall,
+                         longest_current_streak, longest_streak_overall,
                          median_current_streak, streak_leaderboard,
                          streak_summary, average_streak,
                          median_best_streak)
@@ -164,6 +164,26 @@ def test_streak_leaderboard():
           streak_leaderboard(logs, []) == [])
 
 
+def test_longest_current_streak():
+    h1 = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
+    h2 = new_habit("Read", "Reading", 0, "📖", "#FFC6FF", "2026-11-01")
+    h3 = new_habit("Walk", "Health", 0, "🚶", "#BDE0FE", "2026-11-01")
+    logs = {}
+    for day in ("2026-11-04", "2026-11-05", "2026-11-06"):
+        set_done(logs, h1["id"], day, True)
+    set_done(logs, h2["id"], "2026-11-06", True)
+    # Live streaks on 2026-11-06 are 3, 1, 0 -> longest live is 3.
+    check("longest live streak is 3",
+          longest_current_streak(logs, [h1, h2, h3],
+                                 date(2026, 11, 6)) == 3)
+    # On 2026-11-07 every streak is broken -> longest live is 0.
+    check("broken streaks give a 0 longest live streak",
+          longest_current_streak(logs, [h1, h2, h3],
+                                 date(2026, 11, 7)) == 0)
+    check("no habits give a 0 longest live streak",
+          longest_current_streak(logs, []) == 0)
+
+
 def test_habits_on_streak():
     h1 = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
     h2 = new_habit("Read", "Reading", 0, "📖", "#FFC6FF", "2026-11-01")
@@ -213,4 +233,5 @@ if __name__ == "__main__":
     test_longest_gap()
     test_streak_leaderboard()
     test_habits_on_streak()
+    test_longest_current_streak()
     print(f"{PASSED} tests passed")

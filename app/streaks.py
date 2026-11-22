@@ -118,6 +118,18 @@ def habits_on_streak(logs, habits, end_date=None):
                if current_streak(logs, habit, end_date=end_date) >= 1)
 
 
+def longest_current_streak(logs, habits, end_date=None):
+    """Longest live streak across all habits (0 when there are none).
+
+    Different from longest_streak_overall, which is about the best
+    streak ever: this is the longest streak still alive right now.
+    """
+    return max(
+        (current_streak(logs, habit, end_date=end_date)
+         for habit in (habits or [])),
+        default=0)
+
+
 def days_since_last_done(logs, habit, end_date=None):
     """Days since the habit was last done (0 = done on end_date).
 

@@ -172,6 +172,9 @@ def test_ui_api():
     check("Tonight shows minutes in the last 30 days",
           "Last 30 days:" in source
           and "total_minutes_last_30_days(logs, habits)" in source)
+    check("Tonight shows the longest live streak",
+          "Longest live streak:" in source
+          and "longest_current_streak(logs, habits)" in source)
     check("Tonight shows the best day this week by minutes",
           "Best day this week" in source
           and "best_day_by_minutes(logs, habits)" in source)
