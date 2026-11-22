@@ -12,7 +12,8 @@ from app.notes import (MAX_NOTE_LEN, add_note, count_notes,  # noqa: E402
                        count_notes_for_day, find_notes, get_note, has_note,
                        latest_note, longest_note, notes_count_this_week,
                        notes_for_day, notes_for_habit,
-                       notes_for_habit_this_week, notes_in_range)
+                       notes_for_habit_this_week, notes_in_range,
+                       total_notes_count)
 
 PASSED = 0
 
@@ -170,6 +171,21 @@ def test_notes_for_habit_this_week():
           notes_for_habit_this_week(notes, "h9", "2026-11-12") == [])
 
 
+def test_total_notes_count():
+    notes = {}
+    add_note(notes, "h1", "2026-11-10", "Read chapter 3")
+    add_note(notes, "h2", "2026-11-10", "Watered the plants")
+    add_note(notes, "h1", "2026-11-12", "Finished chapter 4")
+    add_note(notes, "h1", "2026-11-01", "Too old to count")
+    add_note(notes, "h1", "2026-11-11", "   ")
+    check("total notes counts all four real notes",
+          total_notes_count(notes) == 4)
+    check("total notes is 0 with no notes",
+          total_notes_count({}) == 0)
+    check("total notes is 0 when only blanks exist",
+          total_notes_count({"2026-11-11": {"h1": "   "}}) == 0)
+
+
 def test_notes_count_this_week():
     notes = {}
     add_note(notes, "h1", "2026-11-10", "Read chapter 3")
@@ -196,4 +212,5 @@ if __name__ == "__main__":
     test_notes_in_range()
     test_notes_count_this_week()
     test_notes_for_habit_this_week()
+    test_total_notes_count()
     print(f"{PASSED} tests passed")

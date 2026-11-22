@@ -110,6 +110,22 @@ def notes_for_habit_this_week(notes, habit_id, end_date=None):
             if start <= date_str <= end.isoformat()]
 
 
+def total_notes_count(notes):
+    """How many non-empty notes exist across all dates and habits.
+
+    Blank notes (spaces only) do not count; 0 when there are no
+    notes at all.
+    """
+    total = 0
+    for day_notes in (notes or {}).values():
+        if not isinstance(day_notes, dict):
+            continue
+        for text in day_notes.values():
+            if isinstance(text, str) and text.strip():
+                total += 1
+    return total
+
+
 def notes_count_this_week(notes, end_date=None):
     """How many non-empty notes were written in the 7 days to end_date.
 
