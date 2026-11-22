@@ -206,3 +206,16 @@ def count_by_effort(habits):
         counts[effort] = counts.get(effort, 0) + 1
     return counts
 
+
+def newest_habit(habits):
+    """The habit planted most recently (latest created_date).
+
+    Ties go to the habit first in creation order. None when there
+    are no habits. A habit with no created_date counts as the
+    oldest, so it never wins while any dated habit exists.
+    """
+    habits = list(habits or [])
+    if not habits:
+        return None
+    return max(habits, key=lambda h: h.get("created_date") or "")
+

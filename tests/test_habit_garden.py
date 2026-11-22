@@ -13,7 +13,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from app.habits import (  # noqa: E402
     new_habit, add_habit, edit_habit, delete_habit, get_habit,
     archive_habit, active_habits, habits_by_category, count_by_category,
-    count_by_effort,
+    count_by_effort, newest_habit,
     clone_habit, habit_age_days, validate_effort,
 )
 from app.tracker import (  # noqa: E402
@@ -396,6 +396,18 @@ def test_count_by_effort():
           count_by_effort([]) == {})
 
 
+def test_newest_habit():
+    h1 = new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-05")
+    h2 = new_habit("Read", "Books", 30, "📖", "#F9A8D4", "2026-11-07")
+    h3 = new_habit("Walk", "Health", 0, "🚶", "#BDE0FE", "2026-11-06")
+    check("the newest habit is the latest created date",
+          newest_habit([h1, h2, h3]) is h2)
+    check("no habits means no newest habit",
+          newest_habit([]) is None)
+    check("a habit with no date never wins",
+          newest_habit([{"name": "Mystery"}, h1]) is h1)
+
+
 def test_stage_progress():
     check("stage progress is 0 at a fresh seed", stage_progress(0) == 0.0)
     check("stage progress is 0 at the start of sprout",
@@ -484,6 +496,7 @@ if __name__ == "__main__":
     test_total_plants()
     test_count_by_category()
     test_count_by_effort()
+    test_newest_habit()
     test_stage_progress()
     test_clone_habit()
     test_effort_level()
