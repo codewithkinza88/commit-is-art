@@ -97,6 +97,22 @@ def total_minutes_in_range(logs, habits, start_date, end_date):
     return total
 
 
+def days_done_this_week(logs, habit, end_date=None):
+    """How many of the last 7 days (ending on end_date) the habit
+    was done — a number from 0 to 7.
+
+    Different from current_streak, which needs the days to be
+    consecutive: a habit done Mon, Wed and Fri counts as 3 here.
+    """
+    if isinstance(end_date, str):
+        end = date.fromisoformat(end_date)
+    else:
+        end = end_date or date.today()
+    return sum(1 for i in range(7)
+               if is_done(logs, habit,
+                          (end - timedelta(days=i)).isoformat()))
+
+
 def total_minutes_last_30_days(logs, habits, end_date=None):
     """Total minutes logged across all habits in the 30 days to end_date.
 
