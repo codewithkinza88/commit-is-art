@@ -2,6 +2,55 @@
 
 All notable changes to Habit Garden are listed here.
 
+## 2026-11-22 — Streaks, garden counts and readable exports (version 1.13.0)
+
+- Streaks on cards: a habit card shows "🔥 Streak: N days" when its
+  streak is alive, and Tonight names the habit with the longest
+  live streak.
+- Minutes in the last 30 days: Tonight shows the minutes logged in
+  the last 30 days.
+- Seeds still waiting: the Garden shows how many plants are still
+  seeds, and how many sprouts are growing.
+- Notes this week: Tonight counts the notes written in the last 7
+  days.
+- Due today but not done: Tonight counts the habits due today that
+  are still undone.
+- Validate habit days: `validate_habit_days()` keeps only weekday
+  numbers 0–6.
+- Done rate this week: `weekly_done_rate()` is the share of habits
+  done over the last 7 days.
+- Days logged this month: Tonight counts the days with minutes
+  logged this month, and how many days logged nothing.
+- A month as readable text: `month_to_text()` writes a calendar
+  month as copyable lines, and `notes_to_text()` / `habits_to_text()`
+  do the same for notes and the habit list.
+- Milestones already reached: `milestones_reached()` lists the
+  milestones a streak has passed, and Tonight shows the next
+  milestone as a cheery message.
+- Habits by effort: Tonight counts habits by effort (Easy / Medium
+  / Hard).
+- Newest habit: the newest habit is named in Tonight's greeting.
+- Days done this week: Tonight counts the days done this week.
+- First done date: `first_done_date()` is the earliest day a habit
+  was ever ticked.
+- Longest live streak: Tonight names the longest live streak.
+- Habits at a streak level: Tonight counts the habits at each
+  streak level (0, 1–2, 3–6, 7+).
+- Average stage progress: the garden's mean growth progress (0.0–1.0).
+- Notes for one habit this week: `notes_for_habit_this_week()`.
+- Total notes count: `total_notes_count()` counts all non-empty notes.
+- Weekday of a date: `weekday_of()` gives 0=Mon..6=Sun, -1 when invalid.
+- Habits due every day: `habits_due_every_day()` lists the habits
+  with no set days.
+- Validate a colour: `validate_colour()` keeps an app colour, else
+  falls back to soft sky blue.
+- Habits below a rate: `habits_below_rate()` lists the habits done
+  less than a threshold percent.
+- Perfect day dates: `perfect_day_dates()` lists the month's 100% days.
+
+Tests: 720 checks passing (624 plain-script + 96 in
+tests/test_ui_api.py under .venv for Flet).
+
 ## 2026-11-21 — Medians, milestones and more (version 1.12.0)
 
 - Median current streak: Tonight shows the median of all live

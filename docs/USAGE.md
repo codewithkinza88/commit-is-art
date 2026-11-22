@@ -131,3 +131,14 @@ minutes, how many habits are due this week, your average minutes per
 day for the month, and how many days remain until your next streak
 milestone. The Garden counts how many plants are blooming right now,
 and a new habit is welcomed by name — "Welcome to the garden, Study! 🌱".
+
+## Streaks, garden counts and readable exports 🌱 (version 1.13.0)
+
+Habit cards show a live streak ("🔥 Streak: N days"), and Tonight
+names the longest live streak and counts habits at each streak level.
+The Garden counts its seeds, sprouts and blooming plants, and Tonight
+counts your notes this week, days done this week, days logged this
+month, habits by effort, and the minutes of the last 30 days. A whole
+month, your notes, and your habit list can each be copied as readable
+text, and the next milestone arrives as a cheery message — "🎯 2 more
+day(s) to a 7-day streak!".
