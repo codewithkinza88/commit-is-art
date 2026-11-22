@@ -124,6 +124,20 @@ def count_sprouts(habits, logs, date_str):
                if plant.get("stage") == "sprout")
 
 
+def average_stage_progress(habits, logs, date_str):
+    """Mean growth progress across all plants on a date (0.0-1.0).
+
+    stage_progress is 0.0 at the start of a stage and 1.0 in full
+    bloom, so this is how far the whole garden has grown on
+    average. 0.0 when there are no habits.
+    """
+    plants = [plant_for(h, logs, date_str) for h in (habits or [])]
+    if not plants:
+        return 0.0
+    return round(sum(stage_progress(p["streak"]) for p in plants)
+                 / len(plants), 2)
+
+
 def count_blooming(habits, logs, date_str):
     """How many plants are blooming or in full bloom on a date.
 

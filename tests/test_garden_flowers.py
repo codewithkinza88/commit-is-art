@@ -13,8 +13,8 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.garden import (  # noqa: E402
-    count_blooming, count_seeds, count_sprouts, flower_bed, flower_count,
-    flower_for, flowers_for_stage,
+    average_stage_progress, count_blooming, count_seeds, count_sprouts,
+    flower_bed, flower_count, flower_for, flowers_for_stage,
     plant_for, plant_of_the_day, plant_with_longest_streak,
 )
 from app.habits import new_habit  # noqa: E402
@@ -206,6 +206,23 @@ def test_count_sprouts():
           count_sprouts([], logs, "2026-11-09") == 0)
 
 
+def test_average_stage_progress():
+    h1 = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
+    h2 = new_habit("Read", "Reading", 0, "📖", "#FFC6FF", "2026-11-01")
+    h3 = new_habit("Walk", "Health", 0, "🚶", "#BDE0FE", "2026-11-01")
+    logs = {}
+    for day in ("2026-11-04", "2026-11-05", "2026-11-06", "2026-11-07",
+                "2026-11-08", "2026-11-09"):
+        set_done(logs, h1["id"], day, True)
+    for day in ("2026-11-07", "2026-11-08", "2026-11-09"):
+        set_done(logs, h2["id"], day, True)
+    # Streaks 6, 3, 0 -> progress 0.67, 0.5, 0.0 -> mean 0.39.
+    check("average stage progress is 0.39",
+          average_stage_progress([h1, h2, h3], logs, "2026-11-09") == 0.39)
+    check("no habits average 0.0 progress",
+          average_stage_progress([], logs, "2026-11-09") == 0.0)
+
+
 if __name__ == "__main__":
     test_garden_flowers()
     test_plant_of_the_day()
@@ -214,4 +231,5 @@ if __name__ == "__main__":
     test_count_blooming()
     test_count_seeds()
     test_count_sprouts()
+    test_average_stage_progress()
     print(f"{PASSED} tests passed")
