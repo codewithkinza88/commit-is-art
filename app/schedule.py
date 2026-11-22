@@ -53,6 +53,19 @@ def habits_due_tomorrow(habits, weekday):
     return habits_due_on(habits, (weekday + 1) % 7)
 
 
+def count_due_today_undone(habits, logs, weekday, date_str):
+    """How many habits due on weekday are still not done on date_str.
+
+    Due habits come from habits_due_on; a habit counts as done when
+    tracker.is_done says so (ticked, or minutes reached its target).
+    0 when nothing is due or everything due is already done.
+    """
+    from app.tracker import is_done
+
+    return sum(1 for habit in habits_due_on(habits or [], weekday)
+               if not is_done(logs or {}, habit, date_str))
+
+
 def count_due_today(habits, weekday):
     """How many habits are due on weekday (0 when none)."""
     return len(habits_due_on(habits or [], weekday))

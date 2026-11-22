@@ -54,7 +54,8 @@ from app.categories import (
     best_category, legend_categories, total_minutes_by_category)
 from app.monthly import (average_minutes_per_day, busiest_weekday,
                          monthly_summary, quietest_weekday)
-from app.schedule import count_due_this_week, habits_due_tomorrow
+from app.schedule import (count_due_this_week, count_due_today_undone,
+                          habits_due_tomorrow)
 from app.celebration import days_to_next_milestone
 from app.goals import weekly_goal_progress, weekly_goal_warning
 from app.store import DEFAULT_PATH, load_store, save_store, seed_store
@@ -467,6 +468,9 @@ def main(page: ft.Page):
                         f"• {summary['percent']}% • "
                         f"⏱ {total_minutes_today(logs, habits, today)} min today",
                         size=14, color=MUTED),
+                ft.Text(f"Still to do today: "
+                        f"{count_due_today_undone(habits, logs, date.today().weekday(), today)}",
+                        size=14, color=PINK),
                 ft.ProgressBar(value=summary["percent"] / 100,
                                color=progress_colour(summary["percent"]),
                                bgcolor=LIGHT_PINK, height=PROGRESS_HEIGHT,
