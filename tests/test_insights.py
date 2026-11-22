@@ -10,8 +10,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.habits import new_habit  # noqa: E402
 from app.insights import (consistency_message, consistency_score,  # noqa: E402
-                          most_consistent_habit, needs_attention,
-                          weekly_done_rate)
+                          habits_below_rate, most_consistent_habit,
+                          needs_attention, weekly_done_rate)
 from app.tracker import set_done  # noqa: E402
 
 PASSED = 0
@@ -69,7 +69,26 @@ def test_weekly_done_rate():
           weekly_done_rate({}, habits, "2026-11-10") == 0)
 
 
+def test_habits_below_rate():
+    a = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
+    b = new_habit("Walk", "Health", 0, "🚶", "#BDE0FE", "2026-11-01")
+    habits = [a, b]
+    logs = {}
+    days = ["2026-11-08", "2026-11-09", "2026-11-10"]
+    for d in days:
+        set_done(logs, a["id"], d, True)
+    set_done(logs, b["id"], "2026-11-08", True)
+    # a done 3/3 (100%), b done 1/3 (33%).
+    check("only the 33% habit is below 50%",
+          habits_below_rate(logs, habits, days) == [b])
+    check("nobody is below 30%",
+          habits_below_rate(logs, habits, days, 30) == [])
+    check("no habits means nobody below the rate",
+          habits_below_rate(logs, [], days) == [])
+
+
 if __name__ == "__main__":
     main()
     test_weekly_done_rate()
+    test_habits_below_rate()
     print(f"{PASSED} tests passed")

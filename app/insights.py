@@ -70,6 +70,24 @@ def weekly_done_rate(logs, habits, end_date=None):
     return consistency_score(logs, habits, date_strs)
 
 
+def habits_below_rate(logs, habits, date_strs, threshold=50):
+    """Habits done less than `threshold` percent over the dates.
+
+    Creation order is kept; [] when every habit meets the rate
+    (or there are no habits/dates). The strict less-than means a
+    habit exactly at the threshold does not count.
+    """
+    if not habits or not date_strs:
+        return []
+    below = []
+    for h in habits:
+        done = sum(1 for d in date_strs if is_done(logs, h, d))
+        rate = 100 * done / len(date_strs)
+        if rate < threshold:
+            below.append(h)
+    return below
+
+
 def consistency_message(score):
     """Warm one-liner for a consistency score (0-100)."""
     score = max(0, min(100, int(score or 0)))
