@@ -112,6 +112,18 @@ def count_seeds(habits, logs, date_str):
                if plant.get("stage") == "seed")
 
 
+def count_sprouts(habits, logs, date_str):
+    """How many plants are sprouts on a date.
+
+    A sprout is the 1-streak stage: the habit was ticked today or
+    has a 1-day streak. Mirror of count_seeds and count_blooming.
+    0 when there are no habits.
+    """
+    plants = [plant_for(h, logs, date_str) for h in (habits or [])]
+    return sum(1 for plant in plants
+               if plant.get("stage") == "sprout")
+
+
 def count_blooming(habits, logs, date_str):
     """How many plants are blooming or in full bloom on a date.
 

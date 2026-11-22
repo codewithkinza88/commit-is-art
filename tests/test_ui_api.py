@@ -199,6 +199,9 @@ def test_ui_api():
     check("Tonight shows milestones already reached",
           "Milestones reached:" in source
           and "milestones_reached(longest_streak)" in source)
+    check("Garden shows how many sprouts are growing",
+          "sprouts growing" in source
+          and "count_sprouts(habits, logs, today)" in source)
     check("Tonight shows the next milestone",
           "Next milestone" in source
           and "days_to_next_milestone(longest_streak)" in source)
