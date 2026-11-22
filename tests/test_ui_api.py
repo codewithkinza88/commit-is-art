@@ -193,6 +193,9 @@ def test_ui_api():
     check("Tonight shows the done rate this week",
           "Done rate this week:" in source
           and "weekly_done_rate(logs, habits)" in source)
+    check("Tonight shows milestones already reached",
+          "Milestones reached:" in source
+          and "milestones_reached(longest_streak)" in source)
     check("Tonight shows the next milestone",
           "Next milestone" in source
           and "days_to_next_milestone(longest_streak)" in source)

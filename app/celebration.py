@@ -20,6 +20,16 @@ def is_milestone(streak):
     return int(streak or 0) in MILESTONES
 
 
+def milestones_reached(streak):
+    """Milestone streaks already reached, smallest first.
+
+    The MILESTONES keys (7/14/30/100) at or below the streak —
+    [] when the streak has not reached any milestone yet.
+    """
+    streak = max(0, int(streak or 0))
+    return sorted(m for m in MILESTONES if m <= streak)
+
+
 def days_to_next_milestone(streak):
     """(milestone, days_left) until the next milestone streak.
 

@@ -57,7 +57,7 @@ from app.monthly import (average_minutes_per_day, busiest_weekday,
                          quietest_weekday)
 from app.schedule import (count_due_this_week, count_due_today_undone,
                           habits_due_tomorrow)
-from app.celebration import days_to_next_milestone
+from app.celebration import days_to_next_milestone, milestones_reached
 from app.goals import weekly_goal_progress, weekly_goal_warning
 from app.store import DEFAULT_PATH, load_store, save_store, seed_store
 from app.theme import (
@@ -800,6 +800,10 @@ def main(page: ft.Page):
                               + ("s" if next_milestone[1] != 1 else ""))
         else:
             milestone_text = "Next milestone: all milestones reached! 🌳"
+        reached = milestones_reached(longest_streak)
+        reached_text = (f"Milestones reached: "
+                        f"{', '.join(str(m) for m in reached)}"
+                        if reached else "")
         board = streak_leaderboard(logs, habits)
         board_text = (", ".join(
             f"{entry['name']} ({entry['current']}d)"
@@ -931,6 +935,7 @@ def main(page: ft.Page):
                         f"{weekly_done_rate(logs, habits)}%",
                         size=15, color=MUTED),
                 ft.Text(milestone_text, size=15, color=MUTED),
+                ft.Text(reached_text, size=15, color=MUTED) if reached_text else ft.Container(),
                 ft.Text(consistency_text, size=15, color=MUTED),
             ], spacing=6), colors=TONIGHT_GRADIENT),
             section_title("Badges earned 🏅"),
