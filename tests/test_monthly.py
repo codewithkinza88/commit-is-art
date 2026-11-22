@@ -11,8 +11,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from app.habits import new_habit  # noqa: E402
 from app.tracker import set_done, log_minutes  # noqa: E402
 from app.monthly import (average_minutes_per_day, busiest_weekday,  # noqa: E402
-                         days_logged_this_month, monthly_summary,
-                         quietest_weekday)
+                         days_logged_this_month, days_with_no_minutes,
+                         monthly_summary, quietest_weekday)
 
 PASSED = 0
 
@@ -103,6 +103,22 @@ def test_average_minutes_per_day():
           average_minutes_per_day({}) == 0)
 
 
+def test_days_with_no_minutes():
+    habits = [new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-01")]
+    logs = {}
+    log_minutes(logs, habits[0]["id"], "2026-11-02", 30)
+    log_minutes(logs, habits[0]["id"], "2026-11-04", 45)
+    log_minutes(logs, habits[0]["id"], "2026-11-05", 45)
+    month = monthly_summary(logs, habits, 2026, 11)
+    # 30 November days minus 3 logged = 27 quiet days.
+    check("27 of 30 November days logged nothing",
+          days_with_no_minutes(month) == 27)
+    check("an empty month has all 30 days quiet",
+          days_with_no_minutes(monthly_summary({}, [], 2026, 11)) == 30)
+    check("no summary has no quiet days",
+          days_with_no_minutes(None) == 0)
+
+
 def test_days_logged_this_month():
     habits = [new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-01")]
     logs = {}
@@ -126,4 +142,5 @@ if __name__ == "__main__":
     test_quietest_weekday()
     test_average_minutes_per_day()
     test_days_logged_this_month()
+    test_days_with_no_minutes()
     print(f"{PASSED} tests passed")

@@ -82,6 +82,18 @@ def days_logged_this_month(summary):
                if int(day.get("total_minutes") or 0) > 0)
 
 
+def days_with_no_minutes(summary):
+    """How many days in a monthly summary logged 0 minutes.
+
+    The other side of days_logged_this_month: days_in_month
+    minus days logged. 0 for a fully logged month (or an empty
+    summary, which has no days at all).
+    """
+    summary = summary or {}
+    total = summary.get("days_in_month") or 0
+    return total - days_logged_this_month(summary)
+
+
 def average_minutes_per_day(summary):
     """Average minutes per day across a monthly summary (0 when empty).
 
