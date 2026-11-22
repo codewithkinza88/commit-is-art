@@ -10,8 +10,9 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.habits import new_habit  # noqa: E402
 from app.tracker import set_done, log_minutes  # noqa: E402
-from app.export import (habits_to_csv, logs_to_csv, notes_to_csv,  # noqa: E402
-                        streaks_to_csv, summary_to_text, week_to_text)
+from app.export import (habits_to_csv, logs_to_csv, month_to_text,  # noqa: E402
+                        notes_to_csv, streaks_to_csv, summary_to_text,
+                        week_to_text)
 
 PASSED = 0
 
@@ -122,6 +123,24 @@ def test_week_to_text():
           lines[-1] == "Week total: 45 minutes")
 
 
+def test_month_to_text():
+    h1 = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
+    logs = {}
+    set_done(logs, h1["id"], "2026-11-08", True)
+    set_done(logs, h1["id"], "2026-11-09", True)
+    log_minutes(logs, h1["id"], "2026-11-09", 45)
+    text = month_to_text(logs, [h1], 2026, 11)
+    lines = text.splitlines()
+    check("month text starts with the month header",
+          lines[0] == "Habit Garden — November 2026")
+    check("month text has one line per day plus a total",
+          len(lines) == 32)
+    check("month text shows the minutes on the right days",
+          "2026-11-09: 1/1 (100%) • 45 min" in lines)
+    check("month text ends with the month total",
+          lines[-1] == "Month total: 45 minutes")
+
+
 if __name__ == "__main__":
     test_habits_to_csv()
     test_logs_to_csv()
@@ -130,4 +149,5 @@ if __name__ == "__main__":
     test_notes_to_csv()
     test_streaks_to_csv()
     test_week_to_text()
+    test_month_to_text()
     print(f"{PASSED} tests passed")

@@ -86,6 +86,25 @@ def summary_to_text(logs, habits, date_str):
     return "\n".join(lines)
 
 
+def month_to_text(logs, habits, year, month):
+    """One calendar month as short readable text lines, oldest first.
+
+    Mirror of week_to_text: a header, one line per day of the month
+    (date, done/total, percent, minutes) from monthly_summary, plus
+    a total line at the end — copyable into a message.
+    """
+    from app.monthly import monthly_summary
+    import calendar as _calendar
+
+    summary = monthly_summary(logs, habits, year, month)
+    lines = [f"Habit Garden — {_calendar.month_name[month]} {year}"]
+    for day in summary["days"]:
+        lines.append(f"{day['date']}: {day['done']}/{day['total']} "
+                     f"({day['percent']}%) • {day['total_minutes']} min")
+    lines.append(f"Month total: {summary['total_minutes']} minutes")
+    return "\n".join(lines)
+
+
 def week_to_text(logs, habits, end_date=None):
     """The last 7 days as short readable text lines, oldest first.
 
