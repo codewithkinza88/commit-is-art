@@ -122,6 +122,24 @@ def notes_to_text(notes, start_date, end_date):
     return "\n".join(lines)
 
 
+def habits_to_text(habits):
+    """Habits as short readable text lines, one per habit.
+
+    Icon, name, category, and daily target when one is set —
+    the same shape as summary_to_text, but for the habit list
+    itself, so it can be copied into a message.
+    """
+    lines = ["Habit Garden — my habits"]
+    for habit in (habits or []):
+        target = int(habit.get("target_minutes") or 0)
+        target_text = f" • 🎯 {target} min/day" if target else ""
+        lines.append(f"{habit.get('icon', '🌱')} {habit.get('name', '')} "
+                     f"({habit.get('category', 'Daily Life')}){target_text}")
+    if not habits:
+        lines.append("No habits yet 🌱")
+    return "\n".join(lines)
+
+
 def week_to_text(logs, habits, end_date=None):
     """The last 7 days as short readable text lines, oldest first.
 
