@@ -90,6 +90,26 @@ def notes_in_range(notes, start_date, end_date):
     return found
 
 
+def notes_for_habit_this_week(notes, habit_id, end_date=None):
+    """(date, text) pairs for one habit in the 7 days to end_date.
+
+    Non-empty notes only, oldest date first; [] when the habit
+    wrote nothing that week. Mirror of notes_for_habit, but for
+    the last 7 days instead of all time.
+    """
+    from datetime import date as _date
+    from datetime import timedelta as _timedelta
+
+    if isinstance(end_date, str):
+        end = _date.fromisoformat(end_date)
+    else:
+        end = end_date or _date.today()
+    start = (end - _timedelta(days=6)).isoformat()
+    return [(date_str, text)
+            for date_str, text in notes_for_habit(notes or {}, habit_id)
+            if start <= date_str <= end.isoformat()]
+
+
 def notes_count_this_week(notes, end_date=None):
     """How many non-empty notes were written in the 7 days to end_date.
 

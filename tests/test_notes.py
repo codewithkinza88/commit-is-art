@@ -11,7 +11,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from app.notes import (MAX_NOTE_LEN, add_note, count_notes,  # noqa: E402
                        count_notes_for_day, find_notes, get_note, has_note,
                        latest_note, longest_note, notes_count_this_week,
-                       notes_for_day, notes_for_habit, notes_in_range)
+                       notes_for_day, notes_for_habit,
+                       notes_for_habit_this_week, notes_in_range)
 
 PASSED = 0
 
@@ -151,6 +152,24 @@ def test_notes_in_range():
           notes_in_range(notes, "2026-11-13", "2026-11-14") == [])
 
 
+def test_notes_for_habit_this_week():
+    notes = {}
+    add_note(notes, "h1", "2026-11-10", "Read chapter 3")
+    add_note(notes, "h2", "2026-11-10", "Watered the plants")
+    add_note(notes, "h1", "2026-11-12", "Finished chapter 4")
+    add_note(notes, "h1", "2026-11-01", "Too old to count")
+    add_note(notes, "h1", "2026-11-11", "   ")
+    check("notes this week for h1 are the two in-window notes",
+          notes_for_habit_this_week(notes, "h1", "2026-11-12") ==
+          [("2026-11-10", "Read chapter 3"),
+           ("2026-11-12", "Finished chapter 4")])
+    check("another habit's notes do not leak in",
+          notes_for_habit_this_week(notes, "h2", "2026-11-12") ==
+          [("2026-11-10", "Watered the plants")])
+    check("a habit with no notes this week gives []",
+          notes_for_habit_this_week(notes, "h9", "2026-11-12") == [])
+
+
 def test_notes_count_this_week():
     notes = {}
     add_note(notes, "h1", "2026-11-10", "Read chapter 3")
@@ -176,4 +195,5 @@ if __name__ == "__main__":
     test_longest_note()
     test_notes_in_range()
     test_notes_count_this_week()
+    test_notes_for_habit_this_week()
     print(f"{PASSED} tests passed")
