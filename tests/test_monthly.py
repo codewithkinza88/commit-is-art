@@ -12,7 +12,8 @@ from app.habits import new_habit  # noqa: E402
 from app.tracker import set_done, log_minutes  # noqa: E402
 from app.monthly import (average_minutes_per_day, busiest_weekday,  # noqa: E402
                          days_logged_this_month, days_with_no_minutes,
-                         monthly_summary, quietest_weekday)
+                         monthly_summary, perfect_day_dates,
+                         quietest_weekday)
 
 PASSED = 0
 
@@ -103,6 +104,23 @@ def test_average_minutes_per_day():
           average_minutes_per_day({}) == 0)
 
 
+def test_perfect_day_dates():
+    habits = [new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-01")]
+    logs = {}
+    set_done(logs, habits[0]["id"], "2026-11-02", True)
+    set_done(logs, habits[0]["id"], "2026-11-04", True)
+    log_minutes(logs, habits[0]["id"], "2026-11-05", 45)
+    month = monthly_summary(logs, habits, 2026, 11)
+    # 11-02 and 11-04 are perfect (1/1, 100%); 11-05 logged minutes
+    # but was not ticked and has no target, so it is not perfect.
+    check("perfect days are 11-02 and 11-04",
+          perfect_day_dates(month) == ["2026-11-02", "2026-11-04"])
+    check("an empty month has no perfect days",
+          perfect_day_dates(monthly_summary({}, [], 2026, 11)) == [])
+    check("no summary has no perfect days",
+          perfect_day_dates(None) == [])
+
+
 def test_days_with_no_minutes():
     habits = [new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-01")]
     logs = {}
@@ -143,4 +161,5 @@ if __name__ == "__main__":
     test_average_minutes_per_day()
     test_days_logged_this_month()
     test_days_with_no_minutes()
+    test_perfect_day_dates()
     print(f"{PASSED} tests passed")

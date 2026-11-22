@@ -94,6 +94,18 @@ def days_with_no_minutes(summary):
     return total - days_logged_this_month(summary)
 
 
+def perfect_day_dates(summary):
+    """ISO dates in a monthly summary that were perfect (100%).
+
+    Oldest first; [] when no day was perfect. A day only counts
+    when at least one habit exists (an empty habit list can never
+    be 100%).
+    """
+    days = (summary or {}).get("days") or []
+    return [day["date"] for day in days
+            if day.get("total") and day.get("percent") == 100]
+
+
 def average_minutes_per_day(summary):
     """Average minutes per day across a monthly summary (0 when empty).
 
