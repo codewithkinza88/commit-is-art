@@ -130,6 +130,18 @@ def longest_current_streak(logs, habits, end_date=None):
         default=0)
 
 
+def habits_with_streak_at_least(logs, habits, minimum, end_date=None):
+    """Names of habits whose current streak is at least `minimum`.
+
+    Creation order is kept; [] when no habit reaches the level
+    (or there are no habits). A minimum of 0 or less lists every
+    habit, since every current streak is >= 0.
+    """
+    minimum = max(0, int(minimum or 0))
+    return [habit["name"] for habit in (habits or [])
+            if current_streak(logs, habit, end_date=end_date) >= minimum]
+
+
 def days_since_last_done(logs, habit, end_date=None):
     """Days since the habit was last done (0 = done on end_date).
 
