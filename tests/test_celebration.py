@@ -9,7 +9,8 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.celebration import (days_to_next_milestone, is_milestone,  # noqa: E402
-                             milestone_message, milestones_reached)
+                             milestone_message, milestones_reached,
+                             next_milestone_message)
 
 PASSED = 0
 
@@ -39,6 +40,15 @@ def test_days_to_next_milestone():
           days_to_next_milestone(100) is None)
 
 
+def test_next_milestone_message():
+    check("5 days in, 2 to go to a 7-day streak",
+          next_milestone_message(5) == "🎯 2 more day(s) to a 7-day streak!")
+    check("a milestone day looks ahead to the next one",
+          next_milestone_message(7) == "🎯 7 more day(s) to a 14-day streak!")
+    check("past the last milestone there is no next message",
+          next_milestone_message(100) == "")
+
+
 def test_milestones_reached():
     check("a 14-day streak reached 7 and 14",
           milestones_reached(14) == [7, 14])
@@ -52,4 +62,5 @@ if __name__ == "__main__":
     main()
     test_days_to_next_milestone()
     test_milestones_reached()
+    test_next_milestone_message()
     print(f"{PASSED} tests passed")

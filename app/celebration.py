@@ -42,3 +42,17 @@ def days_to_next_milestone(streak):
         if milestone > streak:
             return milestone, milestone - streak
     return None
+
+
+def next_milestone_message(streak):
+    """A cheery line naming the next milestone and the days to go.
+
+    "" (empty) when the streak is already at the highest milestone
+    — there is nothing bigger to aim for.
+    """
+    streak = max(0, int(streak or 0))
+    for milestone in sorted(MILESTONES):
+        if streak < milestone:
+            return (f"🎯 {milestone - streak} more day(s) to a "
+                    f"{milestone}-day streak!")
+    return ""
