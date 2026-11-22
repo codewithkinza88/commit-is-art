@@ -20,7 +20,7 @@ from app.tracker import (  # noqa: E402
     set_done, toggle_done, log_minutes, is_done, minutes_for,
     total_minutes_today, total_minutes_this_week, total_minutes_yesterday,
     total_minutes_in_range, total_minutes_last_30_days,
-    best_day_by_minutes, days_done_this_week,
+    best_day_by_minutes, days_done_this_week, first_done_date,
     done_count_today,
     current_streak, daily_summary, last_7_days,
 )
@@ -309,6 +309,20 @@ def test_days_done_this_week():
           days_done_this_week(logs, habit, "2026-11-20") == 0)
 
 
+def test_first_done_date():
+    habit = new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-01")
+    logs = {}
+    set_done(logs, habit["id"], "2026-11-06", True)
+    set_done(logs, habit["id"], "2026-11-04", True)
+    set_done(logs, habit["id"], "2026-11-07", True)
+    check("first done date is the earliest done day",
+          first_done_date(logs, habit) == "2026-11-04")
+    check("never done has no first date",
+          first_done_date({}, habit) == "")
+    check("a ticked day counts even without minutes",
+          first_done_date(logs, habit) != "")
+
+
 def test_total_minutes_last_30_days():
     habits = [new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-05")]
     logs = {}
@@ -505,6 +519,7 @@ if __name__ == "__main__":
     test_total_minutes_yesterday()
     test_total_minutes_last_30_days()
     test_days_done_this_week()
+    test_first_done_date()
     test_total_minutes_in_range()
     test_best_day_by_minutes()
     test_total_plants()

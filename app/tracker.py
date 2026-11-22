@@ -113,6 +113,23 @@ def days_done_this_week(logs, habit, end_date=None):
                           (end - timedelta(days=i)).isoformat()))
 
 
+def first_done_date(logs, habit):
+    """The earliest ISO date the habit was ever done.
+
+    "" when the habit was never done — the day its garden journey
+    started. Invalid log dates are skipped.
+    """
+    done = []
+    for date_str in (logs or {}):
+        try:
+            date.fromisoformat(date_str)
+        except ValueError:
+            continue
+        if is_done(logs, habit, date_str):
+            done.append(date_str)
+    return min(done) if done else ""
+
+
 def total_minutes_last_30_days(logs, habits, end_date=None):
     """Total minutes logged across all habits in the 30 days to end_date.
 
