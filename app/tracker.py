@@ -97,6 +97,23 @@ def total_minutes_in_range(logs, habits, start_date, end_date):
     return total
 
 
+def total_minutes_last_30_days(logs, habits, end_date=None):
+    """Total minutes logged across all habits in the 30 days to end_date.
+
+    Mirror of total_minutes_this_week with a 30-day rolling window;
+    0 when there are no logs or no habits.
+    """
+    if isinstance(end_date, str):
+        end = date.fromisoformat(end_date)
+    else:
+        end = end_date or date.today()
+    total = 0
+    for i in range(30):
+        day = (end - timedelta(days=i)).isoformat()
+        total += total_minutes_today(logs, habits, day)
+    return total
+
+
 def total_minutes_yesterday(logs, habits, end_date=None):
     """Total minutes logged across all habits on the day before end_date."""
     if isinstance(end_date, str):

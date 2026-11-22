@@ -18,7 +18,8 @@ from app.habits import (  # noqa: E402
 from app.tracker import (  # noqa: E402
     set_done, toggle_done, log_minutes, is_done, minutes_for,
     total_minutes_today, total_minutes_this_week, total_minutes_yesterday,
-    total_minutes_in_range, best_day_by_minutes,
+    total_minutes_in_range, total_minutes_last_30_days,
+    best_day_by_minutes,
     done_count_today,
     current_streak, daily_summary, last_7_days,
 )
@@ -294,6 +295,20 @@ def test_total_minutes_this_week():
           total_minutes_this_week(logs, [], "2026-11-07") == 0)
 
 
+def test_total_minutes_last_30_days():
+    habits = [new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-05")]
+    logs = {}
+    log_minutes(logs, habits[0]["id"], "2026-11-07", 45)
+    log_minutes(logs, habits[0]["id"], "2026-10-20", 30)
+    log_minutes(logs, habits[0]["id"], "2026-10-08", 99)
+    check("last 30 days sums the 30-day window",
+          total_minutes_last_30_days(logs, habits, "2026-11-07") == 75)
+    check("last 30 days is 0 with no logs",
+          total_minutes_last_30_days({}, habits, "2026-11-07") == 0)
+    check("last 30 days is 0 with no habits",
+          total_minutes_last_30_days(logs, [], "2026-11-07") == 0)
+
+
 def test_total_minutes_in_range():
     habits = [new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-05")]
     logs = {}
@@ -446,6 +461,7 @@ if __name__ == "__main__":
     test_habits_by_category()
     test_total_minutes_this_week()
     test_total_minutes_yesterday()
+    test_total_minutes_last_30_days()
     test_total_minutes_in_range()
     test_best_day_by_minutes()
     test_total_plants()
