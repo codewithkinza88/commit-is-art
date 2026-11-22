@@ -86,6 +86,14 @@ def validate_date_str(text):
         return ""
 
 
+def validate_colour(colour):
+    """The colour itself when it is one of the app colours,
+    else the soft sky blue "#BDE0FE"."""
+    from app.habits import COLOURS
+
+    return colour if colour in COLOURS else "#BDE0FE"
+
+
 def validate_habit_days(days):
     """A habit's weekday list, cleaned to sorted unique ints 0..6.
 

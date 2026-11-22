@@ -9,7 +9,8 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.validation import (MAX_NAME_LEN, validate_category,  # noqa: E402
-                            validate_date_str, validate_habit_days,
+                            validate_colour, validate_date_str,
+                            validate_habit_days,
                             validate_habit_name,
                             validate_icon, validate_minutes,
                             validate_note_text, validate_target_minutes,
@@ -89,6 +90,15 @@ def test_validate_weekly_target():
           validate_weekly_target("soon") == 0)
 
 
+def test_validate_colour():
+    check("a real app colour passes through",
+          validate_colour("#F9A8D4") == "#F9A8D4")
+    check("an unknown colour falls back to soft sky blue",
+          validate_colour("#123456") == "#BDE0FE")
+    check("a blank colour falls back to soft sky blue",
+          validate_colour("") == "#BDE0FE")
+
+
 def test_validate_habit_days():
     check("a normal weekday list passes through sorted",
           validate_habit_days([4, 0, 2]) == [0, 2, 4])
@@ -107,4 +117,5 @@ if __name__ == "__main__":
     test_validate_date_str()
     test_validate_weekly_target()
     test_validate_habit_days()
+    test_validate_colour()
     print(f"{PASSED} tests passed")
