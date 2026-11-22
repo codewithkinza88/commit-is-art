@@ -11,8 +11,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from app.habits import new_habit  # noqa: E402
 from app.tracker import set_done, log_minutes  # noqa: E402
 from app.export import (habits_to_csv, logs_to_csv, month_to_text,  # noqa: E402
-                        notes_to_csv, streaks_to_csv, summary_to_text,
-                        week_to_text)
+                        notes_to_csv, notes_to_text, streaks_to_csv,
+                        summary_to_text, week_to_text)
 
 PASSED = 0
 
@@ -123,6 +123,25 @@ def test_week_to_text():
           lines[-1] == "Week total: 45 minutes")
 
 
+def test_notes_to_text():
+    from app.notes import add_note
+
+    notes = {}
+    add_note(notes, "h1", "2026-11-10", "Read chapter 3")
+    add_note(notes, "h2", "2026-11-10", "Watered the plants")
+    add_note(notes, "h1", "2026-11-12", "Finished chapter 4")
+    text = notes_to_text(notes, "2026-11-10", "2026-11-11")
+    lines = text.splitlines()
+    check("notes text starts with the range header",
+          lines[0] == "Habit Garden notes — 2026-11-10 to 2026-11-11")
+    check("notes text lists both notes in range",
+          lines[1] == "2026-11-10 [h1]: Read chapter 3"
+          and lines[2] == "2026-11-10 [h2]: Watered the plants")
+    check("an empty range says so kindly",
+          notes_to_text(notes, "2026-11-13", "2026-11-14").splitlines()[-1]
+          == "No notes in this range 🌱")
+
+
 def test_month_to_text():
     h1 = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
     logs = {}
@@ -150,4 +169,5 @@ if __name__ == "__main__":
     test_streaks_to_csv()
     test_week_to_text()
     test_month_to_text()
+    test_notes_to_text()
     print(f"{PASSED} tests passed")

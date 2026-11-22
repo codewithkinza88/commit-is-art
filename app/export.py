@@ -8,6 +8,7 @@ summary of one day.
 import csv
 import io
 
+from app.notes import notes_in_range
 from app.streaks import best_streak
 from app.tracker import current_streak, daily_summary, last_7_days
 
@@ -102,6 +103,22 @@ def month_to_text(logs, habits, year, month):
         lines.append(f"{day['date']}: {day['done']}/{day['total']} "
                      f"({day['percent']}%) • {day['total_minutes']} min")
     lines.append(f"Month total: {summary['total_minutes']} minutes")
+    return "\n".join(lines)
+
+
+def notes_to_text(notes, start_date, end_date):
+    """Notes in a date range as short readable text lines.
+
+    A header with the range, then one line per non-empty note
+    (date, habit id, text), oldest first; a friendly line when
+    nothing was written in the range.
+    """
+    found = notes_in_range(notes or {}, start_date, end_date)
+    lines = [f"Habit Garden notes — {start_date} to {end_date}"]
+    for date_str, habit_id, text in found:
+        lines.append(f"{date_str} [{habit_id}]: {text}")
+    if not found:
+        lines.append("No notes in this range 🌱")
     return "\n".join(lines)
 
 
