@@ -99,6 +99,19 @@ def flower_count(habits, logs, date_str):
     return total
 
 
+def count_seeds(habits, logs, date_str):
+    """How many plants are still seeds on a date.
+
+    A seed is the 0-streak stage: the habit has never been done
+    (or its streak broke and it has not been ticked today). Mirror
+    of count_blooming, for the other end of the garden. 0 when
+    there are no habits.
+    """
+    plants = [plant_for(h, logs, date_str) for h in (habits or [])]
+    return sum(1 for plant in plants
+               if plant.get("stage") == "seed")
+
+
 def count_blooming(habits, logs, date_str):
     """How many plants are blooming or in full bloom on a date.
 

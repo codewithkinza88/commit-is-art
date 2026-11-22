@@ -181,6 +181,9 @@ def test_ui_api():
     check("Garden shows how many plants are blooming",
           "plants blooming" in source
           and "count_blooming(habits, logs, today)" in source)
+    check("Garden shows how many seeds are waiting",
+          "seeds waiting" in source
+          and "count_seeds(habits, logs, today)" in source)
     check("Tonight shows the next milestone",
           "Next milestone" in source
           and "days_to_next_milestone(longest_streak)" in source)
