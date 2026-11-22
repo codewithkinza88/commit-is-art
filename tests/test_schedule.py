@@ -12,7 +12,8 @@ from app.habits import new_habit  # noqa: E402
 from app.schedule import (count_due_this_week, count_due_today,  # noqa: E402
                           count_due_today_undone, due_this_week,
                           habits_due_on, habits_due_tomorrow,
-                          is_due_today, next_due_weekday, weekday_name)
+                          is_due_today, next_due_weekday, weekday_name,
+                          weekday_of)
 from app.tracker import set_done  # noqa: E402
 
 PASSED = 0
@@ -134,6 +135,17 @@ def test_count_due_this_week():
           count_due_this_week([], 0) == 0)
 
 
+def test_weekday_of():
+    check("2026-11-09 is a Monday",
+          weekday_of("2026-11-09") == 0)
+    check("2026-11-14 is a Saturday",
+          weekday_of("2026-11-14") == 5)
+    check("an impossible date gives -1",
+          weekday_of("2026-02-30") == -1)
+    check("non-date text gives -1",
+          weekday_of("soon") == -1)
+
+
 def test_next_due_weekday():
     weekday_only = new_habit("Study - DSA", "Study", 60, "📚", "#A5D8FF",
                              "2026-11-01")
@@ -158,5 +170,6 @@ if __name__ == "__main__":
     test_count_due_today()
     test_count_due_today_undone()
     test_count_due_this_week()
+    test_weekday_of()
     test_next_due_weekday()
     print(f"{PASSED} tests passed")

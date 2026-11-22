@@ -93,6 +93,22 @@ def next_due_weekday(habit, weekday):
     return weekday % 7
 
 
+def weekday_of(date_str):
+    """Weekday number (0=Mon .. 6=Sun) for an ISO date string.
+
+    -1 when the text is not a valid date — handy before a date is
+    used to look up due habits.
+    """
+    from datetime import date as _date
+
+    if not isinstance(date_str, str):
+        return -1
+    try:
+        return _date.fromisoformat(date_str.strip()).weekday()
+    except ValueError:
+        return -1
+
+
 def weekday_name(weekday):
     """Short name for a weekday number, e.g. 0 -> 'Mon'."""
     if 0 <= weekday <= 6:
