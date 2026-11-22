@@ -13,6 +13,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from app.habits import (  # noqa: E402
     new_habit, add_habit, edit_habit, delete_habit, get_habit,
     archive_habit, active_habits, habits_by_category, count_by_category,
+    count_by_effort,
     clone_habit, habit_age_days, validate_effort,
 )
 from app.tracker import (  # noqa: E402
@@ -379,6 +380,22 @@ def test_count_by_category():
           count_by_category(None) == {})
 
 
+def test_count_by_effort():
+    habits = [new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-07"),
+              new_habit("Read", "Books", 30, "📖", "#F9A8D4", "2026-11-07"),
+              new_habit("Revise", "Study", 30, "✍️", "#FFE5A3", "2026-11-07")]
+    habits[0]["effort"] = "Hard"
+    habits[1]["effort"] = "Easy"
+    habits[2]["effort"] = "Hard"
+    check("count by effort groups Hard and Easy",
+          count_by_effort(habits) == {"Hard": 2, "Easy": 1})
+    check("a missing effort counts as Medium",
+          count_by_effort([new_habit("Walk", "Health", 0, "🚶", "#BDE0FE",
+                                     "2026-11-07")]) == {"Medium": 1})
+    check("count by effort is empty with no habits",
+          count_by_effort([]) == {})
+
+
 def test_stage_progress():
     check("stage progress is 0 at a fresh seed", stage_progress(0) == 0.0)
     check("stage progress is 0 at the start of sprout",
@@ -466,6 +483,7 @@ if __name__ == "__main__":
     test_best_day_by_minutes()
     test_total_plants()
     test_count_by_category()
+    test_count_by_effort()
     test_stage_progress()
     test_clone_habit()
     test_effort_level()

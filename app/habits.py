@@ -193,3 +193,16 @@ def count_by_category(habits):
         counts[category] = counts.get(category, 0) + 1
     return counts
 
+
+def count_by_effort(habits):
+    """How many habits sit at each effort level (only efforts present).
+
+    Effort comes from validate_effort, so an unknown or missing
+    effort counts as "Medium". {} when there are no habits.
+    """
+    counts = {}
+    for habit in (habits or []):
+        effort = validate_effort(habit.get("effort"))
+        counts[effort] = counts.get(effort, 0) + 1
+    return counts
+
