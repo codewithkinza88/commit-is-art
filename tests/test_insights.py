@@ -10,7 +10,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.habits import new_habit  # noqa: E402
 from app.insights import (consistency_message, consistency_score,  # noqa: E402
-                          most_consistent_habit, needs_attention)
+                          most_consistent_habit, needs_attention,
+                          weekly_done_rate)
 from app.tracker import set_done  # noqa: E402
 
 PASSED = 0
@@ -49,6 +50,26 @@ def main():
     check("no ticks message", "No ticks" in consistency_message(0))
 
 
+def test_weekly_done_rate():
+    a = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
+    b = new_habit("Walk", "Health", 0, "🚶", "#BDE0FE", "2026-11-01")
+    habits = [a, b]
+    logs = {}
+    # 7 days ending 2026-11-10: a done all 7, b done 3 -> 10/14 = 71%.
+    for day in ("2026-11-04", "2026-11-05", "2026-11-06", "2026-11-07",
+                "2026-11-08", "2026-11-09", "2026-11-10"):
+        set_done(logs, a["id"], day, True)
+    for day in ("2026-11-08", "2026-11-09", "2026-11-10"):
+        set_done(logs, b["id"], day, True)
+    check("done rate this week is 71%",
+          weekly_done_rate(logs, habits, "2026-11-10") == 71)
+    check("done rate with no habits is 0",
+          weekly_done_rate(logs, [], "2026-11-10") == 0)
+    check("done rate with no logs is 0",
+          weekly_done_rate({}, habits, "2026-11-10") == 0)
+
+
 if __name__ == "__main__":
     main()
+    test_weekly_done_rate()
     print(f"{PASSED} tests passed")

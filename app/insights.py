@@ -52,6 +52,24 @@ def most_consistent_habit(logs, habits, date_strs):
     return best
 
 
+def weekly_done_rate(logs, habits, end_date=None):
+    """Share of habit-days done over the last 7 days, as a percent.
+
+    A thin wrapper over consistency_score with the 7 date strings
+    ending on end_date (default today). 0-100, and 0 when there are
+    no habits.
+    """
+    from datetime import date as _date
+    from datetime import timedelta as _timedelta
+
+    if isinstance(end_date, str):
+        end = _date.fromisoformat(end_date)
+    else:
+        end = end_date or _date.today()
+    date_strs = [(end - _timedelta(days=i)).isoformat() for i in range(7)]
+    return consistency_score(logs, habits, date_strs)
+
+
 def consistency_message(score):
     """Warm one-liner for a consistency score (0-100)."""
     score = max(0, min(100, int(score or 0)))

@@ -32,7 +32,7 @@ from app.garden import (count_blooming, count_seeds, counts_text,
                         plants_by_stage, stage_progress,
                         total_plants)
 from app.insights import (consistency_message, consistency_score,
-                          most_consistent_habit)
+                          most_consistent_habit, weekly_done_rate)
 from app.notes import count_notes, latest_note
 from app.ordering import sort_habits
 from app.motivation import (comeback_message, evening_message,
@@ -925,6 +925,9 @@ def main(page: ft.Page):
                         size=15, color=MUTED),
                 ft.Text(f"Longest gap: {worst_gap} days", size=15,
                         color=MUTED),
+                ft.Text(f"Done rate this week: "
+                        f"{weekly_done_rate(logs, habits)}%",
+                        size=15, color=MUTED),
                 ft.Text(milestone_text, size=15, color=MUTED),
                 ft.Text(consistency_text, size=15, color=MUTED),
             ], spacing=6), colors=TONIGHT_GRADIENT),
