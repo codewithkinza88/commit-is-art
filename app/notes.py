@@ -127,6 +127,20 @@ def notes_for_habit_this_month(notes, habit_id, year, month):
             if start <= date_str <= end]
 
 
+def notes_in_month(notes, year, month):
+    """(date, habit_id, text) for non-empty notes in a calendar month.
+
+    Ordered by date, then habit id; [] when nothing was written
+    that month. Mirror of notes_in_range, but for a whole month.
+    """
+    import calendar as _calendar
+
+    days_in_month = _calendar.monthrange(year, month)[1]
+    start = f"{year:04d}-{month:02d}-01"
+    end = f"{year:04d}-{month:02d}-{days_in_month:02d}"
+    return notes_in_range(notes or {}, start, end)
+
+
 def total_notes_count(notes):
     """How many non-empty notes exist across all dates and habits.
 

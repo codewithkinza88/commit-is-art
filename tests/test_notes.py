@@ -14,7 +14,8 @@ from app.notes import (MAX_NOTE_LEN, add_note, count_notes,  # noqa: E402
                        notes_count_this_week,
                        notes_for_day, notes_for_habit,
                        notes_for_habit_this_month,
-                       notes_for_habit_this_week,                    notes_in_range,
+                       notes_for_habit_this_week, notes_in_month,
+                       notes_in_range,
                        total_notes_count)
 
 PASSED = 0
@@ -173,6 +174,25 @@ def test_notes_for_habit_this_month():
           notes_for_habit_this_month(notes, "h1", 2026, 12) == [])
 
 
+def test_notes_in_month():
+    notes = {}
+    add_note(notes, "h1", "2026-11-03", "Read chapter 3")
+    add_note(notes, "h2", "2026-11-03", "Watered the plants")
+    add_note(notes, "h1", "2026-11-12", "Finished chapter 4")
+    add_note(notes, "h1", "2026-10-31", "Too old to count")
+    add_note(notes, "h1", "2026-11-11", "   ")
+    check("notes in the month are ordered by date then habit",
+          notes_in_month(notes, 2026, 11) ==
+          [("2026-11-03", "h1", "Read chapter 3"),
+           ("2026-11-03", "h2", "Watered the plants"),
+           ("2026-11-12", "h1", "Finished chapter 4")])
+    check("notes outside the month do not count",
+          notes_in_month(notes, 2026, 10) ==
+          [("2026-10-31", "h1", "Too old to count")])
+    check("a month with no notes gives []",
+          notes_in_month({}, 2026, 11) == [])
+
+
 def test_notes_for_habit_this_week():
     notes = {}
     add_note(notes, "h1", "2026-11-10", "Read chapter 3")
@@ -233,5 +253,6 @@ if __name__ == "__main__":
     test_notes_count_this_week()
     test_notes_for_habit_this_week()
     test_notes_for_habit_this_month()
+    test_notes_in_month()
     test_total_notes_count()
     print(f"{PASSED} tests passed")
