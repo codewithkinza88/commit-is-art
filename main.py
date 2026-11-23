@@ -21,10 +21,11 @@ from datetime import date, timedelta
 
 from app.habits import (
     CATEGORIES, COLOURS, EFFORTS, EFFORT_EMOJI, ICONS, add_habit,
-    clone_habit, delete_habit, edit_habit, get_habit, habit_age_days,
-    new_habit,
+    clone_habit, count_archived, delete_habit, edit_habit, get_habit,
+    habit_age_days, new_habit,
 )
-from app.garden import (count_blooming, count_seeds, count_sprouts,
+from app.garden import (count_blooming, count_seeds,
+                        count_sprouts,
                         counts_text,
                         days_to_next_stage,
                         flower_bed, flower_count, flower_for, garden_summary,
@@ -936,6 +937,8 @@ def main(page: ft.Page):
                 ], spacing=10),
                 ft.Text(f"Last 30 days: "
                         f"{total_minutes_last_30_days(logs, habits)} minutes",
+                        size=15, color=MUTED),
+                ft.Text(f"📦 {count_archived(habits)} archived habits",
                         size=15, color=MUTED),
                 ft.Text(f"Longest gap: {worst_gap} days", size=15,
                         color=MUTED),

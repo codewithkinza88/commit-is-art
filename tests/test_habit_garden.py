@@ -14,7 +14,7 @@ from app.habits import (  # noqa: E402
     new_habit, add_habit, edit_habit, delete_habit, get_habit,
     archive_habit, active_habits, habits_by_category, count_by_category,
     count_by_effort, newest_habit, oldest_habit, habits_with_target,
-    clone_habit, habit_age_days, validate_effort,
+    count_archived, clone_habit, habit_age_days, validate_effort,
 )
 from app.tracker import (  # noqa: E402
     set_done, toggle_done, log_minutes, is_done, minutes_for,
@@ -459,6 +459,18 @@ def test_habits_with_target():
           habits_with_target([]) == [])
 
 
+def test_count_archived():
+    h1 = new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-05")
+    h2 = new_habit("Read", "Books", 30, "📖", "#F9A8D4", "2026-11-07")
+    archive_habit([h1, h2], h2["id"])
+    check("one archived habit counts as 1",
+          count_archived([h1, h2]) == 1)
+    check("no archived habits count as 0",
+          count_archived([h1]) == 0)
+    check("no habits count as 0",
+          count_archived([]) == 0)
+
+
 def test_stage_progress():
     check("stage progress is 0 at a fresh seed", stage_progress(0) == 0.0)
     check("stage progress is 0 at the start of sprout",
@@ -552,6 +564,7 @@ if __name__ == "__main__":
     test_newest_habit()
     test_oldest_habit()
     test_habits_with_target()
+    test_count_archived()
     test_stage_progress()
     test_clone_habit()
     test_effort_level()

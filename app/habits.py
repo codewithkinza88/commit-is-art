@@ -243,3 +243,11 @@ def habits_with_target(habits):
     return [h for h in (habits or [])
             if int(h.get("target_minutes") or 0) > 0]
 
+
+def count_archived(habits):
+    """How many habits are archived (parked, not deleted).
+
+    0 when none are archived (or there are no habits).
+    """
+    return sum(1 for h in (habits or []) if h.get("archived", False))
+
