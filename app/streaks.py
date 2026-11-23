@@ -142,6 +142,25 @@ def habits_with_streak_at_least(logs, habits, minimum, end_date=None):
             if current_streak(logs, habit, end_date=end_date) >= minimum]
 
 
+def habits_with_best_streak(logs, habits, end_date=None):
+    """Names of the habits sharing the longest best streak ever.
+
+    [] when there are no habits, or when no habit has any streak
+    yet (a best streak of 0 is not a streak to share). Ties list
+    every habit at the top, in creation order.
+    """
+    habits = list(habits or [])
+    if not habits:
+        return []
+    bests = [best_streak(logs, habit, end_date=end_date)
+             for habit in habits]
+    top = max(bests)
+    if top <= 0:
+        return []
+    return [habit["name"] for habit, best in zip(habits, bests)
+            if best == top]
+
+
 def days_since_last_done(logs, habit, end_date=None):
     """Days since the habit was last done (0 = done on end_date).
 

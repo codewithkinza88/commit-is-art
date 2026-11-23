@@ -13,11 +13,12 @@ from app.habits import new_habit  # noqa: E402
 from app.tracker import set_done  # noqa: E402
 from app.streaks import (average_best_streak, best_streak,
                          days_since_last_done,  # noqa: E402
-                         habits_on_streak, habits_with_streak_at_least,
+                         habits_on_streak, habits_with_best_streak,
+                         habits_with_streak_at_least,
                          last_done_label, longest_gap,
                          longest_current_streak, longest_streak_overall,
                          median_current_streak, streak_leaderboard,
-                         streak_summary, average_streak,
+                         streak_summary,                      average_streak,
                          median_best_streak)
 
 PASSED = 0
@@ -185,6 +186,26 @@ def test_longest_current_streak():
           longest_current_streak(logs, []) == 0)
 
 
+def test_habits_with_best_streak():
+    h1 = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
+    h2 = new_habit("Read", "Reading", 0, "📖", "#FFC6FF", "2026-11-01")
+    h3 = new_habit("Walk", "Health", 0, "🚶", "#BDE0FE", "2026-11-01")
+    logs = {}
+    for day in ("2026-11-04", "2026-11-05", "2026-11-06"):
+        set_done(logs, h1["id"], day, True)
+        set_done(logs, h2["id"], day, True)
+    set_done(logs, h3["id"], "2026-11-06", True)
+    # Best streaks are 3, 3, 1.
+    check("the two habits sharing the best streak are named",
+          habits_with_best_streak(logs, [h1, h2, h3],
+                                  date(2026, 11, 6)) == ["Study", "Read"])
+    check("no habits means an empty list",
+          habits_with_best_streak(logs, [], date(2026, 11, 6)) == [])
+    check("no streaks at all means an empty list",
+          habits_with_best_streak({}, [h1, h2, h3],
+                                  date(2026, 11, 6)) == [])
+
+
 def test_habits_with_streak_at_least():
     h1 = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
     h2 = new_habit("Read", "Reading", 0, "📖", "#FFC6FF", "2026-11-01")
@@ -256,4 +277,5 @@ if __name__ == "__main__":
     test_habits_on_streak()
     test_longest_current_streak()
     test_habits_with_streak_at_least()
+    test_habits_with_best_streak()
     print(f"{PASSED} tests passed")
