@@ -9,7 +9,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.habits import new_habit  # noqa: E402
-from app.insights import (consistency_message,  # noqa: E402
+from app.insights import (average_consistency, consistency_message,  # noqa: E402
                           consistency_score,
                           habits_above_rate, habits_below_rate,
                           most_consistent_habit,
@@ -89,6 +89,24 @@ def test_habits_above_rate():
           habits_above_rate(logs, [], days) == [])
 
 
+def test_average_consistency():
+    a = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
+    b = new_habit("Walk", "Health", 0, "🚶", "#BDE0FE", "2026-11-01")
+    habits = [a, b]
+    logs = {}
+    days = ["2026-11-08", "2026-11-09", "2026-11-10"]
+    for d in days:
+        set_done(logs, a["id"], d, True)
+    set_done(logs, b["id"], "2026-11-08", True)
+    # a 100%, b 33% -> mean 67 (rounded).
+    check("average consistency means the per-habit rates",
+          average_consistency(logs, habits, days) == 67)
+    check("no habits means 0 consistency",
+          average_consistency(logs, [], days) == 0)
+    check("no dates means 0 consistency",
+          average_consistency(logs, habits, []) == 0)
+
+
 def test_habits_below_rate():
     a = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
     b = new_habit("Walk", "Health", 0, "🚶", "#BDE0FE", "2026-11-01")
@@ -112,4 +130,5 @@ if __name__ == "__main__":
     test_weekly_done_rate()
     test_habits_below_rate()
     test_habits_above_rate()
+    test_average_consistency()
     print(f"{PASSED} tests passed")

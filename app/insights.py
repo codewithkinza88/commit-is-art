@@ -107,6 +107,23 @@ def habits_above_rate(logs, habits, date_strs, threshold=80):
     return above
 
 
+def average_consistency(logs, habits, date_strs):
+    """Mean per-habit done-rate over the dates, as a percent (0-100).
+
+    Different from consistency_score, which pools every habit-day
+    together: this averages each habit's own rate, so a habit done
+    every day and one never done average to 50. 0 when there are
+    no habits or no dates.
+    """
+    if not habits or not date_strs:
+        return 0
+    rates = []
+    for h in habits:
+        done = sum(1 for d in date_strs if is_done(logs, h, d))
+        rates.append(100 * done / len(date_strs))
+    return round(sum(rates) / len(rates))
+
+
 def consistency_message(score):
     """Warm one-liner for a consistency score (0-100)."""
     score = max(0, min(100, int(score or 0)))
