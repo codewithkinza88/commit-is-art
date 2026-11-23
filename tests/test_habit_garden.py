@@ -21,6 +21,7 @@ from app.tracker import (  # noqa: E402
     set_done, toggle_done, log_minutes, is_done, minutes_for,
     total_minutes_today, total_minutes_this_week, total_minutes_yesterday,
     total_minutes_in_range, total_minutes_last_30_days,
+    minutes_for_habit_this_month,
     best_day_by_minutes, days_done_this_week, first_done_date,
     done_count_today,
     current_streak, daily_summary, last_7_days,
@@ -484,6 +485,20 @@ def test_total_target_minutes():
           total_target_minutes([]) == 0)
 
 
+def test_minutes_for_habit_this_month():
+    h1 = new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-05")
+    logs = {}
+    log_minutes(logs, h1["id"], "2026-11-03", 20)
+    log_minutes(logs, h1["id"], "2026-11-10", 45)
+    log_minutes(logs, h1["id"], "2026-10-31", 99)
+    check("minutes in the month add up",
+          minutes_for_habit_this_month(logs, h1, 2026, 11) == 65)
+    check("minutes outside the month do not count",
+          minutes_for_habit_this_month(logs, h1, 2026, 10) == 99)
+    check("no logs in the month is 0",
+          minutes_for_habit_this_month({}, h1, 2026, 11) == 0)
+
+
 def test_stage_progress():
     check("stage progress is 0 at a fresh seed", stage_progress(0) == 0.0)
     check("stage progress is 0 at the start of sprout",
@@ -579,6 +594,7 @@ if __name__ == "__main__":
     test_habits_with_target()
     test_count_archived()
     test_total_target_minutes()
+    test_minutes_for_habit_this_month()
     test_stage_progress()
     test_clone_habit()
     test_effort_level()

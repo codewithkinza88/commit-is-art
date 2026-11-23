@@ -11,6 +11,7 @@ A habit counts as done for a day when it is ticked, OR when its logged
 minutes reach its daily target (target_minutes > 0).
 """
 
+import calendar
 from datetime import date, timedelta
 
 
@@ -145,6 +146,18 @@ def total_minutes_last_30_days(logs, habits, end_date=None):
         day = (end - timedelta(days=i)).isoformat()
         total += total_minutes_today(logs, habits, day)
     return total
+
+
+def minutes_for_habit_this_month(logs, habit, year, month):
+    """Minutes logged for one habit across a whole calendar month.
+
+    Sums minutes_for over every day of the month; 0 when the habit
+    logged nothing that month.
+    """
+    days_in_month = calendar.monthrange(year, month)[1]
+    return sum(minutes_for(logs, habit.get("id"),
+                           date(year, month, day).isoformat())
+               for day in range(1, days_in_month + 1))
 
 
 def total_minutes_yesterday(logs, habits, end_date=None):
