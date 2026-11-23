@@ -219,3 +219,17 @@ def newest_habit(habits):
         return None
     return max(habits, key=lambda h: h.get("created_date") or "")
 
+
+def oldest_habit(habits):
+    """The habit planted first (earliest created_date).
+
+    Mirror of newest_habit: ties go to the habit first in creation
+    order. None when there are no habits. A habit with no
+    created_date counts as the oldest, so it wins while any dated
+    habit exists.
+    """
+    habits = list(habits or [])
+    if not habits:
+        return None
+    return min(habits, key=lambda h: h.get("created_date") or "")
+
