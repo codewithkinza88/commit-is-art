@@ -118,6 +118,24 @@ def validate_habit_days(days):
     return sorted(clean)
 
 
+def validate_weekday(value):
+    """A weekday number, cleaned to 0 (Mon) .. 6 (Sun).
+
+    Accepts ints and numeric text ("3" -> 3); -1 when the value
+    is out of range, a bool, a float, or unparseable — the same
+    -1 that weekday_of returns for a bad date.
+    """
+    if isinstance(value, bool):
+        return -1
+    if isinstance(value, int):
+        weekday = value
+    elif isinstance(value, str) and value.strip().lstrip("-").isdigit():
+        weekday = int(value.strip())
+    else:
+        return -1
+    return weekday if 0 <= weekday <= 6 else -1
+
+
 def validate_minutes(value):
     """(is_valid, minutes, error) for a minutes value."""
     try:

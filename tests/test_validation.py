@@ -14,7 +14,7 @@ from app.validation import (MAX_NAME_LEN, validate_category,  # noqa: E402
                             validate_habit_name,
                             validate_icon, validate_minutes,
                             validate_note_text, validate_target_minutes,
-                            validate_weekly_target)
+                            validate_weekday, validate_weekly_target)
 
 PASSED = 0
 
@@ -99,6 +99,19 @@ def test_validate_colour():
           validate_colour("") == "#BDE0FE")
 
 
+def test_validate_weekday():
+    check("Monday is 0 and Sunday is 6",
+          validate_weekday(0) == 0 and validate_weekday(6) == 6)
+    check("numeric text parses to a weekday",
+          validate_weekday("3") == 3)
+    check("out-of-range, junk and floats are -1",
+          validate_weekday(7) == -1
+          and validate_weekday("soon") == -1
+          and validate_weekday(2.5) == -1
+          and validate_weekday(True) == -1
+          and validate_weekday(None) == -1)
+
+
 def test_validate_habit_days():
     check("a normal weekday list passes through sorted",
           validate_habit_days([4, 0, 2]) == [0, 2, 4])
@@ -117,5 +130,6 @@ if __name__ == "__main__":
     test_validate_date_str()
     test_validate_weekly_target()
     test_validate_habit_days()
+    test_validate_weekday()
     test_validate_colour()
     print(f"{PASSED} tests passed")
