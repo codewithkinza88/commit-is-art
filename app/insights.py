@@ -88,6 +88,25 @@ def habits_below_rate(logs, habits, date_strs, threshold=50):
     return below
 
 
+def habits_above_rate(logs, habits, date_strs, threshold=80):
+    """Habits done at least `threshold` percent over the dates.
+
+    Mirror of habits_below_rate, for the garden's stars instead
+    of the ones needing attention. Creation order is kept; [] when
+    no habit meets the rate (or there are no habits/dates). A habit
+    exactly at the threshold counts — the rate is met, not beaten.
+    """
+    if not habits or not date_strs:
+        return []
+    above = []
+    for h in habits:
+        done = sum(1 for d in date_strs if is_done(logs, h, d))
+        rate = 100 * done / len(date_strs)
+        if rate >= threshold:
+            above.append(h)
+    return above
+
+
 def consistency_message(score):
     """Warm one-liner for a consistency score (0-100)."""
     score = max(0, min(100, int(score or 0)))
