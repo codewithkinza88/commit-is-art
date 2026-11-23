@@ -18,7 +18,8 @@ from app.streaks import (average_best_streak, best_streak,
                          last_done_label, longest_gap,
                          longest_current_streak, longest_streak_overall,
                          median_current_streak, streak_leaderboard,
-                         streak_summary,                      average_streak,
+                         streak_summary, streaks_by_habit,
+                         average_streak,
                          median_best_streak)
 
 PASSED = 0
@@ -206,6 +207,25 @@ def test_habits_with_best_streak():
                                   date(2026, 11, 6)) == [])
 
 
+def test_streaks_by_habit():
+    h1 = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
+    h2 = new_habit("Read", "Reading", 0, "📖", "#FFC6FF", "2026-11-01")
+    h3 = new_habit("Walk", "Health", 0, "🚶", "#BDE0FE", "2026-11-01")
+    logs = {}
+    for day in ("2026-11-04", "2026-11-05", "2026-11-06"):
+        set_done(logs, h1["id"], day, True)
+    set_done(logs, h2["id"], "2026-11-06", True)
+    # Current streaks on 2026-11-06 are 3, 1, 0.
+    check("streaks are keyed by habit id",
+          streaks_by_habit(logs, [h1, h2, h3], date(2026, 11, 6))
+          == {h1["id"]: 3, h2["id"]: 1, h3["id"]: 0})
+    check("no habits means an empty map",
+          streaks_by_habit(logs, [], date(2026, 11, 6)) == {})
+    check("no logs means every streak is 0",
+          streaks_by_habit({}, [h1, h2], date(2026, 11, 6))
+          == {h1["id"]: 0, h2["id"]: 0})
+
+
 def test_habits_with_streak_at_least():
     h1 = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
     h2 = new_habit("Read", "Reading", 0, "📖", "#FFC6FF", "2026-11-01")
@@ -278,4 +298,5 @@ if __name__ == "__main__":
     test_longest_current_streak()
     test_habits_with_streak_at_least()
     test_habits_with_best_streak()
+    test_streaks_by_habit()
     print(f"{PASSED} tests passed")

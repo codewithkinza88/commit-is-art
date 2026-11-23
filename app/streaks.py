@@ -161,6 +161,16 @@ def habits_with_best_streak(logs, habits, end_date=None):
             if best == top]
 
 
+def streaks_by_habit(logs, habits, end_date=None):
+    """Current streak per habit, keyed by habit id.
+
+    {} when there are no habits. A habit whose streak broke
+    counts as 0, so every habit is always in the map.
+    """
+    return {habit["id"]: current_streak(logs, habit, end_date=end_date)
+            for habit in (habits or [])}
+
+
 def days_since_last_done(logs, habit, end_date=None):
     """Days since the habit was last done (0 = done on end_date).
 
