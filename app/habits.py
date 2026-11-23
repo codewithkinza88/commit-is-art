@@ -233,3 +233,13 @@ def oldest_habit(habits):
         return None
     return min(habits, key=lambda h: h.get("created_date") or "")
 
+
+def habits_with_target(habits):
+    """Habits with a daily target set (target_minutes > 0).
+
+    Creation order is kept; [] when no habit has a target (or
+    there are no habits).
+    """
+    return [h for h in (habits or [])
+            if int(h.get("target_minutes") or 0) > 0]
+
