@@ -106,6 +106,21 @@ def perfect_day_dates(summary):
             if day.get("total") and day.get("percent") == 100]
 
 
+def average_minutes_on_logged_days(summary):
+    """Average minutes per day that actually had minutes logged.
+
+    Different from average_minutes_per_day, which divides by the
+    whole month: this divides only by the days with minutes, so a
+    month with a few big days reads honestly. 0 when no day was
+    logged (or the summary is empty).
+    """
+    summary = summary or {}
+    logged = days_logged_this_month(summary)
+    if not logged:
+        return 0
+    return round((summary.get("total_minutes") or 0) / logged)
+
+
 def average_minutes_per_day(summary):
     """Average minutes per day across a monthly summary (0 when empty).
 
