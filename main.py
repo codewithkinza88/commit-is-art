@@ -24,7 +24,7 @@ from app.habits import (
     clone_habit, count_archived, delete_habit, edit_habit, get_habit,
     habit_age_days, new_habit,
 )
-from app.garden import (count_blooming, count_seeds,
+from app.garden import (count_blooming, count_full_bloom, count_seeds,
                         count_sprouts,
                         counts_text,
                         days_to_next_stage,
@@ -735,6 +735,9 @@ def main(page: ft.Page):
             garden_rows.append(ft.Text(
                 f"🌸 {count_blooming(habits, logs, today)} plants blooming "
                 "right now",
+                size=14, color=PINK))
+            garden_rows.append(ft.Text(
+                f"🌷 {count_full_bloom(habits, logs, today)} in full bloom",
                 size=14, color=PINK))
             garden_rows.append(ft.Text(
                 f"🌱 {count_seeds(habits, logs, today)} seeds waiting "

@@ -13,7 +13,8 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.garden import (  # noqa: E402
-    average_stage_progress, count_blooming, count_seeds, count_sprouts,
+    average_stage_progress, count_blooming, count_full_bloom,
+    count_seeds, count_sprouts,
     flower_bed, flower_count, flower_for, flowers_for_stage,
     plant_for, plant_of_the_day, plant_with_longest_streak,
 )
@@ -206,6 +207,25 @@ def test_count_sprouts():
           count_sprouts([], logs, "2026-11-09") == 0)
 
 
+def test_count_full_bloom():
+    h1 = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
+    h2 = new_habit("Read", "Reading", 0, "📖", "#FFC6FF", "2026-11-01")
+    h3 = new_habit("Walk", "Health", 0, "🚶", "#BDE0FE", "2026-11-01")
+    logs = {}
+    for day in ("2026-11-03", "2026-11-04", "2026-11-05", "2026-11-06",
+                "2026-11-07", "2026-11-08", "2026-11-09"):
+        set_done(logs, h1["id"], day, True)
+    for day in ("2026-11-06", "2026-11-07", "2026-11-08", "2026-11-09"):
+        set_done(logs, h2["id"], day, True)
+    # h1 streak 7 -> full bloom; h2 streak 4 -> blooming; h3 seed.
+    check("one plant in full bloom counts as 1",
+          count_full_bloom([h1, h2, h3], logs, "2026-11-09") == 1)
+    check("a blooming plant is not in full bloom yet",
+          count_full_bloom([h2], logs, "2026-11-09") == 0)
+    check("no habits means nothing in full bloom",
+          count_full_bloom([], logs, "2026-11-09") == 0)
+
+
 def test_average_stage_progress():
     h1 = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
     h2 = new_habit("Read", "Reading", 0, "📖", "#FFC6FF", "2026-11-01")
@@ -229,6 +249,7 @@ if __name__ == "__main__":
     test_plant_with_longest_streak()
     test_flower_count()
     test_count_blooming()
+    test_count_full_bloom()
     test_count_seeds()
     test_count_sprouts()
     test_average_stage_progress()
