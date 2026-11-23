@@ -251,3 +251,12 @@ def count_archived(habits):
     """
     return sum(1 for h in (habits or []) if h.get("archived", False))
 
+
+def total_target_minutes(habits):
+    """Total daily target minutes across all habits.
+
+    The minutes a perfect day would take, added up; 0 when no
+    habit has a target (or there are no habits).
+    """
+    return sum(int(h.get("target_minutes") or 0) for h in (habits or []))
+
