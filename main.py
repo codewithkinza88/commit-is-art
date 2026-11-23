@@ -50,7 +50,7 @@ from app.streaks import (average_best_streak, average_streak, best_streak,
                          longest_current_streak, longest_gap,
                          longest_streak_overall,
                          median_best_streak, median_current_streak,
-                         streak_leaderboard)
+                         streak_leaderboard, total_streak_days)
 from app.achievements import badges_for
 from app.backup import backup_filename, backup_to_json, restore_from_json
 from app.categories import (
@@ -924,6 +924,9 @@ def main(page: ft.Page):
                         size=15, color=MUTED),
                 ft.Text(f"🌳 Longest live streak: "
                         f"{longest_current_streak(logs, habits)} days",
+                        size=15, color=MUTED),
+                ft.Text(f"Total streak days: "
+                        f"{total_streak_days(logs, habits)}",
                         size=15, color=MUTED),
                 ft.Text(f"🏆 Streak leaderboard: {board_text}",
                         size=15, color=MUTED),

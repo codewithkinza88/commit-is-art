@@ -171,6 +171,17 @@ def streaks_by_habit(logs, habits, end_date=None):
             for habit in (habits or [])}
 
 
+def total_streak_days(logs, habits, end_date=None):
+    """Total live streak days across all habits.
+
+    The sum of every habit's current streak — how many
+    streak-days the whole garden holds right now. 0 when there
+    are no habits (or none on a streak).
+    """
+    return sum(current_streak(logs, habit, end_date=end_date)
+               for habit in (habits or []))
+
+
 def days_since_last_done(logs, habit, end_date=None):
     """Days since the habit was last done (0 = done on end_date).
 
