@@ -31,8 +31,8 @@ see `docs/UI.md` for the full guide.
   You need Python 3.10+ on your computer. That is all — there is no
   account or sign-in.
 - **Android APK (latest built version):**
-  [Download Habit Garden APK — 60.4 MB](https://github.com/codewithkinza88/commit-is-art/actions/runs/44884197603/artifacts/14699940313)
-  — built 21 November 2026 from commit `cfc00f2` (GitHub Actions run #18).
+  [Download Habit Garden APK — 60.5 MB](https://github.com/codewithkinza88/commit-is-art/actions/runs/45153760893/artifacts/14808012389)
+  — built 23 November 2026 from commit `d683e71` (GitHub Actions run #21).
   Sign in to GitHub as `codewithkinza88` first (otherwise the link
   shows a 404), download the ZIP, unzip it, and install the APK inside.
   Do not install older APKs — they crash on launch. This APK has not
