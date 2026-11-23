@@ -110,6 +110,23 @@ def notes_for_habit_this_week(notes, habit_id, end_date=None):
             if start <= date_str <= end.isoformat()]
 
 
+def notes_for_habit_this_month(notes, habit_id, year, month):
+    """(date, text) pairs for one habit in a calendar month.
+
+    Non-empty notes only, oldest date first; [] when the habit
+    wrote nothing that month. Mirror of notes_for_habit_this_week,
+    but for a whole month instead of 7 days.
+    """
+    import calendar as _calendar
+
+    days_in_month = _calendar.monthrange(year, month)[1]
+    start = f"{year:04d}-{month:02d}-01"
+    end = f"{year:04d}-{month:02d}-{days_in_month:02d}"
+    return [(date_str, text)
+            for date_str, text in notes_for_habit(notes or {}, habit_id)
+            if start <= date_str <= end]
+
+
 def total_notes_count(notes):
     """How many non-empty notes exist across all dates and habits.
 
