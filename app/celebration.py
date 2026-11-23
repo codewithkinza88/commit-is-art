@@ -44,6 +44,26 @@ def days_to_next_milestone(streak):
     return None
 
 
+def celebration_for(streak):
+    """{"emoji", "message"} celebrating a streak.
+
+    A milestone streak (7/14/30/100) gets its milestone_message;
+    any other streak gets "N days and growing!". The emoji is
+    always the garden stage emoji for the streak, so a week-long
+    streak blooms 🌷 and a fresh one sprouts 🌱.
+    """
+    from app.garden import growth_stage
+
+    streak = max(0, int(streak or 0))
+    emoji = growth_stage(streak)["emoji"]
+    if is_milestone(streak):
+        message = milestone_message(streak)
+    else:
+        message = (f"{streak} day{'s' if streak != 1 else ''} "
+                   "and growing!")
+    return {"emoji": emoji, "message": message}
+
+
 def next_milestone_message(streak):
     """A cheery line naming the next milestone and the days to go.
 
