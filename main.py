@@ -80,6 +80,7 @@ from app.tracker import (
     best_day_by_minutes, current_streak, daily_summary, done_count_today,
     is_done, last_7_days, log_minutes, minutes_for, set_done, today_str,
     total_minutes_last_30_days, total_minutes_this_week,
+    total_minutes_last_14_days,
     total_minutes_today, total_minutes_yesterday,
 )
 
@@ -937,6 +938,9 @@ def main(page: ft.Page):
                 ], spacing=10),
                 ft.Text(f"Last 30 days: "
                         f"{total_minutes_last_30_days(logs, habits)} minutes",
+                        size=15, color=MUTED),
+                ft.Text(f"Last 14 days: "
+                        f"{total_minutes_last_14_days(logs, habits)} minutes",
                         size=15, color=MUTED),
                 ft.Text(f"📦 {count_archived(habits)} archived habits",
                         size=15, color=MUTED),
