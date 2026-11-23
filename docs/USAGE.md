@@ -142,3 +142,12 @@ month, habits by effort, and the minutes of the last 30 days. A whole
 month, your notes, and your habit list can each be copied as readable
 text, and the next milestone arrives as a cheery message — "🎯 2 more
 day(s) to a 7-day streak!".
+
+## Oldest habits, full bloom and monthly notes 🌱 (version 1.14.0)
+
+Tonight counts your archived habits, the minutes of the last 14 days,
+your total streak days, and your badges earned. The Garden counts the
+plants in full bloom and the ones still growing, and names the plants
+in full bloom. Each habit can be followed across a whole month — its
+minutes, its done days, and its notes — and a streak gets its own
+celebration with its garden emoji.

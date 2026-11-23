@@ -2,6 +2,39 @@
 
 All notable changes to Habit Garden are listed here.
 
+## 2026-11-23 — Oldest habits, full bloom and monthly notes (version 1.14.0)
+
+- Oldest habit: `oldest_habit()` names the habit planted first, and
+  `habits_with_target()` lists the habits with a daily target set.
+- Archived habits: Tonight counts the archived habits, and
+  `total_target_minutes()` adds up every habit's daily target.
+- This month per habit: `minutes_for_habit_this_month()` and
+  `days_done_this_month()` track one habit across a calendar month.
+- Last 14 days: Tonight shows the minutes logged in the last 14
+  days, and `best_day_this_month()` names the month's biggest day.
+- Best streaks: `habits_with_best_streak()` names the habits sharing
+  the longest best streak, `streaks_by_habit()` maps every habit to
+  its live streak, and Tonight shows the total streak days.
+- Full bloom: the Garden counts the plants in full bloom and at the
+  growing stage, and names the plants in full bloom.
+- Notes this month: `notes_for_habit_this_month()`,
+  `notes_in_month()` and `latest_note_text()` find a habit's notes
+  for one month and its latest words.
+- Due weekdays: `count_due_on_weekday()` counts the habits due on
+  any weekday, `next_due_weekday_name()` names the next due day, and
+  `validate_weekday()` cleans a weekday number to 0–6.
+- Above the rate: `habits_above_rate()` lists the habits done at
+  least 80% of the time, and `average_consistency()` averages each
+  habit's own done-rate.
+- Monthly averages: `average_minutes_on_logged_days()` averages only
+  the days with minutes, `minutes_for_weekday()` reads one weekday's
+  minutes, and `longest_day_minutes()` finds the biggest day.
+- Streaks as text: `streaks_to_text()` and `summary_lines()` write
+  streaks and one day's summary as copyable lines.
+- Streak celebrations: `celebration_for()` pairs a streak with its
+  milestone message and garden emoji, and `badges_count()` counts
+  the badges Tonight shows.
+
 ## 2026-11-22 — Streaks, garden counts and readable exports (version 1.13.0)
 
 - Streaks on cards: a habit card shows "🔥 Streak: N days" when its

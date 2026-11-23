@@ -184,6 +184,15 @@ def test_ui_api():
     check("Garden shows how many plants are blooming",
           "plants blooming" in source
           and "count_blooming(habits, logs, today)" in source)
+    check("Garden shows how many plants are in full bloom",
+          "in full bloom" in source
+          and "count_full_bloom(habits, logs, today)" in source)
+    check("Garden names the plants in full bloom",
+          "In full bloom:" in source
+          and "plants_at_stage(habits, logs, today" in source)
+    check("Tonight shows the total streak days",
+          "Total streak days:" in source
+          and "total_streak_days(logs, habits)" in source)
     check("Garden shows how many seeds are waiting",
           "seeds waiting" in source
           and "count_seeds(habits, logs, today)" in source)
@@ -207,9 +216,9 @@ def test_ui_api():
           and "days_to_next_milestone(longest_streak)" in source)
     check("a new habit gets a welcome message",
           "welcome_message(name_field.value)" in source)
-    check("app version is 1.13.0",
+    check("app version is 1.14.0",
           open(os.path.join(root, "app", "version.py"),
-               encoding="utf-8").read().count('APP_VERSION = "1.13.0"') == 1)
+               encoding="utf-8").read().count('APP_VERSION = "1.14.0"') == 1)
     check("garden plants show a flower row, not one big emoji",
           'plant["flowers"]' in source)
     check("garden opens with a full flower bed on top",
