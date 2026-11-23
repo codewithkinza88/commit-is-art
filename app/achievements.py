@@ -10,6 +10,15 @@ from datetime import date
 from app.tracker import current_streak, daily_summary, is_done
 
 
+def badges_count(logs, habits, date_str):
+    """How many badges are earned up to and including date_str.
+
+    The count of badges_for — 0 when nothing is earned yet (or
+    there are no habits).
+    """
+    return len(badges_for(logs, habits, date_str))
+
+
 def badges_for(logs, habits, date_str):
     """Badges earned up to and including date_str."""
     habits = list(habits or [])

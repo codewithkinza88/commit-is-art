@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.habits import new_habit  # noqa: E402
 from app.tracker import set_done, log_minutes  # noqa: E402
-from app.achievements import badges_for  # noqa: E402
+from app.achievements import badges_count, badges_for  # noqa: E402
 
 PASSED = 0
 
@@ -51,6 +51,19 @@ def test_streak_badges():
     check("week badge not earned yet", "week_strong" not in keys)
 
 
+def test_badges_count():
+    habits = [new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-01")]
+    logs = {}
+    set_done(logs, habits[0]["id"], "2026-11-07", True)
+    # First step + perfect day = 2 badges.
+    check("two badges earned counts as 2",
+          badges_count(logs, habits, "2026-11-07") == 2)
+    check("no badges earned counts as 0",
+          badges_count({}, habits, "2026-11-07") == 0)
+    check("no habits means 0 badges",
+          badges_count(logs, [], "2026-11-07") == 0)
+
+
 def test_century_minutes_badge():
     habits = [new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-01")]
     logs = {}
@@ -64,4 +77,5 @@ if __name__ == "__main__":
     test_first_step_and_perfect_day()
     test_streak_badges()
     test_century_minutes_badge()
+    test_badges_count()
     print(f"{PASSED} tests passed")

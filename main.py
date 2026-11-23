@@ -51,7 +51,7 @@ from app.streaks import (average_best_streak, average_streak, best_streak,
                          longest_streak_overall,
                          median_best_streak, median_current_streak,
                          streak_leaderboard, total_streak_days)
-from app.achievements import badges_for
+from app.achievements import badges_count, badges_for
 from app.backup import backup_filename, backup_to_json, restore_from_json
 from app.categories import (
     best_category, legend_categories, total_minutes_by_category)
@@ -966,6 +966,8 @@ def main(page: ft.Page):
                 ft.Text(consistency_text, size=15, color=MUTED),
             ], spacing=6), colors=TONIGHT_GRADIENT),
             section_title("Badges earned 🏅"),
+            ft.Text(f"Badges earned: {badges_count(logs, habits, today)}",
+                    size=14, color=TEXT),
             ft.Text(badges_text, size=14, color=TEXT),
             section_title("Minutes per habit"),
             *minutes_rows,
