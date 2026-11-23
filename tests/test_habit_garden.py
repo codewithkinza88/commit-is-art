@@ -22,7 +22,8 @@ from app.tracker import (  # noqa: E402
     total_minutes_today, total_minutes_this_week, total_minutes_yesterday,
     total_minutes_in_range, total_minutes_last_30_days,
     total_minutes_last_14_days, minutes_for_habit_this_month,
-    days_done_this_month, best_day_by_minutes, days_done_this_week, first_done_date,
+    days_done_this_month, best_day_this_month,
+    best_day_by_minutes, days_done_this_week, first_done_date,
     done_count_today,
     current_streak, daily_summary, last_7_days,
 )
@@ -528,6 +529,23 @@ def test_total_minutes_last_14_days():
           total_minutes_last_14_days({}, [h1], "2026-11-14") == 0)
 
 
+def test_best_day_this_month():
+    h1 = new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-05")
+    logs = {}
+    log_minutes(logs, h1["id"], "2026-11-05", 40)
+    log_minutes(logs, h1["id"], "2026-11-12", 70)
+    log_minutes(logs, h1["id"], "2026-10-31", 999)
+    check("the best day is the one with the most minutes",
+          best_day_this_month(logs, [h1], 2026, 11) == ("2026-11-12", 70))
+    check("no minutes logged in the month is empty",
+          best_day_this_month({}, [h1], 2026, 11) == ("", 0))
+    logs2 = {}
+    log_minutes(logs2, h1["id"], "2026-11-05", 40)
+    log_minutes(logs2, h1["id"], "2026-11-12", 40)
+    check("equal days pick the most recent one",
+          best_day_this_month(logs2, [h1], 2026, 11) == ("2026-11-12", 40))
+
+
 def test_stage_progress():
     check("stage progress is 0 at a fresh seed", stage_progress(0) == 0.0)
     check("stage progress is 0 at the start of sprout",
@@ -626,6 +644,7 @@ if __name__ == "__main__":
     test_minutes_for_habit_this_month()
     test_days_done_this_month()
     test_total_minutes_last_14_days()
+    test_best_day_this_month()
     test_stage_progress()
     test_clone_habit()
     test_effort_level()

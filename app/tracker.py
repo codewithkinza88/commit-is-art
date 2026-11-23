@@ -189,6 +189,22 @@ def days_done_this_month(logs, habit, year, month):
                           date(year, month, day).isoformat()))
 
 
+def best_day_this_month(logs, habits, year, month):
+    """(date, minutes) with the most minutes logged in a month.
+
+    ("", 0) when nothing was logged that month. Ties go to the
+    most recent day, mirroring best_day_by_minutes.
+    """
+    days_in_month = calendar.monthrange(year, month)[1]
+    best_date, best_minutes = "", 0
+    for day in range(1, days_in_month + 1):
+        day_str = date(year, month, day).isoformat()
+        minutes = total_minutes_today(logs, habits, day_str)
+        if minutes > 0 and minutes >= best_minutes:
+            best_date, best_minutes = day_str, minutes
+    return best_date, best_minutes
+
+
 def total_minutes_yesterday(logs, habits, end_date=None):
     """Total minutes logged across all habits on the day before end_date."""
     if isinstance(end_date, str):
