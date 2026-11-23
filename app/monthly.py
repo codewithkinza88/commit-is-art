@@ -121,6 +121,16 @@ def average_minutes_on_logged_days(summary):
     return round((summary.get("total_minutes") or 0) / logged)
 
 
+def minutes_for_weekday(summary, weekday_name):
+    """Minutes logged on one weekday in a monthly summary.
+
+    Looks up minutes_by_weekday by name ("Mon".."Sun"); 0 for an
+    unknown name or a summary with no minutes that day.
+    """
+    minutes = (summary or {}).get("minutes_by_weekday") or {}
+    return int(minutes.get(weekday_name) or 0)
+
+
 def average_minutes_per_day(summary):
     """Average minutes per day across a monthly summary (0 when empty).
 
