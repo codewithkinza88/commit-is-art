@@ -131,6 +131,16 @@ def minutes_for_weekday(summary, weekday_name):
     return int(minutes.get(weekday_name) or 0)
 
 
+def longest_day_minutes(summary):
+    """Most minutes logged on any single day in a monthly summary.
+
+    0 when the summary has no days (or nothing was logged).
+    """
+    days = (summary or {}).get("days") or []
+    return max((int(day.get("total_minutes") or 0) for day in days),
+               default=0)
+
+
 def average_minutes_per_day(summary):
     """Average minutes per day across a monthly summary (0 when empty).
 
