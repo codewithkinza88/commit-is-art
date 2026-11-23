@@ -102,6 +102,15 @@ def count_due_on_weekday(habits, weekday):
     return len(habits_due_on(habits or [], weekday))
 
 
+def next_due_weekday_name(habit, weekday):
+    """Short name of the next weekday the habit is due.
+
+    The weekday_name of next_due_weekday(habit, weekday), e.g.
+    "Wed" for a Mon/Wed/Fri habit asked on a Tuesday.
+    """
+    return weekday_name(next_due_weekday(habit, weekday))
+
+
 def weekday_of(date_str):
     """Weekday number (0=Mon .. 6=Sun) for an ISO date string.
 

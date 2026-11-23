@@ -15,7 +15,7 @@ from app.schedule import (count_due_on_weekday, count_due_this_week,
                           habits_due_every_day, habits_due_on,
                           habits_due_tomorrow,
                           is_due_today, next_due_weekday,
-                          weekday_name,
+                          next_due_weekday_name, weekday_name,
                           weekday_of)
 from app.tracker import set_done  # noqa: E402
 
@@ -177,6 +177,20 @@ def test_count_due_on_weekday():
           count_due_on_weekday([], 0) == 0)
 
 
+def test_next_due_weekday_name():
+    weekday_only = new_habit("Study - DSA", "Study", 60, "📚", "#A5D8FF",
+                             "2026-11-01")
+    weekday_only["days"] = [0, 2, 4]  # Mon, Wed, Fri
+    daily = new_habit("Drink water", "Health", 0, "💧", "#BDE0FE",
+                      "2026-11-01")
+    check("Tuesday waits until Wednesday",
+          next_due_weekday_name(weekday_only, 1) == "Wed")
+    check("Saturday wraps around to Monday",
+          next_due_weekday_name(weekday_only, 5) == "Mon")
+    check("a daily habit names the given weekday",
+          next_due_weekday_name(daily, 3) == "Thu")
+
+
 def test_next_due_weekday():
     weekday_only = new_habit("Study - DSA", "Study", 60, "📚", "#A5D8FF",
                              "2026-11-01")
@@ -205,4 +219,5 @@ if __name__ == "__main__":
     test_habits_due_every_day()
     test_next_due_weekday()
     test_count_due_on_weekday()
+    test_next_due_weekday_name()
     print(f"{PASSED} tests passed")
