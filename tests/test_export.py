@@ -12,7 +12,7 @@ from app.habits import new_habit  # noqa: E402
 from app.tracker import set_done, log_minutes  # noqa: E402
 from app.export import (habits_to_csv, habits_to_text, logs_to_csv,  # noqa: E402
                         month_to_text, notes_to_csv, notes_to_text,
-                        streaks_to_csv, summary_to_text, week_to_text)
+                        streaks_to_csv, streaks_to_text,                     summary_to_text, week_to_text)
 
 PASSED = 0
 
@@ -84,6 +84,25 @@ def test_notes_to_csv():
           len(csv_text.strip().splitlines()) == 3)
     check("empty notes csv is header only",
           len(notes_to_csv({}).strip().splitlines()) == 1)
+
+
+def test_streaks_to_text():
+    from datetime import date
+    h1 = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
+    h2 = new_habit("Read", "Books", 0, "📖", "#F9A8D4", "2026-11-01")
+    logs = {}
+    set_done(logs, h1["id"], "2026-11-08", True)
+    set_done(logs, h1["id"], "2026-11-09", True)
+    set_done(logs, h2["id"], "2026-11-09", True)
+    text = streaks_to_text(logs, [h1, h2], date(2026, 11, 9))
+    check("streaks text has a header",
+          text.startswith("Habit Garden — streaks"))
+    check("streaks text lists each habit's streak",
+          "Study: 2-day streak" in text
+          and "Read: 1-day streak" in text)
+    check("streaks text with no habits is friendly",
+          "No habits yet 🌱" in streaks_to_text(logs, [],
+                                                date(2026, 11, 9)))
 
 
 def test_streaks_to_csv():
@@ -182,6 +201,7 @@ if __name__ == "__main__":
     test_summary_best_streak()
     test_notes_to_csv()
     test_streaks_to_csv()
+    test_streaks_to_text()
     test_week_to_text()
     test_month_to_text()
     test_notes_to_text()

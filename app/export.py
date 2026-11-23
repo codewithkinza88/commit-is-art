@@ -10,7 +10,8 @@ import io
 
 from app.notes import notes_in_range
 from app.streaks import best_streak
-from app.tracker import current_streak, daily_summary, last_7_days
+from app.tracker import (current_streak, daily_summary, is_done,  # noqa: E402
+                         last_7_days, minutes_for)
 
 
 def habits_to_csv(habits):
@@ -67,6 +68,22 @@ def notes_to_csv(notes):
             if isinstance(text, str) and text.strip():
                 writer.writerow([date_str, habit_id, text.strip()])
     return output.getvalue()
+
+
+def streaks_to_text(logs, habits, end_date=None):
+    """Current streak per habit as short readable text lines.
+
+    A header, then one line per habit ("name: N-day streak") in
+    habit order — the text mirror of streaks_to_csv, for copying
+    into a message. A friendly line when there are no habits.
+    """
+    lines = ["Habit Garden — streaks"]
+    for habit in (habits or []):
+        streak = current_streak(logs, habit, end_date=end_date)
+        lines.append(f"{habit.get('name', '')}: {streak}-day streak")
+    if not habits:
+        lines.append("No habits yet 🌱")
+    return "\n".join(lines)
 
 
 def summary_to_text(logs, habits, date_str):
