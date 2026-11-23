@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.notes import (MAX_NOTE_LEN, add_note, count_notes,  # noqa: E402
                        count_notes_for_day, find_notes, get_note, has_note,
-                       latest_note, longest_note,
+                       latest_note, latest_note_text, longest_note,
                        notes_count_this_week,
                        notes_for_day, notes_for_habit,
                        notes_for_habit_this_month,
@@ -193,6 +193,19 @@ def test_notes_in_month():
           notes_in_month({}, 2026, 11) == [])
 
 
+def test_latest_note_text():
+    notes = {}
+    add_note(notes, "h1", "2026-11-03", "Read chapter 3")
+    add_note(notes, "h1", "2026-11-12", "Finished chapter 4")
+    add_note(notes, "h2", "2026-11-10", "Watered the plants")
+    check("the latest note text is the newest one",
+          latest_note_text(notes, "h1") == "Finished chapter 4")
+    check("another habit has its own latest text",
+          latest_note_text(notes, "h2") == "Watered the plants")
+    check("a habit with no notes has empty text",
+          latest_note_text(notes, "h3") == "")
+
+
 def test_notes_for_habit_this_week():
     notes = {}
     add_note(notes, "h1", "2026-11-10", "Read chapter 3")
@@ -254,5 +267,6 @@ if __name__ == "__main__":
     test_notes_for_habit_this_week()
     test_notes_for_habit_this_month()
     test_notes_in_month()
+    test_latest_note_text()
     test_total_notes_count()
     print(f"{PASSED} tests passed")

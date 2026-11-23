@@ -141,6 +141,16 @@ def notes_in_month(notes, year, month):
     return notes_in_range(notes or {}, start, end)
 
 
+def latest_note_text(notes, habit_id):
+    """Text of the habit's most recent non-empty note.
+
+    "" when the habit has no notes — the text-only mirror of
+    latest_note, for places that only need the words.
+    """
+    _date, text = latest_note(notes or {}, habit_id)
+    return text
+
+
 def total_notes_count(notes):
     """How many non-empty notes exist across all dates and habits.
 
