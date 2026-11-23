@@ -160,6 +160,18 @@ def minutes_for_habit_this_month(logs, habit, year, month):
                for day in range(1, days_in_month + 1))
 
 
+def days_done_this_month(logs, habit, year, month):
+    """How many days in a calendar month the habit was done.
+
+    Counts the days is_done is True (ticked, or minutes reached
+    the target); 0 when the habit was never done that month.
+    """
+    days_in_month = calendar.monthrange(year, month)[1]
+    return sum(1 for day in range(1, days_in_month + 1)
+               if is_done(logs, habit,
+                          date(year, month, day).isoformat()))
+
+
 def total_minutes_yesterday(logs, habits, end_date=None):
     """Total minutes logged across all habits on the day before end_date."""
     if isinstance(end_date, str):

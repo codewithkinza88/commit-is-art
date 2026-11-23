@@ -22,7 +22,7 @@ from app.tracker import (  # noqa: E402
     total_minutes_today, total_minutes_this_week, total_minutes_yesterday,
     total_minutes_in_range, total_minutes_last_30_days,
     minutes_for_habit_this_month,
-    best_day_by_minutes, days_done_this_week, first_done_date,
+    days_done_this_month, best_day_by_minutes, days_done_this_week, first_done_date,
     done_count_today,
     current_streak, daily_summary, last_7_days,
 )
@@ -499,6 +499,21 @@ def test_minutes_for_habit_this_month():
           minutes_for_habit_this_month({}, h1, 2026, 11) == 0)
 
 
+def test_days_done_this_month():
+    h1 = new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-05")
+    logs = {}
+    set_done(logs, h1["id"], "2026-11-03")
+    set_done(logs, h1["id"], "2026-11-10")
+    set_done(logs, h1["id"], "2026-11-11")
+    set_done(logs, h1["id"], "2026-10-31")
+    check("three done days in the month count as 3",
+          days_done_this_month(logs, h1, 2026, 11) == 3)
+    check("a done day outside the month does not count",
+          days_done_this_month(logs, h1, 2026, 10) == 1)
+    check("no done days in the month is 0",
+          days_done_this_month({}, h1, 2026, 11) == 0)
+
+
 def test_stage_progress():
     check("stage progress is 0 at a fresh seed", stage_progress(0) == 0.0)
     check("stage progress is 0 at the start of sprout",
@@ -595,6 +610,7 @@ if __name__ == "__main__":
     test_count_archived()
     test_total_target_minutes()
     test_minutes_for_habit_this_month()
+    test_days_done_this_month()
     test_stage_progress()
     test_clone_habit()
     test_effort_level()
