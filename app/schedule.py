@@ -93,6 +93,15 @@ def next_due_weekday(habit, weekday):
     return weekday % 7
 
 
+def count_due_on_weekday(habits, weekday):
+    """How many habits are due on weekday (0=Mon .. 6=Sun).
+
+    Mirror of count_due_today, but for any weekday instead of
+    just today; 0 when nothing is due that day.
+    """
+    return len(habits_due_on(habits or [], weekday))
+
+
 def weekday_of(date_str):
     """Weekday number (0=Mon .. 6=Sun) for an ISO date string.
 

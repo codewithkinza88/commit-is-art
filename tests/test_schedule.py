@@ -9,11 +9,13 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.habits import new_habit  # noqa: E402
-from app.schedule import (count_due_this_week, count_due_today,  # noqa: E402
+from app.schedule import (count_due_on_weekday, count_due_this_week,
+                          count_due_today,  # noqa: E402
                           count_due_today_undone, due_this_week,
                           habits_due_every_day, habits_due_on,
                           habits_due_tomorrow,
-                          is_due_today, next_due_weekday, weekday_name,
+                          is_due_today, next_due_weekday,
+                          weekday_name,
                           weekday_of)
 from app.tracker import set_done  # noqa: E402
 
@@ -161,6 +163,20 @@ def test_weekday_of():
           weekday_of("soon") == -1)
 
 
+def test_count_due_on_weekday():
+    weekday_only = new_habit("Study - DSA", "Study", 60, "📚", "#A5D8FF",
+                             "2026-11-01")
+    weekday_only["days"] = [0, 2, 4]  # Mon, Wed, Fri
+    daily = new_habit("Drink water", "Health", 0, "💧", "#BDE0FE",
+                      "2026-11-01")
+    check("two habits are due on Monday",
+          count_due_on_weekday([weekday_only, daily], 0) == 2)
+    check("only the daily habit is due on Tuesday",
+          count_due_on_weekday([weekday_only, daily], 1) == 1)
+    check("no habits means nothing due",
+          count_due_on_weekday([], 0) == 0)
+
+
 def test_next_due_weekday():
     weekday_only = new_habit("Study - DSA", "Study", 60, "📚", "#A5D8FF",
                              "2026-11-01")
@@ -188,4 +204,5 @@ if __name__ == "__main__":
     test_weekday_of()
     test_habits_due_every_day()
     test_next_due_weekday()
+    test_count_due_on_weekday()
     print(f"{PASSED} tests passed")
