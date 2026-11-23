@@ -12,7 +12,8 @@ from app.habits import new_habit  # noqa: E402
 from app.tracker import set_done, log_minutes  # noqa: E402
 from app.export import (habits_to_csv, habits_to_text, logs_to_csv,  # noqa: E402
                         month_to_text, notes_to_csv, notes_to_text,
-                        streaks_to_csv, streaks_to_text,                     summary_to_text, week_to_text)
+                        streaks_to_csv, streaks_to_text, summary_lines,
+                        summary_to_text, week_to_text)
 
 PASSED = 0
 
@@ -103,6 +104,22 @@ def test_streaks_to_text():
     check("streaks text with no habits is friendly",
           "No habits yet 🌱" in streaks_to_text(logs, [],
                                                 date(2026, 11, 9)))
+
+
+def test_summary_lines():
+    habits = [new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-01"),
+              new_habit("Read", "Books", 30, "📖", "#FFD6A5", "2026-11-01")]
+    logs = {}
+    set_done(logs, habits[0]["id"], "2026-11-07", True)
+    log_minutes(logs, habits[0]["id"], "2026-11-07", 45)
+    lines = summary_lines(logs, habits, "2026-11-07")
+    check("summary lines start with the date header",
+          lines[0] == "Habit Garden — 2026-11-07")
+    check("summary lines name each habit with its state and minutes",
+          "- Study — done / 45 minutes" in lines
+          and "- Read — not done / 0 minutes" in lines)
+    check("summary lines end with the day totals",
+          "Total time: 45 minutes" in lines)
 
 
 def test_streaks_to_csv():
@@ -202,6 +219,7 @@ if __name__ == "__main__":
     test_notes_to_csv()
     test_streaks_to_csv()
     test_streaks_to_text()
+    test_summary_lines()
     test_week_to_text()
     test_month_to_text()
     test_notes_to_text()

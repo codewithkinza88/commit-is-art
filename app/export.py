@@ -86,6 +86,26 @@ def streaks_to_text(logs, habits, end_date=None):
     return "\n".join(lines)
 
 
+def summary_lines(logs, habits, date_str):
+    """One day's summary as a list of short readable lines.
+
+    The list form of summary_to_text: a header, one line per habit
+    ("name — done / N minutes"), and the day's totals — handy when
+    the caller wants the lines, not one joined block.
+    """
+    summary = daily_summary(logs, habits, date_str)
+    lines = [f"Habit Garden — {date_str}",
+             f"{summary['done']} / {summary['total']} habits "
+             f"({summary['percent']}%)",
+             f"Total time: {summary['total_minutes']} minutes"]
+    for habit in (habits or []):
+        state = "done" if is_done(logs, habit, date_str) else "not done"
+        minutes = minutes_for(logs, habit["id"], date_str)
+        lines.append(f"- {habit.get('name', '')} — {state} / "
+                     f"{minutes} minutes")
+    return lines
+
+
 def summary_to_text(logs, habits, date_str):
     """One day's summary as short readable text lines."""
     summary = daily_summary(logs, habits, date_str)
