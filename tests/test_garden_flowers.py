@@ -14,7 +14,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.garden import (  # noqa: E402
     average_stage_progress, count_blooming, count_full_bloom,
-    count_seeds, count_sprouts,
+    count_growing, count_seeds, count_sprouts,
     flower_bed, flower_count, flower_for, flowers_for_stage,
     plant_for, plant_of_the_day, plant_with_longest_streak,
 )
@@ -226,6 +226,23 @@ def test_count_full_bloom():
           count_full_bloom([], logs, "2026-11-09") == 0)
 
 
+def test_count_growing():
+    h1 = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
+    h2 = new_habit("Read", "Reading", 0, "📖", "#FFC6FF", "2026-11-01")
+    h3 = new_habit("Walk", "Health", 0, "🚶", "#BDE0FE", "2026-11-01")
+    logs = {}
+    for day in ("2026-11-08", "2026-11-09"):
+        set_done(logs, h1["id"], day, True)
+    set_done(logs, h2["id"], "2026-11-09", True)
+    # h1 streak 2 -> growing; h2 streak 1 -> sprout; h3 seed.
+    check("one growing plant counts as 1",
+          count_growing([h1, h2, h3], logs, "2026-11-09") == 1)
+    check("a sprout is not growing yet",
+          count_growing([h2], logs, "2026-11-09") == 0)
+    check("no habits means nothing growing",
+          count_growing([], logs, "2026-11-09") == 0)
+
+
 def test_average_stage_progress():
     h1 = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
     h2 = new_habit("Read", "Reading", 0, "📖", "#FFC6FF", "2026-11-01")
@@ -250,6 +267,7 @@ if __name__ == "__main__":
     test_flower_count()
     test_count_blooming()
     test_count_full_bloom()
+    test_count_growing()
     test_count_seeds()
     test_count_sprouts()
     test_average_stage_progress()

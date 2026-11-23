@@ -162,6 +162,18 @@ def count_full_bloom(habits, logs, date_str):
                if plant.get("stage") == "full_bloom")
 
 
+def count_growing(habits, logs, date_str):
+    """How many plants are at the growing stage on a date.
+
+    Growing is the 2-day streak stage: past a sprout, not yet
+    blooming. Mirror of count_seeds and count_sprouts. 0 when
+    there are no habits.
+    """
+    plants = [plant_for(h, logs, date_str) for h in (habits or [])]
+    return sum(1 for plant in plants
+               if plant.get("stage") == "growing")
+
+
 def growth_stage(streak, done_today=False):
     """Stage for a habit from its streak (and today's tick).
 
