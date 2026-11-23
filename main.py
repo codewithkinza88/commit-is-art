@@ -31,7 +31,7 @@ from app.garden import (count_blooming, count_full_bloom, count_seeds,
                         flower_bed, flower_count, flower_for, garden_summary,
                         next_habit_to_water,
                         plant_of_the_day, plant_with_longest_streak,
-                        plants_by_stage, stage_progress,
+                        plants_at_stage, plants_by_stage, stage_progress,
                         total_plants)
 from app.insights import (consistency_message, consistency_score,
                           most_consistent_habit, weekly_done_rate)
@@ -739,6 +739,12 @@ def main(page: ft.Page):
             garden_rows.append(ft.Text(
                 f"🌷 {count_full_bloom(habits, logs, today)} in full bloom",
                 size=14, color=PINK))
+            full_bloom_names = plants_at_stage(habits, logs, today,
+                                               "full_bloom")
+            if full_bloom_names:
+                garden_rows.append(ft.Text(
+                    f"🌷 In full bloom: {', '.join(full_bloom_names)}",
+                    size=14, color=PINK))
             garden_rows.append(ft.Text(
                 f"🌱 {count_seeds(habits, logs, today)} seeds waiting "
                 "for their first day",

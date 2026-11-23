@@ -174,6 +174,18 @@ def count_growing(habits, logs, date_str):
                if plant.get("stage") == "growing")
 
 
+def plants_at_stage(habits, logs, date_str, stage):
+    """Names of the plants at one growth stage on a date.
+
+    Creation order is kept; [] when no plant sits at that stage
+    (or there are no habits, or the stage name is unknown).
+    Handy for naming the garden's full-bloom stars.
+    """
+    plants = [plant_for(h, logs, date_str) for h in (habits or [])]
+    return [plant["name"] for plant in plants
+            if plant.get("stage") == (stage or "")]
+
+
 def growth_stage(streak, done_today=False):
     """Stage for a habit from its streak (and today's tick).
 
