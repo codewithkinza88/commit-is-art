@@ -130,6 +130,17 @@ def habits_on_streak(logs, habits, end_date=None):
                if current_streak(logs, habit, end_date=end_date) >= 1)
 
 
+def habits_with_no_streak(logs, habits, end_date=None):
+    """Names of habits with no live streak right now (current == 0).
+
+    Creation order is kept; [] when every habit is on a streak
+    (or there are no habits). The mirror of habits_on_streak, for
+    the plants that need a fresh start today.
+    """
+    return [habit["name"] for habit in (habits or [])
+            if current_streak(logs, habit, end_date=end_date) == 0]
+
+
 def longest_current_streak(logs, habits, end_date=None):
     """Longest live streak across all habits (0 when there are none).
 

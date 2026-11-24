@@ -19,7 +19,8 @@ from app.streaks import (average_best_streak, best_streak,
                          longest_current_streak, longest_streak_overall,
                          median_current_streak,                      streak_leaderboard,                      streak_summary, streaks_by_habit,
                          total_streak_days, average_streak,
-                         median_best_streak, shortest_best_streak)
+                         median_best_streak, shortest_best_streak,
+                         habits_with_no_streak)
 
 PASSED = 0
 
@@ -295,6 +296,26 @@ def test_habits_on_streak():
           habits_on_streak(logs, []) == 0)
 
 
+def test_habits_with_no_streak():
+    h1 = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
+    h2 = new_habit("Read", "Reading", 0, "📖", "#FFC6FF", "2026-11-01")
+    h3 = new_habit("Walk", "Health", 0, "🚶", "#BDE0FE", "2026-11-01")
+    logs = {}
+    for day in ("2026-11-04", "2026-11-05", "2026-11-06"):
+        set_done(logs, h1["id"], day, True)
+    set_done(logs, h2["id"], "2026-11-06", True)
+    # Current streaks on 2026-11-06 are 3, 1, 0 -> only Walk has none.
+    check("only the habit with no streak is named",
+          habits_with_no_streak(logs, [h1, h2, h3],
+                                date(2026, 11, 6)) == ["Walk"])
+    # On 2026-11-07 both streaks are broken -> all three have none.
+    check("broken streaks all count as no streak",
+          habits_with_no_streak(logs, [h1, h2, h3],
+                                date(2026, 11, 7)) == ["Study", "Read", "Walk"])
+    check("no habits means an empty list",
+          habits_with_no_streak(logs, []) == [])
+
+
 def test_median_current_streak():
     h1 = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
     h2 = new_habit("Read", "Reading", 0, "📖", "#FFC6FF", "2026-11-01")
@@ -327,6 +348,7 @@ if __name__ == "__main__":
     test_longest_gap()
     test_streak_leaderboard()
     test_habits_on_streak()
+    test_habits_with_no_streak()
     test_longest_current_streak()
     test_habits_with_streak_at_least()
     test_habits_with_best_streak()
