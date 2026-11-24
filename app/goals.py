@@ -43,6 +43,16 @@ def weekly_goal_progress(logs, habit, weekly_target_minutes, end_date=None):
     }
 
 
+def weekly_goal_remaining(logs, habit, weekly_target_minutes, end_date=None):
+    """Minutes left to reach a weekly minutes goal, 0 when met.
+
+    The "remaining" of weekly_goal_progress — 0 when there is no
+    goal, or when the goal is already met.
+    """
+    return weekly_goal_progress(logs, habit, weekly_target_minutes,
+                                end_date)["remaining"]
+
+
 def weekly_goal_warning(progress):
     """Warning line when a weekly goal is not met yet, else ''.
 

@@ -12,7 +12,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from app.habits import new_habit  # noqa: E402
 from app.tracker import log_minutes  # noqa: E402
 from app.goals import (minutes_in_last_7_days, weekly_goal_progress,  # noqa: E402
-                       weekly_goal_warning)
+                       weekly_goal_warning, weekly_goal_remaining)
 
 PASSED = 0
 
@@ -68,9 +68,22 @@ def test_weekly_goal_warning():
               logs, habit, 0, date(2026, 11, 7))) == "")
 
 
+def test_weekly_goal_remaining():
+    habit = new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-01")
+    logs = {}
+    log_minutes(logs, habit["id"], "2026-11-07", 45)
+    check("45 minutes left of a 90-minute goal",
+          weekly_goal_remaining(logs, habit, 90, date(2026, 11, 7)) == 45)
+    check("0 left when the goal is met",
+          weekly_goal_remaining(logs, habit, 30, date(2026, 11, 7)) == 0)
+    check("0 left when there is no goal",
+          weekly_goal_remaining(logs, habit, 0, date(2026, 11, 7)) == 0)
+
+
 if __name__ == "__main__":
     test_minutes_in_last_7_days()
     test_weekly_goal_progress()
     test_weekly_goal_met_and_no_goal()
     test_weekly_goal_warning()
+    test_weekly_goal_remaining()
     print(f"{PASSED} tests passed")
