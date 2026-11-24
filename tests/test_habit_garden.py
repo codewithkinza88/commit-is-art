@@ -12,7 +12,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.habits import (  # noqa: E402
     new_habit, add_habit, edit_habit, delete_habit, get_habit,
-    archive_habit, active_habits, count_active_habits,
+    archive_habit, active_habits, count_active_habits, habit_names,
     habits_by_category, count_by_category,
     count_by_effort, newest_habit, oldest_habit, habits_with_target,
     habits_without_target,
@@ -500,6 +500,17 @@ def test_count_active_habits():
           count_active_habits([]) == 0)
 
 
+def test_habit_names():
+    h1 = new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-05")
+    h2 = new_habit("Read", "Books", 30, "📖", "#F9A8D4", "2026-11-07")
+    check("habit names keep creation order",
+          habit_names([h1, h2]) == ["Study", "Read"])
+    check("one habit gives one name",
+          habit_names([h2]) == ["Read"])
+    check("no habits means an empty list",
+          habit_names([]) == [])
+
+
 def test_total_target_minutes():
     h1 = new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-05")
     h2 = new_habit("Read", "Books", 30, "📖", "#F9A8D4", "2026-11-07")
@@ -668,6 +679,7 @@ if __name__ == "__main__":
     test_habits_without_target()
     test_count_archived()
     test_count_active_habits()
+    test_habit_names()
     test_total_target_minutes()
     test_minutes_for_habit_this_month()
     test_days_done_this_month()
