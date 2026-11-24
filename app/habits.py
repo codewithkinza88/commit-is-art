@@ -244,6 +244,17 @@ def habits_with_target(habits):
             if int(h.get("target_minutes") or 0) > 0]
 
 
+def habits_without_target(habits):
+    """Habits with no daily target set (target_minutes == 0 or missing).
+
+    Mirror of habits_with_target, for the habits that are just
+    ticked, never timed. Creation order is kept; [] when every
+    habit has a target (or there are no habits).
+    """
+    return [h for h in (habits or [])
+            if int(h.get("target_minutes") or 0) == 0]
+
+
 def count_archived(habits):
     """How many habits are archived (parked, not deleted).
 
