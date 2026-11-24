@@ -10,7 +10,9 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.habits import new_habit  # noqa: E402
 from app.tracker import set_done, log_minutes  # noqa: E402
-from app.export import (habits_to_csv, habits_to_text, logs_to_csv,  # noqa: E402
+from app.export import (habits_to_csv, habits_to_text,  # noqa: E402
+                        habits_to_lines,
+                        logs_to_csv,
                         month_to_text, notes_to_csv, notes_to_text,
                         streaks_to_csv, streaks_to_text, summary_lines,
                         summary_to_text, week_to_text)
@@ -174,6 +176,18 @@ def test_habits_to_text():
           habits_to_text([]).splitlines()[-1] == "No habits yet 🌱")
 
 
+def test_habits_to_lines():
+    habits = [new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-01"),
+              new_habit("Walk", "Health", 0, "🚶", "#BDE0FE", "2026-11-01")]
+    lines = habits_to_lines(habits)
+    check("habits lines start with a header",
+          lines[0] == "Habit Garden — my habits")
+    check("habits lines show the target when set",
+          lines[1] == "📚 Study (Study) • 🎯 60 min/day")
+    check("an empty habit list says so kindly",
+          habits_to_lines([])[-1] == "No habits yet 🌱")
+
+
 def test_notes_to_text():
     from app.notes import add_note
 
@@ -224,4 +238,5 @@ if __name__ == "__main__":
     test_month_to_text()
     test_notes_to_text()
     test_habits_to_text()
+    test_habits_to_lines()
     print(f"{PASSED} tests passed")

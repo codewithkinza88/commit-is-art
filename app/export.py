@@ -86,6 +86,24 @@ def streaks_to_text(logs, habits, end_date=None):
     return "\n".join(lines)
 
 
+def habits_to_lines(habits):
+    """Habits as a list of short readable lines, one per habit.
+
+    The list form of habits_to_text: a header, then one line per
+    habit (icon, name, category, daily target when set) — handy
+    when the caller wants the lines, not one joined block.
+    """
+    lines = ["Habit Garden — my habits"]
+    for habit in (habits or []):
+        target = int(habit.get("target_minutes") or 0)
+        target_text = f" • 🎯 {target} min/day" if target else ""
+        lines.append(f"{habit.get('icon', '🌱')} {habit.get('name', '')} "
+                     f"({habit.get('category', 'Daily Life')}){target_text}")
+    if not habits:
+        lines.append("No habits yet 🌱")
+    return lines
+
+
 def summary_lines(logs, habits, date_str):
     """One day's summary as a list of short readable lines.
 
