@@ -174,6 +174,15 @@ def active_habits(habits):
     return [h for h in (habits or []) if not h.get("archived", False)]
 
 
+def count_active_habits(habits):
+    """How many habits are active (not archived).
+
+    The count form of active_habits; 0 when every habit is
+    archived (or there are no habits).
+    """
+    return sum(1 for h in (habits or []) if not h.get("archived", False))
+
+
 def list_habits(habits):
     """Return the habits in display order (creation order)."""
     return list(habits or [])
