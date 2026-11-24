@@ -70,6 +70,16 @@ def longest_note(notes, habit_id):
     return best_date, best_text
 
 
+def longest_note_text(notes, habit_id):
+    """Text of the habit's longest non-empty note.
+
+    "" when the habit has no notes — the text-only mirror of
+    longest_note, for places that only need the words.
+    """
+    _date, text = longest_note(notes or {}, habit_id)
+    return text
+
+
 def notes_in_range(notes, start_date, end_date):
     """(date, habit_id, text) for non-empty notes in a date range, inclusive.
 

@@ -11,6 +11,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from app.notes import (MAX_NOTE_LEN, add_note, count_notes,  # noqa: E402
                        count_notes_for_day, find_notes, get_note, has_note,
                        latest_note, latest_note_text, longest_note,
+                                                             longest_note_text,
                                                              notes_count_this_week,
                        notes_for_day, notes_for_habit,
                                           notes_for_habit_this_month,
@@ -135,6 +136,20 @@ def test_longest_note():
           longest_note(notes, "h1")[0] == "2026-11-13")
     check("a habit with no notes has no longest note",
           longest_note(notes, "h9") == ("", ""))
+
+
+
+def test_longest_note_text():
+    notes = {}
+    add_note(notes, "h1", "2026-11-10", "Read chapter 3")
+    add_note(notes, "h1", "2026-11-12", "Finished chapter 4 and started 5")
+    add_note(notes, "h2", "2026-11-11", "A very long note indeed, longer")
+    check("longest note text is the longest text",
+          longest_note_text(notes, "h1") == "Finished chapter 4 and started 5")
+    check("another habit has its own longest text",
+          longest_note_text(notes, "h2") == "A very long note indeed, longer")
+    check("a habit with no notes has empty text",
+          longest_note_text(notes, "h9") == "")
 
 
 def test_notes_in_range():
@@ -280,6 +295,7 @@ if __name__ == "__main__":
     test_find_notes()
     test_notes_for_habit()
     test_longest_note()
+    test_longest_note_text()
     test_notes_in_range()
     test_notes_count_this_week()
     test_notes_for_habit_this_week()
