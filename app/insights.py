@@ -35,6 +35,18 @@ def needs_attention(logs, habits, date_strs):
     return worst
 
 
+def done_rate_for_habit(logs, habit, date_strs):
+    """Done rate for one habit over the dates, as a fraction 0.0-1.0.
+
+    Done days / window days; 0.0 when there is no habit or no
+    dates. The per-habit rate behind least_consistent_habit.
+    """
+    if not habit or not date_strs:
+        return 0.0
+    done = sum(1 for d in date_strs if is_done(logs, habit, d))
+    return done / len(date_strs)
+
+
 def most_consistent_habit(logs, habits, date_strs):
     """The habit done most often over the dates, or None when no habits.
 

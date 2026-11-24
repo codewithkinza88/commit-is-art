@@ -12,7 +12,7 @@ from app.habits import new_habit  # noqa: E402
 from app.insights import (average_consistency, consistency_message,  # noqa: E402
                           consistency_score,                       habits_above_rate, habits_below_rate,
                                                 least_consistent_habit, most_consistent_habit,
-                          needs_attention, weekly_done_rate)
+                          needs_attention, weekly_done_rate, done_rate_for_habit)
 from app.tracker import set_done  # noqa: E402
 
 PASSED = 0
@@ -142,11 +142,29 @@ def test_least_consistent_habit():
           least_consistent_habit(logs, habits, []) is None)
 
 
+def test_done_rate_for_habit():
+    a = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
+    b = new_habit("Walk", "Health", 0, "🚶", "#BDE0FE", "2026-11-01")
+    logs = {}
+    days = ["2026-11-08", "2026-11-09", "2026-11-10"]
+    for d in days:
+        set_done(logs, a["id"], d, True)
+    set_done(logs, b["id"], "2026-11-08", True)
+    # a done 3/3, b done 1/3.
+    check("a habit done every day has rate 1.0",
+          done_rate_for_habit(logs, a, days) == 1.0)
+    check("a habit done one day in three has rate 1/3",
+          done_rate_for_habit(logs, b, days) == 1 / 3)
+    check("no dates means rate 0.0",
+          done_rate_for_habit(logs, a, []) == 0.0)
+
+
 if __name__ == "__main__":
     main()
     test_weekly_done_rate()
     test_habits_below_rate()
     test_least_consistent_habit()
+    test_done_rate_for_habit()
     test_habits_above_rate()
     test_average_consistency()
     print(f"{PASSED} tests passed")
