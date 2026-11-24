@@ -11,11 +11,11 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from app.notes import (MAX_NOTE_LEN, add_note, count_notes,  # noqa: E402
                        count_notes_for_day, find_notes, get_note, has_note,
                        latest_note, latest_note_text, longest_note,
-                       notes_count_this_week,
+                                                             notes_count_this_week,
                        notes_for_day, notes_for_habit,
-                       notes_for_habit_this_month,
+                                          notes_for_habit_this_month,
                        notes_for_habit_this_week, notes_in_month,
-                       notes_in_range,
+                       notes_in_range, notes_for_habit_last_7_days,
                        total_notes_count)
 
 PASSED = 0
@@ -224,6 +224,24 @@ def test_notes_for_habit_this_week():
           notes_for_habit_this_week(notes, "h9", "2026-11-12") == [])
 
 
+def test_notes_for_habit_last_7_days():
+    notes = {}
+    add_note(notes, "h1", "2026-11-10", "Read chapter 3")
+    add_note(notes, "h2", "2026-11-10", "Watered the plants")
+    add_note(notes, "h1", "2026-11-12", "Finished chapter 4")
+    add_note(notes, "h1", "2026-11-01", "Too old to count")
+    add_note(notes, "h1", "2026-11-11", "   ")
+    check("notes in the last 7 days for h1 are the two in-window notes",
+          notes_for_habit_last_7_days(notes, "h1", "2026-11-12") ==
+          [("2026-11-10", "Read chapter 3"),
+           ("2026-11-12", "Finished chapter 4")])
+    check("another habit's notes do not leak in",
+          notes_for_habit_last_7_days(notes, "h2", "2026-11-12") ==
+          [("2026-11-10", "Watered the plants")])
+    check("a habit with no notes in the window gives []",
+          notes_for_habit_last_7_days(notes, "h9", "2026-11-12") == [])
+
+
 def test_total_notes_count():
     notes = {}
     add_note(notes, "h1", "2026-11-10", "Read chapter 3")
@@ -265,6 +283,7 @@ if __name__ == "__main__":
     test_notes_in_range()
     test_notes_count_this_week()
     test_notes_for_habit_this_week()
+    test_notes_for_habit_last_7_days()
     test_notes_for_habit_this_month()
     test_notes_in_month()
     test_latest_note_text()

@@ -110,6 +110,16 @@ def notes_for_habit_this_week(notes, habit_id, end_date=None):
             if start <= date_str <= end.isoformat()]
 
 
+def notes_for_habit_last_7_days(notes, habit_id, end_date=None):
+    """(date, text) pairs for one habit in the last 7 days.
+
+    Non-empty notes only, oldest date first; [] when the habit
+    wrote nothing in the window. The rolling-window name for
+    notes_for_habit_this_week.
+    """
+    return notes_for_habit_this_week(notes, habit_id, end_date)
+
+
 def notes_for_habit_this_month(notes, habit_id, year, month):
     """(date, text) pairs for one habit in a calendar month.
 
