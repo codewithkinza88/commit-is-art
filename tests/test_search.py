@@ -9,7 +9,8 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.habits import new_habit  # noqa: E402
-from app.search import count_matches, find_habits, find_habits_by_icon  # noqa: E402
+from app.search import (count_matches, find_habits,  # noqa: E402
+                        find_habits_by_effort, find_habits_by_icon)
 
 PASSED = 0
 
@@ -40,6 +41,14 @@ def main():
           find_habits_by_icon(habits, "🚀") == [])
     check("find by icon on an empty list is empty",
           find_habits_by_icon([], "📚") == [])
+    check("find by effort returns habits at or above the threshold",
+          [h["name"] for h in find_habits_by_effort(habits, 30)]
+          == ["Study - DSA", "Read a book"])
+    check("find by effort with a high threshold is narrow",
+          [h["name"] for h in find_habits_by_effort(habits, 60)]
+          == ["Study - DSA"])
+    check("find by effort with 0 returns all habits",
+          len(find_habits_by_effort(habits, 0)) == 3)
 
 
 if __name__ == "__main__":
