@@ -177,6 +177,23 @@ def minutes_for_habit_this_month(logs, habit, year, month):
                for day in range(1, days_in_month + 1))
 
 
+def minutes_for_habit_last_7_days(logs, habit, end_date=None):
+    """Minutes logged for one habit over the last 7 days.
+
+    Sums minutes_for over the 7 days ending on end_date; 0 when
+    the habit logged nothing in the window. Mirror of
+    minutes_in_last_7_days in goals.py, kept on the tracker so
+    callers need only one import.
+    """
+    if isinstance(end_date, str):
+        end = date.fromisoformat(end_date)
+    else:
+        end = end_date or date.today()
+    return sum(minutes_for(logs, habit.get("id"),
+                           (end - timedelta(days=i)).isoformat())
+               for i in range(7))
+
+
 def days_done_this_month(logs, habit, year, month):
     """How many days in a calendar month the habit was done.
 

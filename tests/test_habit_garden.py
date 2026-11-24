@@ -24,6 +24,7 @@ from app.tracker import (  # noqa: E402
     total_minutes_today, total_minutes_this_week, total_minutes_yesterday,
     total_minutes_in_range, total_minutes_last_30_days,
     total_minutes_last_14_days, minutes_for_habit_this_month,
+    minutes_for_habit_last_7_days,
     days_done_this_month, best_day_this_month,
     best_day_by_minutes, days_done_this_week, first_done_date,
     done_count_today,
@@ -566,6 +567,20 @@ def test_total_minutes_last_14_days():
           total_minutes_last_14_days({}, [h1], "2026-11-14") == 0)
 
 
+def test_minutes_for_habit_last_7_days():
+    h1 = new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-05")
+    logs = {}
+    log_minutes(logs, h1["id"], "2026-11-14", 30)
+    log_minutes(logs, h1["id"], "2026-11-08", 20)
+    log_minutes(logs, h1["id"], "2026-11-07", 99)
+    check("last 7 days sum the 7-day window",
+          minutes_for_habit_last_7_days(logs, h1, "2026-11-14") == 50)
+    check("a day 7 days back is outside the window",
+          minutes_for_habit_last_7_days(logs, h1, "2026-11-15") == 30)
+    check("no logs in the window is 0",
+          minutes_for_habit_last_7_days({}, h1, "2026-11-14") == 0)
+
+
 def test_best_day_this_month():
     h1 = new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-05")
     logs = {}
@@ -684,6 +699,7 @@ if __name__ == "__main__":
     test_minutes_for_habit_this_month()
     test_days_done_this_month()
     test_total_minutes_last_14_days()
+    test_minutes_for_habit_last_7_days()
     test_best_day_this_month()
     test_stage_progress()
     test_clone_habit()
