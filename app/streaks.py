@@ -60,6 +60,18 @@ def longest_streak_overall(logs, habits, end_date=None):
          for habit in (habits or [])),
         default=0)
 
+
+def shortest_best_streak(logs, habits, end_date=None):
+    """Smallest best streak across all habits (0 when there are none).
+
+    Mirror of longest_streak_overall: the shortest ever-run any
+    habit managed, so the garden can cheer on its slowest grower.
+    """
+    return min(
+        (best_streak(logs, habit, end_date=end_date)
+         for habit in (habits or [])),
+        default=0)
+
 def average_streak(logs, habits, end_date=None):
     """Mean best streak across all habits (0.0 when there are none)."""
     habits = list(habits or [])

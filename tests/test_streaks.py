@@ -14,13 +14,12 @@ from app.tracker import set_done  # noqa: E402
 from app.streaks import (average_best_streak, best_streak,
                          days_since_last_done,  # noqa: E402
                          habits_on_streak, habits_with_best_streak,
-                         habits_with_streak_at_least,
+                                              habits_with_streak_at_least,
                          last_done_label, longest_gap,
                          longest_current_streak, longest_streak_overall,
-                         median_current_streak, streak_leaderboard,
-                         streak_summary, streaks_by_habit,
+                         median_current_streak,                      streak_leaderboard,                      streak_summary, streaks_by_habit,
                          total_streak_days, average_streak,
-                         median_best_streak)
+                         median_best_streak, shortest_best_streak)
 
 PASSED = 0
 
@@ -88,6 +87,21 @@ def test_longest_streak_overall():
           longest_streak_overall(logs, [], date(2026, 11, 3)) == 0)
     check("longest streak with no logs is 0",
           longest_streak_overall({}, [h1, h2], date(2026, 11, 3)) == 0)
+
+
+def test_shortest_best_streak():
+    h1 = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
+    h2 = new_habit("Read", "Books", 0, "📖", "#F9A8D4", "2026-11-01")
+    logs = {}
+    for day in ("2026-11-01", "2026-11-02", "2026-11-03"):
+        set_done(logs, h1["id"], day, True)
+    set_done(logs, h2["id"], "2026-11-03", True)
+    check("shortest best streak across habits is 1",
+          shortest_best_streak(logs, [h1, h2], date(2026, 11, 3)) == 1)
+    check("shortest streak with no habits is 0",
+          shortest_best_streak(logs, [], date(2026, 11, 3)) == 0)
+    check("shortest streak with no logs is 0",
+          shortest_best_streak({}, [h1, h2], date(2026, 11, 3)) == 0)
 
 
 def test_average_streak():
@@ -309,6 +323,7 @@ if __name__ == "__main__":
     test_streak_summary()
     test_last_done_label()
     test_longest_streak_overall()
+    test_shortest_best_streak()
     test_longest_gap()
     test_streak_leaderboard()
     test_habits_on_streak()
