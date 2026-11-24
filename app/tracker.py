@@ -175,6 +175,23 @@ def total_minutes_last_14_days(logs, habits, end_date=None):
     return total
 
 
+def total_minutes_last_7_days(logs, habits, end_date=None):
+    """Total minutes logged across all habits in the 7 days to end_date.
+
+    Mirror of total_minutes_last_14_days with a 7-day window;
+    0 when there are no logs or no habits.
+    """
+    if isinstance(end_date, str):
+        end = date.fromisoformat(end_date)
+    else:
+        end = end_date or date.today()
+    total = 0
+    for i in range(7):
+        day = (end - timedelta(days=i)).isoformat()
+        total += total_minutes_today(logs, habits, day)
+    return total
+
+
 def minutes_for_habit_this_month(logs, habit, year, month):
     """Minutes logged for one habit across a whole calendar month.
 
