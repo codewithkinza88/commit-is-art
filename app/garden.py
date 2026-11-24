@@ -195,6 +195,15 @@ def names_in_full_bloom(habits, logs, date_str):
     return plants_at_stage(habits, logs, date_str, "full_bloom")
 
 
+def names_blooming(habits, logs, date_str):
+    """Names of the plants at the blooming stage on a date.
+
+    Wrapper over plants_at_stage with "blooming"; [] when no
+    plant is blooming (or there are no habits).
+    """
+    return plants_at_stage(habits, logs, date_str, "blooming")
+
+
 def growth_stage(streak, done_today=False):
     """Stage for a habit from its streak (and today's tick).
 
