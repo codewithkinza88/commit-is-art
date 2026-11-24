@@ -210,3 +210,20 @@ def week_to_text(logs, habits, end_date=None):
     total = sum(day["total_minutes"] for day in days)
     lines.append(f"Week total: {total} minutes")
     return "\n".join(lines)
+
+
+def week_lines(logs, habits, end_date=None):
+    """The last 7 days as a list of short readable lines, oldest first.
+
+    The list form of week_to_text: one line per day (date,
+    done/total, percent, minutes) plus a total line at the end —
+    handy when the caller wants the lines, not one joined block.
+    """
+    days = last_7_days(logs, habits, end_date=end_date)
+    lines = ["Habit Garden — last 7 days"]
+    for day in days:
+        lines.append(f"{day['date']}: {day['done']}/{day['total']} "
+                     f"({day['percent']}%) • {day['total_minutes']} min")
+    total = sum(day["total_minutes"] for day in days)
+    lines.append(f"Week total: {total} minutes")
+    return lines

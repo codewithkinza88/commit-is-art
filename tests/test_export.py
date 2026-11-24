@@ -15,7 +15,7 @@ from app.export import (habits_to_csv, habits_to_text,  # noqa: E402
                         logs_to_csv,
                         month_to_text, notes_to_csv, notes_to_text,
                         streaks_to_csv, streaks_to_text, summary_lines,
-                        summary_to_text, week_to_text)
+                        summary_to_text, week_to_text, week_lines)
 
 PASSED = 0
 
@@ -161,6 +161,22 @@ def test_week_to_text():
           lines[-1] == "Week total: 45 minutes")
 
 
+def test_week_lines():
+    from datetime import date
+    h1 = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
+    logs = {}
+    set_done(logs, h1["id"], "2026-11-08", True)
+    set_done(logs, h1["id"], "2026-11-09", True)
+    log_minutes(logs, h1["id"], "2026-11-09", 45)
+    lines = week_lines(logs, [h1], date(2026, 11, 9))
+    check("week lines start with a header",
+          lines[0] == "Habit Garden — last 7 days")
+    check("week lines have one line per day plus a total",
+          len(lines) == 9)
+    check("week lines end with the week total",
+          lines[-1] == "Week total: 45 minutes")
+
+
 def test_habits_to_text():
     habits = [new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-01"),
               new_habit("Walk", "Health", 0, "🚶", "#BDE0FE", "2026-11-01")]
@@ -235,6 +251,7 @@ if __name__ == "__main__":
     test_streaks_to_text()
     test_summary_lines()
     test_week_to_text()
+    test_week_lines()
     test_month_to_text()
     test_notes_to_text()
     test_habits_to_text()
