@@ -168,3 +168,17 @@ def validate_percent(value):
     if percent > MAX_PERCENT:
         return False, MAX_PERCENT, "Percent cannot be more than 100"
     return True, percent, ""
+
+
+def validate_habit_id(value):
+    """(is_valid, clean_id, error) for a habit id.
+
+    Mirror of validate_habit_name without the length cap: a
+    non-empty string, stripped; blank or non-text ids are invalid.
+    """
+    if not isinstance(value, str):
+        return False, "", "Habit id must be text"
+    clean = value.strip()
+    if not clean:
+        return False, "", "Habit id cannot be empty"
+    return True, clean, ""
