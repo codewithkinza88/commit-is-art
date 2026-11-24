@@ -194,6 +194,18 @@ def streaks_by_habit(logs, habits, end_date=None):
             for habit in (habits or [])}
 
 
+def streaks_sorted(logs, habits, end_date=None):
+    """(name, current streak) pairs, longest streak first.
+
+    Creation order breaks ties (the sort is stable); [] when
+    there are no habits.
+    """
+    pairs = [(habit["name"],
+              current_streak(logs, habit, end_date=end_date))
+             for habit in (habits or [])]
+    return sorted(pairs, key=lambda pair: pair[1], reverse=True)
+
+
 def total_streak_days(logs, habits, end_date=None):
     """Total live streak days across all habits.
 
