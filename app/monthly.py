@@ -141,6 +141,16 @@ def longest_day_minutes(summary):
                default=0)
 
 
+def best_day_minutes(summary):
+    """Minutes logged on the best day of a monthly summary.
+
+    The best day is the summary's best_day (highest percent, then
+    most minutes); 0 when the summary has no best day.
+    """
+    best = (summary or {}).get("best_day") or {}
+    return int(best.get("total_minutes") or 0)
+
+
 def average_minutes_per_day(summary):
     """Average minutes per day across a monthly summary (0 when empty).
 

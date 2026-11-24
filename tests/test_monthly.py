@@ -11,11 +11,11 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from app.habits import new_habit  # noqa: E402
 from app.tracker import set_done, log_minutes  # noqa: E402
 from app.monthly import (average_minutes_on_logged_days,  # noqa: E402
-                         average_minutes_per_day, busiest_weekday,
+                         average_minutes_per_day,                      busiest_weekday,
                          days_logged_this_month, days_with_no_minutes,
                          longest_day_minutes, minutes_for_weekday,
                          monthly_summary, perfect_day_dates,
-                         quietest_weekday)
+                         quietest_weekday, best_day_minutes)
 
 PASSED = 0
 
@@ -135,6 +135,21 @@ def test_longest_day_minutes():
           longest_day_minutes({}) == 0)
 
 
+def test_best_day_minutes():
+    habits = [new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-01")]
+    logs = {}
+    log_minutes(logs, habits[0]["id"], "2026-11-02", 30)
+    log_minutes(logs, habits[0]["id"], "2026-11-04", 45)
+    log_minutes(logs, habits[0]["id"], "2026-11-05", 45)
+    month = monthly_summary(logs, habits, 2026, 11)
+    check("the best day logged 45 minutes",
+          best_day_minutes(month) == 45)
+    check("a month with no minutes has a 0 best day",
+          best_day_minutes(monthly_summary({}, [], 2026, 11)) == 0)
+    check("no summary has a 0 best day",
+          best_day_minutes({}) == 0)
+
+
 def test_average_minutes_per_day():
     habits = [new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-01")]
     logs = {}
@@ -209,6 +224,7 @@ if __name__ == "__main__":
     test_average_minutes_on_logged_days()
     test_minutes_for_weekday()
     test_longest_day_minutes()
+    test_best_day_minutes()
     test_days_logged_this_month()
     test_days_with_no_minutes()
     test_perfect_day_dates()
