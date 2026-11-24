@@ -186,6 +186,15 @@ def plants_at_stage(habits, logs, date_str, stage):
             if plant.get("stage") == (stage or "")]
 
 
+def names_in_full_bloom(habits, logs, date_str):
+    """Names of the plants in full bloom on a date.
+
+    Wrapper over plants_at_stage with "full_bloom"; [] when no
+    plant has reached full bloom (or there are no habits).
+    """
+    return plants_at_stage(habits, logs, date_str, "full_bloom")
+
+
 def growth_stage(streak, done_today=False):
     """Stage for a habit from its streak (and today's tick).
 
