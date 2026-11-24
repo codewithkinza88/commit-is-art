@@ -26,7 +26,8 @@ from app.tracker import (  # noqa: E402
     total_minutes_last_14_days, minutes_for_habit_this_month,
     minutes_for_habit_last_7_days,
     days_done_this_month, best_day_this_month,
-    best_day_by_minutes, days_done_this_week, first_done_date,
+    best_day_by_minutes, days_done_this_week, days_done_last_7_days,
+    first_done_date,
     done_count_today,
     current_streak, daily_summary, last_7_days,
 )
@@ -313,6 +314,19 @@ def test_days_done_this_week():
           days_done_this_week({}, habit, "2026-11-07") == 0)
     check("days done is 0 outside the window",
           days_done_this_week(logs, habit, "2026-11-20") == 0)
+
+
+def test_days_done_last_7_days():
+    habit = new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-01")
+    logs = {}
+    for day in ("2026-11-04", "2026-11-06", "2026-11-07"):
+        set_done(logs, habit["id"], day, True)
+    check("three non-consecutive days count as 3",
+          days_done_last_7_days(logs, habit, "2026-11-07") == 3)
+    check("days done is 0 with no logs",
+          days_done_last_7_days({}, habit, "2026-11-07") == 0)
+    check("days done is 0 outside the window",
+          days_done_last_7_days(logs, habit, "2026-11-20") == 0)
 
 
 def test_first_done_date():
@@ -682,6 +696,7 @@ if __name__ == "__main__":
     test_total_minutes_yesterday()
     test_total_minutes_last_30_days()
     test_days_done_this_week()
+    test_days_done_last_7_days()
     test_first_done_date()
     test_total_minutes_in_range()
     test_best_day_by_minutes()

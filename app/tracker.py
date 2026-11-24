@@ -114,6 +114,16 @@ def days_done_this_week(logs, habit, end_date=None):
                           (end - timedelta(days=i)).isoformat()))
 
 
+def days_done_last_7_days(logs, habit, end_date=None):
+    """How many of the last 7 days (ending on end_date) the habit
+    was done — a number from 0 to 7.
+
+    The windowed name for days_done_this_week, for callers that
+    think in rolling weeks rather than calendar weeks.
+    """
+    return days_done_this_week(logs, habit, end_date)
+
+
 def first_done_date(logs, habit):
     """The earliest ISO date the habit was ever done.
 
