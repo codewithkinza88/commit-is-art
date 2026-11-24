@@ -13,7 +13,7 @@ from app.schedule import (count_due_on_weekday, count_due_this_week,
                           count_due_today,  # noqa: E402
                           count_due_today_undone, due_this_week,
                           habits_due_every_day, habits_due_on,
-                          habits_due_tomorrow,
+                          habits_due_tomorrow, habits_due_on_weekday_name,
                           is_due_today, next_due_weekday,
                           next_due_weekday_name, weekday_name,
                           weekday_of)
@@ -207,6 +207,24 @@ def test_next_due_weekday():
           next_due_weekday(daily, 3) == 3)
 
 
+def test_habits_due_on_weekday_name():
+    weekday_only = new_habit("Study - DSA", "Study", 60, "📚", "#A5D8FF",
+                             "2026-11-01")
+    weekday_only["days"] = [0, 2, 4]  # Mon, Wed, Fri
+    daily = new_habit("Drink water", "Health", 0, "💧", "#BDE0FE",
+                      "2026-11-01")
+    weekend = new_habit("Long walk", "Health", 0, "🏃", "#C8F7C5",
+                        "2026-11-01")
+    weekend["days"] = [5, 6]
+    habits = [weekday_only, daily, weekend]
+    check("Tuesday names the daily habit only",
+          habits_due_on_weekday_name(habits, "Tue") == [daily])
+    check("Saturday names daily and weekend habits",
+          habits_due_on_weekday_name(habits, "Sat") == [daily, weekend])
+    check("an unknown name names nobody",
+          habits_due_on_weekday_name(habits, "Funday") == [])
+
+
 if __name__ == "__main__":
     main()
     test_due_this_week()
@@ -218,6 +236,7 @@ if __name__ == "__main__":
     test_weekday_of()
     test_habits_due_every_day()
     test_next_due_weekday()
+    test_habits_due_on_weekday_name()
     test_count_due_on_weekday()
     test_next_due_weekday_name()
     print(f"{PASSED} tests passed")

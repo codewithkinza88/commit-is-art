@@ -141,3 +141,17 @@ def weekday_name(weekday):
     if 0 <= weekday <= 6:
         return WEEKDAYS[weekday]
     return "?"
+
+
+def habits_due_on_weekday_name(habits, name):
+    """Habits due on the weekday named by its short name.
+
+    "Tue" means weekday 1; creation order is kept. [] when the
+    name is unknown (or there are no habits).
+    """
+    if not isinstance(name, str):
+        return []
+    short = name.strip().title()[:3]
+    if short not in WEEKDAYS:
+        return []
+    return habits_due_on(habits or [], WEEKDAYS.index(short))
