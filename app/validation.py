@@ -147,3 +147,24 @@ def validate_minutes(value):
     if minutes > MAX_MINUTES:
         return False, MAX_MINUTES, "Minutes cannot be more than a day"
     return True, minutes, ""
+
+
+MAX_PERCENT = 100
+
+
+def validate_percent(value):
+    """(is_valid, percent, error) for a percent value 0..100.
+
+    Mirror of validate_minutes, but for percents: non-numeric
+    input and negatives are invalid, and anything over 100 is
+    capped at 100.
+    """
+    try:
+        percent = int(value)
+    except (TypeError, ValueError):
+        return False, 0, "Percent must be a number"
+    if percent < 0:
+        return False, 0, "Percent cannot be negative"
+    if percent > MAX_PERCENT:
+        return False, MAX_PERCENT, "Percent cannot be more than 100"
+    return True, percent, ""

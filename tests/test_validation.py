@@ -10,10 +10,9 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.validation import (MAX_NAME_LEN, validate_category,  # noqa: E402
                             validate_colour, validate_date_str,
-                            validate_habit_days,
-                            validate_habit_name,
-                            validate_icon, validate_minutes,
-                            validate_note_text, validate_target_minutes,
+                            validate_habit_days,                         validate_habit_name,
+                            validate_icon, validate_minutes, validate_percent,
+                            validate_note_text,                         validate_target_minutes,
                             validate_weekday, validate_weekly_target)
 
 PASSED = 0
@@ -124,6 +123,15 @@ def test_validate_habit_days():
           and validate_habit_days("Mon") == [])
 
 
+def test_validate_percent():
+    check("good percent", validate_percent(75) == (True, 75, ""))
+    check("string percent", validate_percent("40") == (True, 40, ""))
+    check("negative percent", validate_percent(-5)[0] is False)
+    check("text percent", validate_percent("lots")[0] is False)
+    check("too much percent capped",
+          validate_percent(250) == (False, 100, "Percent cannot be more than 100"))
+
+
 if __name__ == "__main__":
     main()
     test_validate_note_text()
@@ -132,4 +140,5 @@ if __name__ == "__main__":
     test_validate_habit_days()
     test_validate_weekday()
     test_validate_colour()
+    test_validate_percent()
     print(f"{PASSED} tests passed")
