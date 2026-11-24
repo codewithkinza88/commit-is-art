@@ -71,6 +71,14 @@ def count_due_today(habits, weekday):
     return len(habits_due_on(habits or [], weekday))
 
 
+def count_due_tomorrow(habits, weekday):
+    """How many habits are due on the next weekday (0 when none).
+
+    Count form of habits_due_tomorrow; wraps Sunday -> Monday.
+    """
+    return len(habits_due_tomorrow(habits or [], weekday))
+
+
 def count_due_this_week(habits, weekday):
     """How many habits are due at least once from weekday to Sunday."""
     return len(due_this_week(habits or [], weekday))
