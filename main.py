@@ -21,7 +21,8 @@ from datetime import date, timedelta
 
 from app.habits import (
     CATEGORIES, COLOURS, EFFORTS, EFFORT_EMOJI, ICONS, add_habit,
-    clone_habit, count_archived, delete_habit, edit_habit, get_habit,
+    clone_habit, count_active_habits, count_archived, delete_habit,
+    edit_habit, get_habit,
     habit_age_days, new_habit,
 )
 from app.garden import (count_blooming, count_full_bloom, count_seeds,
@@ -51,7 +52,7 @@ from app.streaks import (average_best_streak, average_streak, best_streak,
                          longest_streak_overall,
                          median_best_streak, median_current_streak,
                          streak_leaderboard, total_streak_days)
-from app.achievements import badges_count, badges_for
+from app.achievements import badge_labels, badges_count, badges_for
 from app.backup import backup_filename, backup_to_json, restore_from_json
 from app.categories import (
     best_category, legend_categories, total_minutes_by_category)
@@ -80,7 +81,7 @@ from app.tracker import (
     best_day_by_minutes, current_streak, daily_summary, done_count_today,
     is_done, last_7_days, log_minutes, minutes_for, set_done, today_str,
     total_minutes_last_30_days, total_minutes_this_week,
-    total_minutes_last_14_days,
+    total_minutes_last_14_days, total_minutes_last_7_days,
     total_minutes_today, total_minutes_yesterday,
 )
 
@@ -829,8 +830,9 @@ def main(page: ft.Page):
                        if steady else "🌟 Most consistent: —")
         evening = evening_message(summary["done"], summary["total"])
         badges = badges_for(logs, habits, today)
+        labels = badge_labels(logs, habits, today)
         badges_text = (", ".join(
-            f"{b['emoji']} {b['label']}" for b in badges)
+            f"{b['emoji']} {label}" for b, label in zip(badges, labels))
             if badges else "No badges yet today — plant a habit! 🌱")
         goal_rows = []
         for habit in habits:
@@ -954,7 +956,12 @@ def main(page: ft.Page):
                 ft.Text(f"Last 14 days: "
                         f"{total_minutes_last_14_days(logs, habits)} minutes",
                         size=15, color=MUTED),
+                ft.Text(f"Last 7 days: "
+                        f"{total_minutes_last_7_days(logs, habits)} minutes",
+                        size=15, color=MUTED),
                 ft.Text(f"📦 {count_archived(habits)} archived habits",
+                        size=15, color=MUTED),
+                ft.Text(f"🌱 {count_active_habits(habits)} active habits",
                         size=15, color=MUTED),
                 ft.Text(f"Longest gap: {worst_gap} days", size=15,
                         color=MUTED),

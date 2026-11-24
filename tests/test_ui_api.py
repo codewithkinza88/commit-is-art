@@ -216,9 +216,18 @@ def test_ui_api():
           and "days_to_next_milestone(longest_streak)" in source)
     check("a new habit gets a welcome message",
           "welcome_message(name_field.value)" in source)
-    check("app version is 1.14.0",
+    check("app version is 1.15.0",
           open(os.path.join(root, "app", "version.py"),
-               encoding="utf-8").read().count('APP_VERSION = "1.14.0"') == 1)
+               encoding="utf-8").read().count('APP_VERSION = "1.15.0"') == 1)
+    check("Tonight shows how many habits are active",
+          "active habits" in source
+          and "count_active_habits(habits)" in source)
+    check("Tonight shows minutes in the last 7 days",
+          "Last 7 days:" in source
+          and "total_minutes_last_7_days(logs, habits)" in source)
+    check("Tonight shows your badge labels",
+          "Badges earned 🏅" in source
+          and "badge_labels(logs, habits, today)" in source)
     check("garden plants show a flower row, not one big emoji",
           'plant["flowers"]' in source)
     check("garden opens with a full flower bed on top",

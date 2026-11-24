@@ -151,3 +151,11 @@ plants in full bloom and the ones still growing, and names the plants
 in full bloom. Each habit can be followed across a whole month — its
 minutes, its done days, and its notes — and a streak gets its own
 celebration with its garden emoji.
+
+## Counts, last 7 days and badge labels 🌱 (version 1.15.0)
+
+Tonight shows how many habits are active and the minutes of the last
+7 days, and lists your badge labels. Each habit can be followed across
+the last 7 days — its minutes, its done days, and its notes — and the
+Garden names the plants in full bloom and the ones blooming, while the
+streaks rank every habit from longest to shortest.

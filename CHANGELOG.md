@@ -2,6 +2,45 @@
 
 All notable changes to Habit Garden are listed here.
 
+## 2026-11-24 — Counts, last 7 days and badge labels (version 1.15.0)
+
+- Habit counts: `habits_without_target()` lists the habits with no
+  daily target, and `count_active_habits()` counts the habits that
+  are not archived.
+- Last 7 days: `minutes_for_habit_last_7_days()`,
+  `days_done_last_7_days()` and `total_minutes_last_7_days()` track
+  one habit and the whole garden across the last 7 days, and
+  `best_day_last_7_days()` names the biggest day of the week.
+- Streak names: `shortest_best_streak()` finds the smallest best
+  streak, `habits_with_no_streak()` names the habits with no live
+  streak, and `streaks_sorted()` ranks every habit by its streak.
+- Garden names: `names_in_full_bloom()` and `names_blooming()` name
+  the plants at each stage, and `garden_stage_names()` lists the
+  stages present in the garden.
+- Notes in the window: `notes_for_habit_last_7_days()`,
+  `longest_note_text()` and `notes_count_last_7_days()` find one
+  habit's notes in the last 7 days, its longest words, and how
+  many were written.
+- Due days: `habits_due_on_weekday_name()` finds the habits due on
+  a named weekday, and `count_due_tomorrow()` counts the habits
+  due tomorrow.
+- Validation: `validate_percent()` cleans a percent to 0–100, and
+  `validate_habit_id()` cleans a habit id.
+- Insights: `least_consistent_habit()` names the habit done least
+  often, and `done_rate_for_habit()` gives one habit's done rate
+  as a fraction.
+- Best day: `best_day_minutes()` reads the minutes of the month's
+  best day.
+- Readable lines: `habits_to_lines()` and `week_lines()` write the
+  habit list and the last 7 days as copyable lines.
+- Celebrations: `celebration_message()` gives one line for a streak,
+  and `badge_labels()` lists the labels of the badges Tonight shows.
+- Goals and search: `weekly_goal_remaining()` counts the minutes
+  left on a weekly goal, and `find_habits_by_effort()` finds the
+  habits with a daily target of at least N minutes.
+- Tonight shows how many habits are active, the minutes of the last
+  7 days, and your badge labels.
+
 ## 2026-11-23 — Oldest habits, full bloom and monthly notes (version 1.14.0)
 
 - Oldest habit: `oldest_habit()` names the habit planted first, and
