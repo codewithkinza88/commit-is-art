@@ -19,6 +19,16 @@ def badges_count(logs, habits, date_str):
     return len(badges_for(logs, habits, date_str))
 
 
+def badge_labels(logs, habits, date_str):
+    """Labels of the badges earned up to and including date_str.
+
+    The label of each badge in badges_for, in award order;
+    [] when nothing is earned yet (or there are no habits).
+    """
+    return [badge["label"]
+            for badge in badges_for(logs, habits, date_str)]
+
+
 def badges_for(logs, habits, date_str):
     """Badges earned up to and including date_str."""
     habits = list(habits or [])
