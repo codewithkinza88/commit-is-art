@@ -8,7 +8,9 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from app.celebration import (celebration_for, days_to_next_milestone,  # noqa: E402
+from app.celebration import (celebration_for,  # noqa: E402
+                             celebration_message,
+                             days_to_next_milestone,
                              is_milestone,
                              milestone_message, milestones_reached,
                              next_milestone_message)
@@ -53,6 +55,15 @@ def test_celebration_for():
                                  "message": "0 days and growing!"})
 
 
+def test_celebration_message():
+    check("a milestone day celebrates its milestone",
+          celebration_message(7) == "One whole week! 🌸")
+    check("an ordinary streak is growing",
+          celebration_message(5) == "5 days and growing!")
+    check("one day is singular",
+          celebration_message(1) == "1 day and growing!")
+
+
 def test_next_milestone_message():
     check("5 days in, 2 to go to a 7-day streak",
           next_milestone_message(5) == "🎯 2 more day(s) to a 7-day streak!")
@@ -77,4 +88,5 @@ if __name__ == "__main__":
     test_milestones_reached()
     test_next_milestone_message()
     test_celebration_for()
+    test_celebration_message()
     print(f"{PASSED} tests passed")

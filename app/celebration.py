@@ -64,6 +64,16 @@ def celebration_for(streak):
     return {"emoji": emoji, "message": message}
 
 
+def celebration_message(streak):
+    """One-line celebration message for a streak.
+
+    The milestone text on a milestone day, else "N days and
+    growing!" — the message part of celebration_for, for places
+    that only need the words.
+    """
+    return celebration_for(streak)["message"]
+
+
 def next_milestone_message(streak):
     """A cheery line naming the next milestone and the days to go.
 
