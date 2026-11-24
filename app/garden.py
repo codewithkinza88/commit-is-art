@@ -204,6 +204,18 @@ def names_blooming(habits, logs, date_str):
     return plants_at_stage(habits, logs, date_str, "blooming")
 
 
+def garden_stage_names(habits, logs, date_str):
+    """Stage names present in the garden, in growth order.
+
+    Seed first, full bloom last; only the stages that have at
+    least one plant. [] when there are no habits.
+    """
+    stages = ["seed", "sprout", "growing", "blooming", "full_bloom"]
+    plants = [plant_for(h, logs, date_str) for h in (habits or [])]
+    present = {plant.get("stage") for plant in plants}
+    return [stage for stage in stages if stage in present]
+
+
 def growth_stage(streak, done_today=False):
     """Stage for a habit from its streak (and today's tick).
 

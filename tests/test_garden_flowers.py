@@ -18,6 +18,7 @@ from app.garden import (  # noqa: E402
     flower_bed, flower_count, flower_for, flowers_for_stage,
     plant_for, plant_of_the_day, plant_with_longest_streak,
     plants_at_stage, names_in_full_bloom, names_blooming,
+    garden_stage_names,
 )
 from app.habits import new_habit  # noqa: E402
 from app.theme import STAGE_COLOURS, stage_colour  # noqa: E402
@@ -304,6 +305,26 @@ def test_names_blooming():
           names_blooming([], logs, "2026-11-09") == [])
 
 
+def test_garden_stage_names():
+    h1 = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
+    h2 = new_habit("Read", "Reading", 0, "📖", "#FFC6FF", "2026-11-01")
+    h3 = new_habit("Walk", "Health", 0, "🚶", "#BDE0FE", "2026-11-01")
+    logs = {}
+    for day in ("2026-11-03", "2026-11-04", "2026-11-05", "2026-11-06",
+                "2026-11-07", "2026-11-08", "2026-11-09"):
+        set_done(logs, h1["id"], day, True)
+    for day in ("2026-11-06", "2026-11-07", "2026-11-08", "2026-11-09"):
+        set_done(logs, h2["id"], day, True)
+    # h1 full bloom; h2 blooming; h3 seed — in growth order.
+    check("stages present list in growth order",
+          garden_stage_names([h1, h2, h3], logs, "2026-11-09")
+          == ["seed", "blooming", "full_bloom"])
+    check("one plant gives one stage",
+          garden_stage_names([h1], logs, "2026-11-09") == ["full_bloom"])
+    check("no habits means no stages",
+          garden_stage_names([], logs, "2026-11-09") == [])
+
+
 def test_average_stage_progress():
     h1 = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
     h2 = new_habit("Read", "Reading", 0, "📖", "#FFC6FF", "2026-11-01")
@@ -332,6 +353,7 @@ if __name__ == "__main__":
     test_plants_at_stage()
     test_names_in_full_bloom()
     test_names_blooming()
+    test_garden_stage_names()
     test_count_seeds()
     test_count_sprouts()
     test_average_stage_progress()
