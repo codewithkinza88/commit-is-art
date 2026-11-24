@@ -26,7 +26,7 @@ from app.tracker import (  # noqa: E402
     total_minutes_last_14_days, total_minutes_last_7_days,
     minutes_for_habit_this_month,
     minutes_for_habit_last_7_days,
-    days_done_this_month, best_day_this_month,
+    days_done_this_month, best_day_this_month, best_day_last_7_days,
     best_day_by_minutes, days_done_this_week, days_done_last_7_days,
     first_done_date,
     done_count_today,
@@ -627,6 +627,23 @@ def test_best_day_this_month():
           best_day_this_month(logs2, [h1], 2026, 11) == ("2026-11-12", 40))
 
 
+def test_best_day_last_7_days():
+    h1 = new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-05")
+    logs = {}
+    log_minutes(logs, h1["id"], "2026-11-10", 40)
+    log_minutes(logs, h1["id"], "2026-11-12", 70)
+    log_minutes(logs, h1["id"], "2026-11-07", 999)
+    check("the best day is the one with the most minutes",
+          best_day_last_7_days(logs, [h1], "2026-11-14") == ("2026-11-12", 70))
+    check("no minutes logged in the window is empty",
+          best_day_last_7_days({}, [h1], "2026-11-14") == ("", 0))
+    logs2 = {}
+    log_minutes(logs2, h1["id"], "2026-11-10", 40)
+    log_minutes(logs2, h1["id"], "2026-11-12", 40)
+    check("equal days pick the most recent one",
+          best_day_last_7_days(logs2, [h1], "2026-11-14") == ("2026-11-12", 40))
+
+
 def test_stage_progress():
     check("stage progress is 0 at a fresh seed", stage_progress(0) == 0.0)
     check("stage progress is 0 at the start of sprout",
@@ -732,6 +749,7 @@ if __name__ == "__main__":
     test_total_minutes_last_7_days()
     test_minutes_for_habit_last_7_days()
     test_best_day_this_month()
+    test_best_day_last_7_days()
     test_stage_progress()
     test_clone_habit()
     test_effort_level()

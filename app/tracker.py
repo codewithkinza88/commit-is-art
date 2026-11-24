@@ -249,6 +249,25 @@ def best_day_this_month(logs, habits, year, month):
     return best_date, best_minutes
 
 
+def best_day_last_7_days(logs, habits, end_date=None):
+    """(date, minutes) with the most minutes logged in the last 7 days.
+
+    ("", 0) when nothing was logged in the window. Ties go to the
+    most recent day, mirroring best_day_this_month.
+    """
+    if isinstance(end_date, str):
+        end = date.fromisoformat(end_date)
+    else:
+        end = end_date or date.today()
+    best_date, best_minutes = "", 0
+    for i in range(6, -1, -1):
+        day_str = (end - timedelta(days=i)).isoformat()
+        minutes = total_minutes_today(logs, habits, day_str)
+        if minutes > 0 and minutes >= best_minutes:
+            best_date, best_minutes = day_str, minutes
+    return best_date, best_minutes
+
+
 def total_minutes_yesterday(logs, habits, end_date=None):
     """Total minutes logged across all habits on the day before end_date."""
     if isinstance(end_date, str):
