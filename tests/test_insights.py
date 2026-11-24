@@ -10,9 +10,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.habits import new_habit  # noqa: E402
 from app.insights import (average_consistency, consistency_message,  # noqa: E402
-                          consistency_score,
-                          habits_above_rate, habits_below_rate,
-                          most_consistent_habit,
+                          consistency_score,                       habits_above_rate, habits_below_rate,
+                                                least_consistent_habit, most_consistent_habit,
                           needs_attention, weekly_done_rate)
 from app.tracker import set_done  # noqa: E402
 
@@ -125,10 +124,29 @@ def test_habits_below_rate():
           habits_below_rate(logs, [], days) == [])
 
 
+def test_least_consistent_habit():
+    a = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
+    b = new_habit("Walk", "Health", 0, "🚶", "#BDE0FE", "2026-11-01")
+    habits = [a, b]
+    logs = {}
+    days = ["2026-11-08", "2026-11-09", "2026-11-10"]
+    for d in days:
+        set_done(logs, a["id"], d, True)
+    set_done(logs, b["id"], "2026-11-08", True)
+    # a done 3/3, b done 1/3 — b is the least consistent.
+    check("least consistent habit is walk",
+          least_consistent_habit(logs, habits, days) is b)
+    check("least consistent with no habits is None",
+          least_consistent_habit(logs, [], days) is None)
+    check("least consistent with no days is None",
+          least_consistent_habit(logs, habits, []) is None)
+
+
 if __name__ == "__main__":
     main()
     test_weekly_done_rate()
     test_habits_below_rate()
+    test_least_consistent_habit()
     test_habits_above_rate()
     test_average_consistency()
     print(f"{PASSED} tests passed")

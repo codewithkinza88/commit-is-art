@@ -52,6 +52,24 @@ def most_consistent_habit(logs, habits, date_strs):
     return best
 
 
+def least_consistent_habit(logs, habits, date_strs):
+    """The habit done least often over the dates, or None when no habits.
+
+    Mirror of most_consistent_habit: first habit wins a tie
+    (creation order), mirroring needs_attention.
+    """
+    if not habits or not date_strs:
+        return None
+    worst = None
+    worst_rate = None
+    for h in habits:
+        done = sum(1 for d in date_strs if is_done(logs, h, d))
+        rate = done / len(date_strs)
+        if worst_rate is None or rate < worst_rate:
+            worst, worst_rate = h, rate
+    return worst
+
+
 def weekly_done_rate(logs, habits, end_date=None):
     """Share of habit-days done over the last 7 days, as a percent.
 
