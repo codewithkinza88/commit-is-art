@@ -17,6 +17,7 @@ from app.notes import (MAX_NOTE_LEN, add_note, count_notes,  # noqa: E402
                                           notes_for_habit_this_month,
                        notes_for_habit_this_week, notes_in_month,
                        notes_in_range, notes_for_habit_last_7_days,
+                       notes_count_last_7_days,
                        total_notes_count)
 
 PASSED = 0
@@ -287,6 +288,21 @@ def test_notes_count_this_week():
           notes_count_this_week({}, "2026-11-12") == 0)
 
 
+def test_notes_count_last_7_days():
+    notes = {}
+    add_note(notes, "h1", "2026-11-10", "Read chapter 3")
+    add_note(notes, "h2", "2026-11-10", "Watered the plants")
+    add_note(notes, "h1", "2026-11-12", "Finished chapter 4")
+    add_note(notes, "h1", "2026-11-01", "Too old to count")
+    add_note(notes, "h1", "2026-11-11", "   ")
+    check("notes in the last 7 days counts the window",
+          notes_count_last_7_days(notes, "2026-11-12") == 3)
+    check("notes in the last 7 days skips blank notes",
+          notes_count_last_7_days(notes, "2026-11-11") == 2)
+    check("notes in the last 7 days is 0 with no notes",
+          notes_count_last_7_days({}, "2026-11-12") == 0)
+
+
 if __name__ == "__main__":
     main()
     test_latest_note()
@@ -298,6 +314,7 @@ if __name__ == "__main__":
     test_longest_note_text()
     test_notes_in_range()
     test_notes_count_this_week()
+    test_notes_count_last_7_days()
     test_notes_for_habit_this_week()
     test_notes_for_habit_last_7_days()
     test_notes_for_habit_this_month()

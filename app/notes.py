@@ -204,6 +204,15 @@ def notes_count_this_week(notes, end_date=None):
     return len(notes_in_range(notes or {}, start, end.isoformat()))
 
 
+def notes_count_last_7_days(notes, end_date=None):
+    """How many non-empty notes were written in the last 7 days.
+
+    The rolling-window name for notes_count_this_week; 0 when
+    nothing was written in the window.
+    """
+    return notes_count_this_week(notes, end_date)
+
+
 def count_notes(notes, habit_id):
     """How many non-empty notes a habit has across all dates."""
     total = 0
