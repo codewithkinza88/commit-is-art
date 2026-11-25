@@ -18,7 +18,7 @@ from app.garden import (  # noqa: E402
     flower_bed, flower_count, flower_for, flowers_for_stage,
     plant_for, plant_of_the_day, plant_with_longest_streak,
     plants_at_stage, names_in_full_bloom, names_blooming,
-    names_sprouts,
+    names_sprouts, names_growing,
     garden_stage_names,
 )
 from app.habits import new_habit  # noqa: E402
@@ -356,6 +356,20 @@ def test_names_sprouts():
           names_sprouts([], logs, "2026-11-09") == [])
 
 
+def test_names_growing():
+    h1 = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
+    h2 = new_habit("Read", "Books", 0, "📖", "#FFC6FF", "2026-11-01")
+    logs = {}
+    set_done(logs, h1["id"], "2026-11-08", True)
+    set_done(logs, h1["id"], "2026-11-09", True)
+    check("names the growing plant",
+          names_growing([h1, h2], logs, "2026-11-09") == ["Study"])
+    check("a sprout is not growing yet",
+          names_growing([h2], logs, "2026-11-09") == [])
+    check("no habits give no names",
+          names_growing([], logs, "2026-11-09") == [])
+
+
 if __name__ == "__main__":
     test_garden_flowers()
     test_plant_of_the_day()
@@ -372,4 +386,5 @@ if __name__ == "__main__":
     test_count_sprouts()
     test_average_stage_progress()
     test_names_sprouts()
+    test_names_growing()
     print(f"{PASSED} tests passed")
