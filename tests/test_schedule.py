@@ -14,6 +14,7 @@ from app.schedule import (count_due_every_day, count_due_on_weekday,
                           count_due_today, count_due_tomorrow,  # noqa: E402
                           count_due_today_undone, due_this_week,
                           habits_due_every_day, habits_due_on,
+                          habits_not_due_today,
                           habits_due_tomorrow, habits_due_on_weekday_name,
                           is_due_today, next_due_weekday,
                           next_due_weekday_name, weekday_name,
@@ -254,6 +255,20 @@ def test_count_due_every_day():
     check("no habits give 0", count_due_every_day([]) == 0)
 
 
+def test_habits_not_due_today():
+    daily = new_habit("Drink water", "Health", 0, "💧", "#BDE0FE", "2026-11-01")
+    weekday_only = new_habit("Study - DSA", "Study", 60, "📚", "#A5D8FF", "2026-11-01")
+    weekday_only["days"] = [0, 1, 2, 3, 4]  # Mon-Fri
+    weekend = new_habit("Long walk", "Health", 0, "🏃", "#C8F7C5", "2026-11-01")
+    weekend["days"] = [5, 6]
+    check("on Monday the weekend habit is not due",
+          habits_not_due_today([daily, weekday_only, weekend], 0) == [weekend])
+    check("on Saturday the weekday habit is not due",
+          habits_not_due_today([daily, weekday_only, weekend], 5)
+          == [weekday_only])
+    check("no habits give none", habits_not_due_today([], 0) == [])
+
+
 if __name__ == "__main__":
     main()
     test_due_this_week()
@@ -270,4 +285,5 @@ if __name__ == "__main__":
     test_count_due_on_weekday()
     test_next_due_weekday_name()
     test_count_due_every_day()
+    test_habits_not_due_today()
     print(f"{PASSED} tests passed")
