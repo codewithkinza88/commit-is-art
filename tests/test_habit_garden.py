@@ -26,7 +26,7 @@ from app.tracker import (  # noqa: E402
     total_minutes_in_range, total_minutes_last_30_days,
     total_minutes_last_14_days, total_minutes_last_7_days,
     minutes_for_habit_this_month,
-    minutes_for_habit_last_7_days,
+    minutes_for_habit_last_7_days, minutes_for_habit_yesterday,
     days_done_this_month, best_day_this_month, best_day_last_7_days,
     best_day_by_minutes, days_done_this_week, days_done_last_7_days,
     first_done_date,
@@ -749,6 +749,18 @@ def test_longest_habit_name():
     check("no habits give an empty name", longest_habit_name([]) == "")
 
 
+def test_minutes_for_habit_yesterday():
+    a = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
+    logs = {}
+    log_minutes(logs, a["id"], "2026-11-09", 45)
+    check("minutes from yesterday",
+          minutes_for_habit_yesterday(logs, a, "2026-11-10") == 45)
+    check("today does not count as yesterday",
+          minutes_for_habit_yesterday(logs, a, "2026-11-09") == 0)
+    check("no logs give 0",
+          minutes_for_habit_yesterday({}, a, "2026-11-10") == 0)
+
+
 if __name__ == "__main__":
     test_add_edit_delete_habit()
     test_tick_and_minutes()
@@ -798,5 +810,6 @@ if __name__ == "__main__":
     test_habits_with_icon()
     test_archived_habit_names()
     test_longest_habit_name()
+    test_minutes_for_habit_yesterday()
     print(f"{PASSED} tests passed")
 

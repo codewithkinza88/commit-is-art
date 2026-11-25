@@ -278,6 +278,20 @@ def total_minutes_yesterday(logs, habits, end_date=None):
     return total_minutes_today(logs, habits, yesterday)
 
 
+def minutes_for_habit_yesterday(logs, habit, end_date=None):
+    """Minutes logged for one habit on the day before end_date.
+
+    0 when the habit logged nothing yesterday — the one-habit
+    mirror of total_minutes_yesterday.
+    """
+    if isinstance(end_date, str):
+        end = date.fromisoformat(end_date)
+    else:
+        end = end_date or date.today()
+    yesterday = (end - timedelta(days=1)).isoformat()
+    return minutes_for(logs, habit.get("id"), yesterday)
+
+
 def done_count_today(logs, habits, date_str):
     """How many habits are done on a date (0 when none)."""
     return sum(1 for habit in (habits or [])
