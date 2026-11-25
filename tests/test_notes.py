@@ -17,6 +17,7 @@ from app.notes import (MAX_NOTE_LEN, add_note, count_notes,  # noqa: E402
                                           notes_for_habit_this_month,
                        notes_for_habit_this_week, notes_in_month,
                        notes_in_range, notes_for_habit_last_7_days,
+                       notes_for_habit_last_14_days,
                        notes_count_last_7_days,
                        total_notes_count)
 
@@ -303,6 +304,23 @@ def test_notes_count_last_7_days():
           notes_count_last_7_days({}, "2026-11-12") == 0)
 
 
+def test_notes_for_habit_last_14_days():
+    notes = {}
+    add_note(notes, "h1", "2026-10-28", "Too old to count")
+    add_note(notes, "h1", "2026-11-03", "Read chapter 3")
+    add_note(notes, "h1", "2026-11-12", "Finished chapter 4")
+    add_note(notes, "h2", "2026-11-12", "Watered the plants")
+    check("notes in the last 14 days for h1 are the two in-window notes",
+          notes_for_habit_last_14_days(notes, "h1", "2026-11-12") ==
+          [("2026-11-03", "Read chapter 3"),
+           ("2026-11-12", "Finished chapter 4")])
+    check("another habit's notes do not leak in",
+          notes_for_habit_last_14_days(notes, "h2", "2026-11-12") ==
+          [("2026-11-12", "Watered the plants")])
+    check("no notes in the window give []",
+          notes_for_habit_last_14_days(notes, "h1", "2026-10-20") == [])
+
+
 if __name__ == "__main__":
     main()
     test_latest_note()
@@ -321,4 +339,5 @@ if __name__ == "__main__":
     test_notes_in_month()
     test_latest_note_text()
     test_total_notes_count()
+    test_notes_for_habit_last_14_days()
     print(f"{PASSED} tests passed")
