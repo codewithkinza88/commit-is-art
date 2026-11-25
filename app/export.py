@@ -177,6 +177,22 @@ def notes_to_text(notes, start_date, end_date):
     return "\n".join(lines)
 
 
+def notes_to_lines(notes, start_date, end_date):
+    """Notes in a date range as a list of short readable lines.
+
+    The list form of notes_to_text: a header with the range,
+    then one line per non-empty note (date, habit id, text),
+    oldest first; a friendly line when nothing was written.
+    """
+    found = notes_in_range(notes or {}, start_date, end_date)
+    lines = [f"Habit Garden notes — {start_date} to {end_date}"]
+    for date_str, habit_id, text in found:
+        lines.append(f"{date_str} [{habit_id}]: {text}")
+    if not found:
+        lines.append("No notes in this range 🌱")
+    return lines
+
+
 def habits_to_text(habits):
     """Habits as short readable text lines, one per habit.
 

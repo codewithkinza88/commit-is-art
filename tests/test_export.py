@@ -14,6 +14,7 @@ from app.export import (habits_to_csv, habits_to_text,  # noqa: E402
                         habits_to_lines,
                         logs_to_csv,
                         month_to_text, notes_to_csv, notes_to_text,
+                        notes_to_lines,
                         streaks_to_csv, streaks_to_text, summary_lines,
                         summary_to_text, week_to_text, week_lines)
 
@@ -241,6 +242,22 @@ def test_month_to_text():
           lines[-1] == "Month total: 45 minutes")
 
 
+def test_notes_to_lines():
+    from app.notes import add_note
+
+    notes = {}
+    add_note(notes, "h1", "2026-11-10", "Read chapter 3")
+    add_note(notes, "h2", "2026-11-10", "Watered the plants")
+    lines = notes_to_lines(notes, "2026-11-10", "2026-11-11")
+    check("notes lines start with the range header",
+          lines[0] == "Habit Garden notes — 2026-11-10 to 2026-11-11")
+    check("notes lines carry the note",
+          lines[1] == "2026-11-10 [h1]: Read chapter 3")
+    check("no notes give a friendly line",
+          notes_to_lines({}, "2026-11-10", "2026-11-11")[-1]
+          == "No notes in this range 🌱")
+
+
 if __name__ == "__main__":
     test_habits_to_csv()
     test_logs_to_csv()
@@ -256,4 +273,5 @@ if __name__ == "__main__":
     test_notes_to_text()
     test_habits_to_text()
     test_habits_to_lines()
+    test_notes_to_lines()
     print(f"{PASSED} tests passed")
