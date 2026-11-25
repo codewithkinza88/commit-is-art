@@ -124,6 +124,21 @@ def days_done_last_7_days(logs, habit, end_date=None):
     return days_done_this_week(logs, habit, end_date)
 
 
+def days_done_last_14_days(logs, habit, end_date=None):
+    """How many of the last 14 days (ending on end_date) the habit
+    was done — a number from 0 to 14.
+
+    The 14-day form of days_done_last_7_days.
+    """
+    if isinstance(end_date, str):
+        end = date.fromisoformat(end_date)
+    else:
+        end = end_date or date.today()
+    return sum(1 for i in range(14)
+               if is_done(logs, habit,
+                          (end - timedelta(days=i)).isoformat()))
+
+
 def first_done_date(logs, habit):
     """The earliest ISO date the habit was ever done.
 
