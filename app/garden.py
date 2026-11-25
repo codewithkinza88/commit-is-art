@@ -204,6 +204,15 @@ def names_blooming(habits, logs, date_str):
     return plants_at_stage(habits, logs, date_str, "blooming")
 
 
+def names_sprouts(habits, logs, date_str):
+    """Names of the plants at the sprout stage on a date.
+
+    Wrapper over plants_at_stage with "sprout"; [] when no plant
+    is sprouting (or there are no habits).
+    """
+    return plants_at_stage(habits, logs, date_str, "sprout")
+
+
 def garden_stage_names(habits, logs, date_str):
     """Stage names present in the garden, in growth order.
 
