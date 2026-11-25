@@ -70,6 +70,17 @@ def validate_note_text(text):
     return text.strip()[:MAX_NOTE_LEN]
 
 
+def validate_search_query(text):
+    """A search query cleaned for use: stripped, "" when blank or None.
+
+    The clean-or-"" shape of validate_note_text, for the notes
+    and habits search box.
+    """
+    if not isinstance(text, str):
+        return ""
+    return text.strip()
+
+
 def validate_date_str(text):
     """A date cleaned to ISO YYYY-MM-DD, or "" when it is not a date.
 

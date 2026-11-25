@@ -14,6 +14,7 @@ from app.validation import (MAX_NAME_LEN, validate_category,  # noqa: E402
                             validate_icon, validate_minutes, validate_percent,
                             validate_habit_id,
                             validate_note_text,                         validate_target_minutes,
+                            validate_search_query,
                             validate_weekday, validate_weekly_target)
 
 PASSED = 0
@@ -141,6 +142,12 @@ def test_validate_habit_id():
     check("missing id invalid", validate_habit_id(None)[0] is False)
 
 
+def test_validate_search_query():
+    check("a query is stripped", validate_search_query("  study  ") == "study")
+    check("a blank query is empty", validate_search_query("   ") == "")
+    check("no query is empty", validate_search_query(None) == "")
+
+
 if __name__ == "__main__":
     main()
     test_validate_note_text()
@@ -151,4 +158,5 @@ if __name__ == "__main__":
     test_validate_colour()
     test_validate_percent()
     test_validate_habit_id()
+    test_validate_search_query()
     print(f"{PASSED} tests passed")
