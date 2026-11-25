@@ -13,7 +13,7 @@ from app.notes import (MAX_NOTE_LEN, add_note, count_notes,  # noqa: E402
                        latest_note, latest_note_text, longest_note,
                                                              longest_note_text,
                                                              notes_count_this_week,
-                       notes_for_day, notes_for_habit,
+                       notes_for_day, notes_for_habit, notes_on_date,
                                           notes_for_habit_this_month,
                        notes_for_habit_this_week, notes_in_month,
                        notes_in_range, notes_for_habit_last_7_days,
@@ -348,6 +348,21 @@ def test_shortest_note_text():
           shortest_note_text({}, "h1") == "")
 
 
+def test_notes_on_date():
+    notes = {}
+    add_note(notes, "h1", "2026-11-10", "Read chapter 3")
+    add_note(notes, "h2", "2026-11-10", "Watered the plants")
+    add_note(notes, "h1", "2026-11-11", "Finished chapter 4")
+    check("notes on a date list that day's notes",
+          notes_on_date(notes, "2026-11-10") ==
+          [("h1", "Read chapter 3"), ("h2", "Watered the plants")])
+    check("another date's notes do not leak in",
+          notes_on_date(notes, "2026-11-11") ==
+          [("h1", "Finished chapter 4")])
+    check("a date with no notes gives []",
+          notes_on_date(notes, "2026-11-12") == [])
+
+
 if __name__ == "__main__":
     main()
     test_latest_note()
@@ -369,4 +384,5 @@ if __name__ == "__main__":
     test_notes_for_habit_last_14_days()
     test_notes_count_last_14_days()
     test_shortest_note_text()
+    test_notes_on_date()
     print(f"{PASSED} tests passed")

@@ -287,6 +287,15 @@ def notes_for_day(notes, date_str):
             if isinstance(text, str) and text.strip()]
 
 
+def notes_on_date(notes, date_str):
+    """All non-empty notes written on one date, as (habit_id, text) pairs.
+
+    In the order they were stored; [] when the date has no notes.
+    The date form of notes_for_day.
+    """
+    return notes_for_day(notes or {}, date_str)
+
+
 def count_notes_for_day(notes, date_str):
     """How many non-empty notes were written on one date (0 when none)."""
     return len(notes_for_day(notes, date_str))
