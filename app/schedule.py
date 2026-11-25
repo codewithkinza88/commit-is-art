@@ -39,6 +39,15 @@ def habits_not_due_today(habits, weekday):
     return [h for h in (habits or []) if not is_due_today(h, weekday)]
 
 
+def due_today_names(habits, weekday):
+    """Names of the habits due on weekday (0=Mon .. 6=Sun).
+
+    Creation order is kept; [] when nothing is due that day
+    (or there are no habits).
+    """
+    return [h.get("name", "") for h in habits_due_on(habits or [], weekday)]
+
+
 def due_this_week(habits, weekday):
     """Habits due on any day from weekday through Sunday.
 

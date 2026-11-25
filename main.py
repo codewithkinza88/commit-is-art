@@ -61,7 +61,7 @@ from app.monthly import (average_minutes_per_day, busiest_weekday,
                          days_logged_this_month, monthly_summary,
                          quietest_weekday)
 from app.schedule import (count_due_this_week, count_due_today_undone,
-                          habits_due_tomorrow)
+                          due_today_names, habits_due_tomorrow)
 from app.celebration import days_to_next_milestone, milestones_reached
 from app.goals import weekly_goal_progress, weekly_goal_warning
 from app.store import DEFAULT_PATH, load_store, save_store, seed_store
@@ -909,6 +909,9 @@ def main(page: ft.Page):
             f"{h.get('icon', '🌱')} {h['name']}" for h in tomorrow_due)
             if tomorrow_due else "Kal: nothing due — a free morning! 🌸")
         due_week = count_due_this_week(habits, date.today().weekday())
+        due_today = due_today_names(habits, date.today().weekday())
+        due_today_text = (f"Due today: {', '.join(due_today)}"
+                          if due_today else "Due today: nothing — all free! 🌸")
         due_week_text = (f"Due this week: {due_week} habit"
                          + ("s" if due_week != 1 else ""))
         return ft.Column([
@@ -995,6 +998,7 @@ def main(page: ft.Page):
             section_title("Tomorrow (Kal) 🌅"),
             ft.Text(tomorrow_text, size=14, color=TEXT),
             ft.Text(due_week_text, size=14, color=TEXT),
+            ft.Text(due_today_text, size=14, color=TEXT),
             section_title("Last 7 days 📅"),
             *rows,
         ], spacing=12)
