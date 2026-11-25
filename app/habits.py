@@ -199,6 +199,11 @@ def habit_ids(habits):
     return [h.get("id", "") for h in (habits or [])]
 
 
+def habits_with_icon(habits, icon):
+    """Habits using one icon, in creation order ([] when none)."""
+    return [h for h in (habits or []) if h.get("icon") == icon]
+
+
 def list_habits(habits):
     """Return the habits in display order (creation order)."""
     return list(habits or [])
