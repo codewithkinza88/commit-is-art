@@ -26,7 +26,8 @@ from app.tracker import (  # noqa: E402
     total_minutes_in_range, total_minutes_last_30_days,
     total_minutes_last_14_days, total_minutes_last_7_days,
     minutes_for_habit_this_month,
-    minutes_for_habit_last_7_days, minutes_for_habit_yesterday,
+    minutes_for_habit_last_7_days, minutes_for_habit_last_14_days,
+    minutes_for_habit_yesterday,
     days_done_this_month, best_day_this_month, best_day_last_7_days,
     best_day_by_minutes, days_done_this_week, days_done_last_7_days,
     days_done_last_14_days,
@@ -775,6 +776,19 @@ def test_days_done_last_14_days():
           days_done_last_14_days({}, a, "2026-11-10") == 0)
 
 
+def test_minutes_for_habit_last_14_days():
+    a = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
+    logs = {}
+    log_minutes(logs, a["id"], "2026-11-01", 30)
+    log_minutes(logs, a["id"], "2026-11-10", 45)
+    check("sums the last 14 days",
+          minutes_for_habit_last_14_days(logs, a, "2026-11-10") == 75)
+    check("minutes outside the window do not count",
+          minutes_for_habit_last_14_days(logs, a, "2026-11-09") == 30)
+    check("no logs give 0",
+          minutes_for_habit_last_14_days({}, a, "2026-11-10") == 0)
+
+
 if __name__ == "__main__":
     test_add_edit_delete_habit()
     test_tick_and_minutes()
@@ -826,5 +840,6 @@ if __name__ == "__main__":
     test_longest_habit_name()
     test_minutes_for_habit_yesterday()
     test_days_done_last_14_days()
+    test_minutes_for_habit_last_14_days()
     print(f"{PASSED} tests passed")
 
