@@ -106,6 +106,15 @@ def perfect_day_dates(summary):
             if day.get("total") and day.get("percent") == 100]
 
 
+def best_day_date_str(summary):
+    """The best day's date as text from a monthly summary.
+
+    summary["best_day_date"] or "" — the date-text form beside
+    best_day_minutes, for places that only need the date.
+    """
+    return (summary or {}).get("best_day_date") or ""
+
+
 def average_minutes_on_logged_days(summary):
     """Average minutes per day that actually had minutes logged.
 
