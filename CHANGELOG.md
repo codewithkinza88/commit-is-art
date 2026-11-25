@@ -2,6 +2,41 @@
 
 All notable changes to Habit Garden are listed here.
 
+## 2026-11-25 — Habit ids, last 14 days and sprouting names (version 1.16.0)
+
+- Habit lists: `habit_ids()` lists every habit id, `habits_with_icon()`
+  finds the habits using one icon, `archived_habit_names()` names the
+  archived habits, and `longest_habit_name()` names the longest habit.
+- Yesterday and the last 14 days: `minutes_for_habit_yesterday()` and
+  `is_done_yesterday()` look at yesterday for one habit, and
+  `days_done_last_14_days()`, `minutes_for_habit_last_14_days()`,
+  `notes_for_habit_last_14_days()` and `notes_count_last_14_days()`
+  track one habit and its notes across the last 14 days — Tonight
+  shows how many notes were written in the last 2 weeks.
+- Streaks: `best_streaks_sorted()` ranks every habit by its best
+  streak, `count_habits_on_streak()` counts the habits on a streak,
+  and `streak_summaries()` gives one summary per habit.
+- Garden names: `names_sprouts()` and `names_growing()` name the
+  plants at the sprout and growing stages — the Garden names the
+  plants that are sprouting.
+- Notes: `shortest_note_text()` finds the shortest note, and
+  `notes_on_date()` lists every note written on one date.
+- Due days: `count_due_every_day()` counts the habits due every day,
+  `habits_not_due_today()` lists the habits not due today, and
+  `due_today_names()` names the habits due today — Tonight names
+  them.
+- Validation: `validate_search_query()` cleans a search query.
+- Insights: `done_rate_overall()` gives the overall done rate,
+  `habit_with_most_minutes()` names the habit with the most minutes
+  this week, and `best_category_by_minutes()` names the category
+  with the most minutes today — Tonight shows it.
+- Monthly: `best_day_date_str()` names the best day's date, and
+  `total_minutes_this_month()` gives the month's total minutes.
+- Exports: `notes_to_lines()` and `logs_to_lines()` list notes and
+  logs as readable lines.
+- Milestones: `next_milestone_streak()` names the next milestone
+  streak to aim for.
+
 ## 2026-11-24 — Counts, last 7 days and badge labels (version 1.15.0)
 
 - Habit counts: `habits_without_target()` lists the habits with no

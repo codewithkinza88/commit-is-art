@@ -159,3 +159,11 @@ Tonight shows how many habits are active and the minutes of the last
 the last 7 days — its minutes, its done days, and its notes — and the
 Garden names the plants in full bloom and the ones blooming, while the
 streaks rank every habit from longest to shortest.
+
+## Habit ids, last 14 days and sprouting names 🌱 (version 1.16.0)
+
+Tonight names the habits due today, shows how many notes were written
+in the last 2 weeks, and names the category with the most minutes
+today. The Garden names the plants that are sprouting, and each habit
+can be followed across the last 14 days — its minutes, its done days,
+and its notes — while yesterday gets its own look for one habit.
