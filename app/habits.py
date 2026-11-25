@@ -204,6 +204,15 @@ def habits_with_icon(habits, icon):
     return [h for h in (habits or []) if h.get("icon") == icon]
 
 
+def archived_habit_names(habits):
+    """The names of archived habits, in creation order.
+
+    [] when no habit is archived (or there are no habits).
+    """
+    return [h.get("name", "") for h in (habits or [])
+            if h.get("archived", False)]
+
+
 def list_habits(habits):
     """Return the habits in display order (creation order)."""
     return list(habits or [])
