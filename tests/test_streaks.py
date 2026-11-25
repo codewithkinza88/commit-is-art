@@ -20,7 +20,8 @@ from app.streaks import (average_best_streak, best_streak,
                          median_current_streak,                      streak_leaderboard,                      streak_summary, streaks_by_habit,
                          total_streak_days, average_streak,
                          median_best_streak, shortest_best_streak,
-                         habits_with_no_streak, streaks_sorted)
+                         habits_with_no_streak, streaks_sorted,
+                         best_streaks_sorted)
 
 PASSED = 0
 
@@ -356,6 +357,24 @@ def test_median_current_streak():
           median_current_streak(logs, []) == 0.0)
 
 
+def test_best_streaks_sorted():
+    h1 = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
+    h2 = new_habit("Read", "Books", 0, "📖", "#FFC6FF", "2026-11-01")
+    h3 = new_habit("Walk", "Health", 0, "🏃", "#BDE0FE", "2026-11-01")
+    logs = {}
+    for day in ("2026-11-04", "2026-11-05", "2026-11-06"):
+        set_done(logs, h1["id"], day, True)
+    set_done(logs, h2["id"], "2026-11-06", True)
+    set_done(logs, h3["id"], "2026-11-06", True)
+    check("best streaks longest first",
+          best_streaks_sorted(logs, [h1, h2], date(2026, 11, 6))
+          == [("Study", 3), ("Read", 1)])
+    check("a tie keeps creation order",
+          best_streaks_sorted(logs, [h2, h3], date(2026, 11, 6))
+          == [("Read", 1), ("Walk", 1)])
+    check("no habits give no pairs", best_streaks_sorted(logs, []) == [])
+
+
 if __name__ == "__main__":
     test_best_streak()
     test_average_streak()
@@ -377,4 +396,5 @@ if __name__ == "__main__":
     test_streaks_by_habit()
     test_streaks_sorted()
     test_total_streak_days()
+    test_best_streaks_sorted()
     print(f"{PASSED} tests passed")
