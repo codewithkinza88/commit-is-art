@@ -16,7 +16,7 @@ from app.habits import (  # noqa: E402
     habits_by_category, count_by_category,
     count_by_effort, newest_habit, oldest_habit, habits_with_target,
     habits_without_target, habit_ids, habits_with_icon,
-    archived_habit_names,
+    archived_habit_names, longest_habit_name,
     count_archived, total_target_minutes,
     clone_habit, habit_age_days, validate_effort,
 )
@@ -738,6 +738,17 @@ def test_archived_habit_names():
     check("no habits give no names", archived_habit_names([]) == [])
 
 
+def test_longest_habit_name():
+    a = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
+    b = new_habit("Read a book every night", "Books", 0, "📖", "#FFC6FF",
+                  "2026-11-01")
+    check("longest name wins",
+          longest_habit_name([a, b]) == "Read a book every night")
+    check("a tie keeps the first habit",
+          longest_habit_name([a, a]) == "Study")
+    check("no habits give an empty name", longest_habit_name([]) == "")
+
+
 if __name__ == "__main__":
     test_add_edit_delete_habit()
     test_tick_and_minutes()
@@ -786,5 +797,6 @@ if __name__ == "__main__":
     test_habit_ids()
     test_habits_with_icon()
     test_archived_habit_names()
+    test_longest_habit_name()
     print(f"{PASSED} tests passed")
 

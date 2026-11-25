@@ -213,6 +213,15 @@ def archived_habit_names(habits):
             if h.get("archived", False)]
 
 
+def longest_habit_name(habits):
+    """The longest habit name ("" when there are no habits).
+
+    Ties go to the habit first in creation order.
+    """
+    names = habit_names(habits)
+    return max(names, key=len) if names else ""
+
+
 def list_habits(habits):
     """Return the habits in display order (creation order)."""
     return list(habits or [])
