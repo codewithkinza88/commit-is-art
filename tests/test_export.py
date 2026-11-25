@@ -12,7 +12,7 @@ from app.habits import new_habit  # noqa: E402
 from app.tracker import set_done, log_minutes  # noqa: E402
 from app.export import (habits_to_csv, habits_to_text,  # noqa: E402
                         habits_to_lines,
-                        logs_to_csv,
+                        logs_to_csv, logs_to_lines,
                         month_to_text, notes_to_csv, notes_to_text,
                         notes_to_lines,
                         streaks_to_csv, streaks_to_text, summary_lines,
@@ -258,6 +258,20 @@ def test_notes_to_lines():
           == "No notes in this range 🌱")
 
 
+def test_logs_to_lines():
+    h1 = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
+    logs = {}
+    set_done(logs, h1["id"], "2026-11-08", True)
+    log_minutes(logs, h1["id"], "2026-11-08", 45)
+    lines = logs_to_lines(logs)
+    check("logs lines start with the header",
+          lines[0] == "Habit Garden — logs")
+    check("logs lines carry the entry",
+          lines[1] == f"2026-11-08 — {h1['id']} — 45 min / done")
+    check("no logs give a friendly line",
+          logs_to_lines({})[-1] == "No logs yet 🌱")
+
+
 if __name__ == "__main__":
     test_habits_to_csv()
     test_logs_to_csv()
@@ -274,4 +288,5 @@ if __name__ == "__main__":
     test_habits_to_text()
     test_habits_to_lines()
     test_notes_to_lines()
+    test_logs_to_lines()
     print(f"{PASSED} tests passed")

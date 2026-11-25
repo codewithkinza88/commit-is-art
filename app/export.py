@@ -193,6 +193,24 @@ def notes_to_lines(notes, start_date, end_date):
     return lines
 
 
+def logs_to_lines(logs):
+    """Daily logs as a list of short readable lines, oldest first.
+
+    A header, then one line per log entry ("date — habit — N min
+    / done"), in date order and habit order as stored; a friendly
+    line when there are no logs.
+    """
+    lines = ["Habit Garden — logs"]
+    for date_str in sorted(logs or {}):
+        for habit_id, entry in (logs[date_str] or {}).items():
+            state = "done" if entry.get("done") else "not done"
+            minutes = int(entry.get("minutes", 0) or 0)
+            lines.append(f"{date_str} — {habit_id} — {minutes} min / {state}")
+    if not logs:
+        lines.append("No logs yet 🌱")
+    return lines
+
+
 def habits_to_text(habits):
     """Habits as short readable text lines, one per habit.
 
