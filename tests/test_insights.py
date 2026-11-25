@@ -13,8 +13,8 @@ from app.insights import (average_consistency, consistency_message,  # noqa: E40
                           consistency_score,                       habits_above_rate, habits_below_rate,
                                                 least_consistent_habit, most_consistent_habit,
                           needs_attention, weekly_done_rate, done_rate_for_habit,
-                          done_rate_overall)
-from app.tracker import set_done  # noqa: E402
+                          done_rate_overall, habit_with_most_minutes)
+from app.tracker import set_done, log_minutes  # noqa: E402
 
 PASSED = 0
 
@@ -175,6 +175,23 @@ def test_done_rate_overall():
     check("empty days give 0", done_rate_overall(logs, habits, []) == 0)
 
 
+def test_habit_with_most_minutes():
+    a = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
+    b = new_habit("Read", "Books", 0, "📖", "#FFC6FF", "2026-11-01")
+    logs = {}
+    log_minutes(logs, a["id"], "2026-11-09", 30)
+    log_minutes(logs, b["id"], "2026-11-09", 45)
+    check("most minutes wins",
+          habit_with_most_minutes(logs, [a, b], "2026-11-10")["name"] == "Read")
+    tied = {}
+    log_minutes(tied, a["id"], "2026-11-09", 30)
+    log_minutes(tied, b["id"], "2026-11-09", 30)
+    check("a tie keeps the first habit",
+          habit_with_most_minutes(tied, [b, a], "2026-11-10")["name"] == "Read")
+    check("no habits give None",
+          habit_with_most_minutes(logs, [], "2026-11-10") is None)
+
+
 if __name__ == "__main__":
     main()
     test_weekly_done_rate()
@@ -184,4 +201,5 @@ if __name__ == "__main__":
     test_habits_above_rate()
     test_average_consistency()
     test_done_rate_overall()
+    test_habit_with_most_minutes()
     print(f"{PASSED} tests passed")

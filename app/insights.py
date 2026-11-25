@@ -4,7 +4,7 @@ Different from monthly totals: this looks at consistency and which
 habit needs the most attention right now.
 """
 
-from app.tracker import is_done
+from app.tracker import is_done, minutes_for_habit_last_7_days
 
 
 def consistency_score(logs, habits, date_strs):
@@ -54,6 +54,24 @@ def done_rate_for_habit(logs, habit, date_strs):
         return 0.0
     done = sum(1 for d in date_strs if is_done(logs, habit, d))
     return done / len(date_strs)
+
+
+def habit_with_most_minutes(logs, habits, end_date=None):
+    """The habit with the most minutes over the last 7 days.
+
+    None when there are no habits (or none logged minutes).
+    First habit wins a tie (creation order).
+    """
+    habits = list(habits or [])
+    if not habits:
+        return None
+    best = None
+    best_minutes = 0
+    for habit in habits:
+        minutes = minutes_for_habit_last_7_days(logs, habit, end_date)
+        if minutes > best_minutes:
+            best, best_minutes = habit, minutes
+    return best
 
 
 def most_consistent_habit(logs, habits, date_strs):
