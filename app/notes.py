@@ -233,6 +233,24 @@ def notes_count_last_7_days(notes, end_date=None):
     return notes_count_this_week(notes, end_date)
 
 
+def notes_count_last_14_days(notes, end_date=None):
+    """How many non-empty notes were written in the last 14 days.
+
+    Counts notes_in_range over the 14 days ending on end_date
+    (default today); 0 when nothing was written in the window.
+    The 14-day form of notes_count_last_7_days.
+    """
+    from datetime import date as _date
+    from datetime import timedelta as _timedelta
+
+    if isinstance(end_date, str):
+        end = _date.fromisoformat(end_date)
+    else:
+        end = end_date or _date.today()
+    start = (end - _timedelta(days=13)).isoformat()
+    return len(notes_in_range(notes or {}, start, end.isoformat()))
+
+
 def count_notes(notes, habit_id):
     """How many non-empty notes a habit has across all dates."""
     total = 0

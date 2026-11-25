@@ -36,7 +36,8 @@ from app.garden import (count_blooming, count_full_bloom, count_seeds,
                         total_plants)
 from app.insights import (consistency_message, consistency_score,
                           most_consistent_habit, weekly_done_rate)
-from app.notes import count_notes, latest_note
+from app.notes import (count_notes, latest_note,
+                       notes_count_last_14_days)
 from app.ordering import sort_habits
 from app.motivation import (comeback_message, evening_message,
                             morning_message, nightly_message, weekly_cheer,
@@ -960,6 +961,8 @@ def main(page: ft.Page):
                         size=15, color=MUTED),
                 ft.Text(f"Last 14 days: "
                         f"{total_minutes_last_14_days(logs, habits)} minutes",
+                        size=15, color=MUTED),
+                ft.Text(f"📝 {notes_count_last_14_days(notes)} notes in the last 2 weeks",
                         size=15, color=MUTED),
                 ft.Text(f"Last 7 days: "
                         f"{total_minutes_last_7_days(logs, habits)} minutes",
