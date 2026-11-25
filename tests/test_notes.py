@@ -20,7 +20,7 @@ from app.notes import (MAX_NOTE_LEN, add_note, count_notes,  # noqa: E402
                        notes_for_habit_last_14_days,
                        notes_count_last_7_days,
                        notes_count_last_14_days,
-                       total_notes_count)
+                       shortest_note_text, total_notes_count)
 
 PASSED = 0
 
@@ -335,6 +335,19 @@ def test_notes_count_last_14_days():
     check("no notes give 0", notes_count_last_14_days({}, "2026-11-12") == 0)
 
 
+def test_shortest_note_text():
+    notes = {}
+    add_note(notes, "h1", "2026-11-10", "Read chapter 3")
+    add_note(notes, "h1", "2026-11-11", "Done")
+    add_note(notes, "h2", "2026-11-10", "Only note")
+    check("shortest note text is the shortest note",
+          shortest_note_text(notes, "h1") == "Done")
+    check("a habit with one note gives that note",
+          shortest_note_text(notes, "h2") == "Only note")
+    check("no notes give an empty text",
+          shortest_note_text({}, "h1") == "")
+
+
 if __name__ == "__main__":
     main()
     test_latest_note()
@@ -355,4 +368,5 @@ if __name__ == "__main__":
     test_total_notes_count()
     test_notes_for_habit_last_14_days()
     test_notes_count_last_14_days()
+    test_shortest_note_text()
     print(f"{PASSED} tests passed")

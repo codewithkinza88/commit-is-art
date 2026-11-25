@@ -80,6 +80,19 @@ def longest_note_text(notes, habit_id):
     return text
 
 
+def shortest_note_text(notes, habit_id):
+    """Text of the habit's shortest non-empty note.
+
+    "" when the habit has no notes — the text-only mirror of
+    longest_note_text, for places that only need the words. The
+    earliest note wins a tie.
+    """
+    found = notes_for_habit(notes or {}, habit_id)
+    if not found:
+        return ""
+    return min((text for _date, text in found), key=len)
+
+
 def notes_in_range(notes, start_date, end_date):
     """(date, habit_id, text) for non-empty notes in a date range, inclusive.
 
