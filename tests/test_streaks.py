@@ -17,7 +17,7 @@ from app.streaks import (average_best_streak, best_streak,
                                               habits_with_streak_at_least,
                          last_done_label, longest_gap,
                          longest_current_streak, longest_streak_overall,
-                         median_current_streak,                      streak_leaderboard,                      streak_summary, streaks_by_habit,
+                         median_current_streak,                      streak_leaderboard,                      streak_summaries, streak_summary, streaks_by_habit,
                          total_streak_days, average_streak,
                          median_best_streak, shortest_best_streak,
                          habits_with_no_streak, streaks_sorted,
@@ -387,6 +387,18 @@ def test_count_habits_on_streak():
     check("no habits give 0", count_habits_on_streak(logs, []) == 0)
 
 
+def test_streak_summaries():
+    h1 = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
+    h2 = new_habit("Read", "Books", 0, "📖", "#FFC6FF", "2026-11-01")
+    logs = {}
+    set_done(logs, h1["id"], "2026-11-06", True)
+    summaries = streak_summaries(logs, [h1, h2], date(2026, 11, 6))
+    check("one summary per habit", len(summaries) == 2)
+    check("the first summary carries the live streak",
+          summaries[0]["current"] == 1)
+    check("no habits give no summaries", streak_summaries(logs, []) == [])
+
+
 if __name__ == "__main__":
     test_best_streak()
     test_average_streak()
@@ -410,4 +422,5 @@ if __name__ == "__main__":
     test_total_streak_days()
     test_best_streaks_sorted()
     test_count_habits_on_streak()
+    test_streak_summaries()
     print(f"{PASSED} tests passed")

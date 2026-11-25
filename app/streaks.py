@@ -262,6 +262,16 @@ def streak_summary(logs, habit, end_date=None):
     }
 
 
+def streak_summaries(logs, habits, end_date=None):
+    """One streak_summary per habit, in creation order.
+
+    [] when there are no habits.
+    """
+    end = end_date or date.today()
+    return [streak_summary(logs, habit, end_date=end)
+            for habit in (habits or [])]
+
+
 def streak_leaderboard(logs, habits, end_date=None):
     """Habits ranked by current streak, longest first.
 
