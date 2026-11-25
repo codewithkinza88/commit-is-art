@@ -44,6 +44,19 @@ def days_to_next_milestone(streak):
     return None
 
 
+def next_milestone_streak(streak):
+    """The next milestone streak above the current one.
+
+    The smallest MILESTONES key above the streak (7/14/30/100);
+    None when the streak is already past 100.
+    """
+    streak = max(0, int(streak or 0))
+    for milestone in sorted(MILESTONES):
+        if milestone > streak:
+            return milestone
+    return None
+
+
 def celebration_for(streak):
     """{"emoji", "message"} celebrating a streak.
 
