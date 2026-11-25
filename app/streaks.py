@@ -218,6 +218,15 @@ def best_streaks_sorted(logs, habits, end_date=None):
     return sorted(pairs, key=lambda pair: pair[1], reverse=True)
 
 
+def count_habits_on_streak(logs, habits, end_date=None):
+    """How many habits have a live streak right now (current >= 1).
+
+    The count form of habits_on_streak; 0 when there are no
+    habits (or none on a streak).
+    """
+    return habits_on_streak(logs, habits, end_date=end_date)
+
+
 def total_streak_days(logs, habits, end_date=None):
     """Total live streak days across all habits.
 

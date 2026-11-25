@@ -21,7 +21,7 @@ from app.streaks import (average_best_streak, best_streak,
                          total_streak_days, average_streak,
                          median_best_streak, shortest_best_streak,
                          habits_with_no_streak, streaks_sorted,
-                         best_streaks_sorted)
+                         best_streaks_sorted, count_habits_on_streak)
 
 PASSED = 0
 
@@ -375,6 +375,18 @@ def test_best_streaks_sorted():
     check("no habits give no pairs", best_streaks_sorted(logs, []) == [])
 
 
+def test_count_habits_on_streak():
+    h1 = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
+    h2 = new_habit("Read", "Books", 0, "📖", "#FFC6FF", "2026-11-01")
+    logs = {}
+    set_done(logs, h1["id"], "2026-11-06", True)
+    check("one habit on a streak",
+          count_habits_on_streak(logs, [h1, h2], date(2026, 11, 6)) == 1)
+    check("a broken streak counts as 0",
+          count_habits_on_streak(logs, [h1, h2], date(2026, 11, 7)) == 0)
+    check("no habits give 0", count_habits_on_streak(logs, []) == 0)
+
+
 if __name__ == "__main__":
     test_best_streak()
     test_average_streak()
@@ -397,4 +409,5 @@ if __name__ == "__main__":
     test_streaks_sorted()
     test_total_streak_days()
     test_best_streaks_sorted()
+    test_count_habits_on_streak()
     print(f"{PASSED} tests passed")
