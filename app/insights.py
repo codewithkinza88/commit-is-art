@@ -21,6 +21,15 @@ def consistency_score(logs, habits, date_strs):
     return round(100 * done / total) if total else 0
 
 
+def done_rate_overall(logs, habits, date_strs):
+    """Share of habit-days done over the dates, as a percent (0-100).
+
+    Total done ticks over habits x dates; 0 when there are no
+    dates or no habits. The overall form of consistency_score.
+    """
+    return consistency_score(logs, habits, date_strs)
+
+
 def needs_attention(logs, habits, date_strs):
     """The habit done least often over the dates, or None when no habits."""
     if not habits or not date_strs:
