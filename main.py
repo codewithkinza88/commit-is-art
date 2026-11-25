@@ -34,7 +34,8 @@ from app.garden import (count_blooming, count_full_bloom, count_seeds,
                         plant_of_the_day, plant_with_longest_streak,
                         plants_at_stage, plants_by_stage, stage_progress,
                         total_plants)
-from app.insights import (consistency_message, consistency_score,
+from app.insights import (best_category_by_minutes,
+                          consistency_message, consistency_score,
                           most_consistent_habit, weekly_done_rate)
 from app.notes import (count_notes, latest_note,
                        notes_count_last_14_days)
@@ -873,6 +874,10 @@ def main(page: ft.Page):
         best_cat_text = (f"🏆 Best category today: {best_cat['category']} "
                          f"({best_cat['percent']}% • {best_cat['minutes']} min)"
                          if best_cat else "🏆 Best category today: —")
+        best_cat_mins = best_category_by_minutes(logs, habits, today)
+        best_cat_mins_text = (f"Best category by minutes: {best_cat_mins}"
+                              if best_cat_mins
+                              else "Best category by minutes: —")
         minutes_by_category = total_minutes_by_category(logs, habits, today)
         category_rows = []
         for category, mins in minutes_by_category.items():
@@ -991,6 +996,7 @@ def main(page: ft.Page):
             *minutes_rows,
             section_title("Minutes by category 🌿"),
             ft.Text(best_cat_text, size=14, color=TEXT),
+            ft.Text(best_cat_mins_text, size=14, color=TEXT),
             *category_rows,
             ft.Text(month_text, size=14, color=TEXT),
             section_title("Weekly goals 🎯"),

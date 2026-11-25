@@ -4,7 +4,8 @@ Different from monthly totals: this looks at consistency and which
 habit needs the most attention right now.
 """
 
-from app.tracker import is_done, minutes_for_habit_last_7_days
+from app.tracker import (is_done, minutes_for,
+                         minutes_for_habit_last_7_days)
 
 
 def consistency_score(logs, habits, date_strs):
@@ -72,6 +73,28 @@ def habit_with_most_minutes(logs, habits, end_date=None):
         if minutes > best_minutes:
             best, best_minutes = habit, minutes
     return best
+
+
+def best_category_by_minutes(logs, habits, date_str):
+    """The category with the most minutes logged on date_str.
+
+    None when nothing was logged that day (or there are no
+    habits). Ties go to the first category in habit order.
+    """
+    totals = {}
+    order = []
+    for habit in (habits or []):
+        minutes = minutes_for(logs, habit.get("id"), date_str)
+        if minutes <= 0:
+            continue
+        category = habit.get("category") or "Daily Life"
+        if category not in totals:
+            totals[category] = 0
+            order.append(category)
+        totals[category] += minutes
+    if not totals:
+        return None
+    return max(order, key=lambda c: totals[c])
 
 
 def most_consistent_habit(logs, habits, date_strs):
