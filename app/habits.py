@@ -191,6 +191,14 @@ def habit_names(habits):
     return [h.get("name", "") for h in (habits or [])]
 
 
+def habit_ids(habits):
+    """The ids of the habits, in creation order.
+
+    [] when there are no habits.
+    """
+    return [h.get("id", "") for h in (habits or [])]
+
+
 def list_habits(habits):
     """Return the habits in display order (creation order)."""
     return list(habits or [])
