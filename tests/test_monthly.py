@@ -16,7 +16,7 @@ from app.monthly import (average_minutes_on_logged_days,  # noqa: E402
                          longest_day_minutes, minutes_for_weekday,
                          monthly_summary, perfect_day_dates,
                          quietest_weekday, best_day_minutes,
-                         best_day_date_str)
+                         best_day_date_str, total_minutes_this_month)
 
 PASSED = 0
 
@@ -228,6 +228,18 @@ def test_best_day_date_str():
     check("no summary gives an empty date", best_day_date_str(None) == "")
 
 
+def test_total_minutes_this_month():
+    habits = [new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-01")]
+    logs = {}
+    log_minutes(logs, habits[0]["id"], "2026-11-02", 30)
+    log_minutes(logs, habits[0]["id"], "2026-11-04", 45)
+    month = monthly_summary(logs, habits, 2026, 11)
+    check("total minutes this month", total_minutes_this_month(month) == 75)
+    check("an empty month totals 0",
+          total_minutes_this_month(monthly_summary({}, [], 2026, 11)) == 0)
+    check("no summary totals 0", total_minutes_this_month(None) == 0)
+
+
 if __name__ == "__main__":
     test_monthly_november()
     test_monthly_february_leap_year()
@@ -243,4 +255,5 @@ if __name__ == "__main__":
     test_days_with_no_minutes()
     test_perfect_day_dates()
     test_best_day_date_str()
+    test_total_minutes_this_month()
     print(f"{PASSED} tests passed")

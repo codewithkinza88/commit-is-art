@@ -115,6 +115,15 @@ def best_day_date_str(summary):
     return (summary or {}).get("best_day_date") or ""
 
 
+def total_minutes_this_month(summary):
+    """Total minutes in a monthly summary, as an int.
+
+    int of summary["total_minutes"], 0 when missing — the
+    accessor form of the monthly total.
+    """
+    return int((summary or {}).get("total_minutes") or 0)
+
+
 def average_minutes_on_logged_days(summary):
     """Average minutes per day that actually had minutes logged.
 
