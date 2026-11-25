@@ -9,7 +9,8 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.habits import new_habit  # noqa: E402
-from app.schedule import (count_due_on_weekday, count_due_this_week,
+from app.schedule import (count_due_every_day, count_due_on_weekday,
+                          count_due_this_week,
                           count_due_today, count_due_tomorrow,  # noqa: E402
                           count_due_today_undone, due_this_week,
                           habits_due_every_day, habits_due_on,
@@ -240,6 +241,19 @@ def test_habits_due_on_weekday_name():
           habits_due_on_weekday_name(habits, "Funday") == [])
 
 
+def test_count_due_every_day():
+    daily = new_habit("Drink water", "Health", 0, "💧", "#BDE0FE", "2026-11-01")
+    weekday_only = new_habit("Study - DSA", "Study", 60, "📚", "#A5D8FF", "2026-11-01")
+    weekday_only["days"] = [0, 1, 2, 3, 4]  # Mon-Fri
+    weekend = new_habit("Long walk", "Health", 0, "🏃", "#C8F7C5", "2026-11-01")
+    weekend["days"] = [5, 6]
+    check("one habit is due every day",
+          count_due_every_day([daily, weekday_only, weekend]) == 1)
+    check("no daily habits give 0",
+          count_due_every_day([weekday_only, weekend]) == 0)
+    check("no habits give 0", count_due_every_day([]) == 0)
+
+
 if __name__ == "__main__":
     main()
     test_due_this_week()
@@ -255,4 +269,5 @@ if __name__ == "__main__":
     test_habits_due_on_weekday_name()
     test_count_due_on_weekday()
     test_next_due_weekday_name()
+    test_count_due_every_day()
     print(f"{PASSED} tests passed")

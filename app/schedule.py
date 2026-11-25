@@ -144,6 +144,14 @@ def habits_due_every_day(habits):
     return [h for h in (habits or []) if not h.get("days")]
 
 
+def count_due_every_day(habits):
+    """How many habits are due every single day (0 when none).
+
+    Count form of habits_due_every_day.
+    """
+    return len(habits_due_every_day(habits or []))
+
+
 def weekday_name(weekday):
     """Short name for a weekday number, e.g. 0 -> 'Mon'."""
     if 0 <= weekday <= 6:
