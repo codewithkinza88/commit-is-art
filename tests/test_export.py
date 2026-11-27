@@ -12,7 +12,7 @@ from app.habits import new_habit  # noqa: E402
 from app.tracker import set_done, log_minutes  # noqa: E402
 from app.export import (habits_to_csv, habits_to_text,  # noqa: E402
                         habits_to_lines,
-                        logs_to_csv, logs_to_lines,
+                        logs_to_csv, logs_to_lines, logs_to_text,
                         month_to_text, notes_to_csv, notes_to_text,
                         notes_to_lines,
                         streaks_to_csv, streaks_to_text, summary_lines,
@@ -272,6 +272,20 @@ def test_logs_to_lines():
           logs_to_lines({})[-1] == "No logs yet 🌱")
 
 
+def test_logs_to_text():
+    logs = {"2026-11-09": {"h1": {"done": True, "minutes": 30}}}
+    check("one log entry becomes one text line",
+          logs_to_text(logs)
+          == "Habit Garden — logs\n2026-11-09 — h1 — 30 min / done")
+    check("no logs gives the friendly line",
+          logs_to_text({})
+          == "Habit Garden — logs\nNo logs yet 🌱")
+    logs2 = {"2026-11-09": {"h1": {"done": True, "minutes": 30},
+                            "h2": {"done": False, "minutes": 0}}}
+    check("two entries give a header plus two lines",
+          len(logs_to_text(logs2).splitlines()) == 3)
+
+
 if __name__ == "__main__":
     test_habits_to_csv()
     test_logs_to_csv()
@@ -289,4 +303,5 @@ if __name__ == "__main__":
     test_habits_to_lines()
     test_notes_to_lines()
     test_logs_to_lines()
+    test_logs_to_text()
     print(f"{PASSED} tests passed")

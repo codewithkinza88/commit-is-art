@@ -261,3 +261,13 @@ def week_lines(logs, habits, end_date=None):
     total = sum(day["total_minutes"] for day in days)
     lines.append(f"Week total: {total} minutes")
     return lines
+
+def logs_to_text(logs):
+    """Daily logs as one readable text string.
+
+    A header, then one line per log entry ("date — habit — N min
+    / done"), in date order and habit order as stored; a friendly
+    line when there are no logs. The text form of logs_to_lines,
+    mirror of streaks_to_text.
+    """
+    return "\n".join(logs_to_lines(logs))
