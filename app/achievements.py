@@ -64,3 +64,12 @@ def badges_for(logs, habits, date_str):
         badges.append({"key": "century_minutes", "label": "100 Minutes",
                        "emoji": "⏱️"})
     return badges
+
+def has_badge(logs, habits, date_str, label):
+    """True when a badge with this label is earned by date_str.
+
+    The label form of badges_for — checks the labels from
+    badge_labels; False when nothing is earned yet (or there are
+    no habits, or no badge carries the label).
+    """
+    return (label or "") in badge_labels(logs, habits, date_str)
