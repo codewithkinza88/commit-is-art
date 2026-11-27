@@ -26,7 +26,7 @@ from app.habits import (
     habit_age_days, new_habit,
 )
 from app.garden import (count_blooming, count_full_bloom, count_seeds,
-                        count_sprouts, names_sprouts,
+                        count_sprouts, names_sprouts, names_seeds,
                         counts_text,
                         days_to_next_stage,
                         flower_bed, flower_count, flower_for, garden_summary,
@@ -759,6 +759,11 @@ def main(page: ft.Page):
             if sprout_names:
                 garden_rows.append(ft.Text(
                     f"🌿 Sprouting: {', '.join(sprout_names)}",
+                    size=14, color=PINK))
+            seed_names = names_seeds(habits, logs, today)
+            if seed_names:
+                garden_rows.append(ft.Text(
+                    f"🌱 Seeds: {', '.join(seed_names)}",
                     size=14, color=PINK))
             legend = legend_categories(habits)
             if legend:

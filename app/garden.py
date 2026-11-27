@@ -404,3 +404,12 @@ def garden_summary(habits, logs, date_str):
         message = "Your garden is growing — tick a habit to water it! 💧🌱"
     return {"plants": plants, "counts": counts, "message": message,
             "due_today": due_today, "percent_done": percent_done}
+
+def names_seeds(habits, logs, date_str):
+    """Names of the plants at the seed stage on a date.
+
+    Wrapper over plants_at_stage with "seed"; [] when no plant
+    is still a seed (or there are no habits). Mirror of
+    names_sprouts.
+    """
+    return plants_at_stage(habits, logs, date_str, "seed")
