@@ -11,7 +11,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from app.habits import new_habit  # noqa: E402
 from app.search import (count_matches, find_habits,  # noqa: E402
                         find_habits_by_effort, find_habits_by_icon,
-                        find_habits_by_category, count_notes_matching)
+                        find_habits_by_category, count_notes_matching,
+                        find_notes_by_habit)
 
 PASSED = 0
 
@@ -80,8 +81,24 @@ def test_count_notes_matching():
           count_notes_matching(notes, "") == 0)
 
 
+def test_find_notes_by_habit():
+    notes = {"2026-11-07": {"h1": "Studied DSA"},
+             "2026-11-08": {"h1": "Read a book",
+                            "h2": "Studied DSA again"}}
+    check("lists one habit's notes oldest first",
+          find_notes_by_habit(notes, "h1")
+          == [("2026-11-07", "Studied DSA"),
+              ("2026-11-08", "Read a book")])
+    check("another habit's notes are separate",
+          find_notes_by_habit(notes, "h2")
+          == [("2026-11-08", "Studied DSA again")])
+    check("an unknown habit has no notes",
+          find_notes_by_habit(notes, "h9") == [])
+
+
 if __name__ == "__main__":
     main()
     test_find_habits_by_category()
     test_count_notes_matching()
+    test_find_notes_by_habit()
     print(f"{PASSED} tests passed")

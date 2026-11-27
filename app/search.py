@@ -1,6 +1,6 @@
 """Search habits by name or category (pure logic, no Flet)."""
 
-from app.notes import find_notes
+from app.notes import find_notes, notes_for_habit
 
 def find_habits(habits, query):
     """Habits whose name or category contains query (case-insensitive).
@@ -54,3 +54,11 @@ def count_notes_matching(notes, query):
     The count form of find_notes; a blank query matches nothing.
     """
     return len(find_notes(notes, query))
+
+def find_notes_by_habit(notes, habit_id):
+    """(date, text) pairs for one habit, oldest date first.
+
+    The search-module form of notes_for_habit; [] when the habit
+    has no notes.
+    """
+    return notes_for_habit(notes or {}, habit_id)
