@@ -63,3 +63,12 @@ def weekly_goal_warning(progress):
         return ""
     remaining = progress.get("remaining", 0)
     return f"⚠️ {remaining} min left to hit your weekly goal"
+
+def weekly_goal_reached(logs, habit, weekly_target_minutes, end_date=None):
+    """True when the weekly minutes goal is met.
+
+    The bool form of weekly_goal_progress's "met" — a target of 0
+    or less is always met, matching weekly_goal_progress.
+    """
+    return weekly_goal_progress(logs, habit, weekly_target_minutes,
+                                end_date)["met"]
