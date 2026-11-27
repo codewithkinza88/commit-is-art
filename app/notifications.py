@@ -133,3 +133,12 @@ def build_notifications(habits, logs, notes, date_str, hour=None,
     ordered = (streak_notes + due_notes + goal_notes + time_notes
                + badge_notes + backup_notes)
     return ordered[:MAX_NOTIFICATIONS]
+
+def count_unread_for_habit(notifications, habit_id):
+    """Unread notifications naming one habit (0 when none).
+
+    The list holds unread notifications only (see unread_count),
+    so this counts the ones carrying this habit's id.
+    """
+    return sum(1 for n in (notifications or [])
+               if n.get("habit_id") == habit_id)

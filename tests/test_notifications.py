@@ -18,6 +18,7 @@ from app.achievements import badges_for  # noqa: E402
 from app.habits import new_habit  # noqa: E402
 from app.notifications import (  # noqa: E402
     build_notifications, notification_key, should_refresh, unread_count,
+    count_unread_for_habit,
 )
 from app.tracker import log_minutes, set_done  # noqa: E402
 
@@ -207,6 +208,25 @@ def test_notifications():
           should_refresh("", "") is False)
 
 
+def test_count_unread_for_habit():
+    items = [
+        {"kind": "due", "icon": "🌱", "title": "t", "text": "x",
+         "habit_id": "h1"},
+        {"kind": "streak", "icon": "🔥", "title": "t", "text": "y",
+         "habit_id": "h1"},
+        {"kind": "due", "icon": "🌱", "title": "t", "text": "z",
+         "habit_id": "h2"},
+        {"kind": "badge", "icon": "🏅", "title": "t", "text": "w"},
+    ]
+    check("counts the unread notes naming one habit",
+          count_unread_for_habit(items, "h1") == 2)
+    check("another habit counts separately",
+          count_unread_for_habit(items, "h2") == 1)
+    check("an unknown habit has no unread notes",
+          count_unread_for_habit(items, "h9") == 0)
+
+
 if __name__ == "__main__":
     test_notifications()
+    test_count_unread_for_habit()
     print(f"{PASSED} tests passed")
