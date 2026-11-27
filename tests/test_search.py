@@ -10,7 +10,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.habits import new_habit  # noqa: E402
 from app.search import (count_matches, find_habits,  # noqa: E402
-                        find_habits_by_effort, find_habits_by_icon)
+                        find_habits_by_effort, find_habits_by_icon,
+                        find_habits_by_category)
 
 PASSED = 0
 
@@ -51,6 +52,23 @@ def main():
           len(find_habits_by_effort(habits, 0)) == 3)
 
 
+def test_find_habits_by_category():
+    habits = [
+        new_habit("Study - DSA", "Study", 60, "📚", "#A5D8FF", "2026-11-01"),
+        new_habit("Read a book", "Books", 30, "📖", "#FBCFE8", "2026-11-01"),
+        new_habit("Drink water", "Health", 0, "💧", "#BDE0FE", "2026-11-01"),
+    ]
+    check("finds the habits in one category",
+          [h["name"] for h in find_habits_by_category(habits, "study")]
+          == ["Study - DSA"])
+    check("the match is case-insensitive",
+          [h["name"] for h in find_habits_by_category(habits, "BOOKS")]
+          == ["Read a book"])
+    check("an empty category finds nothing",
+          find_habits_by_category(habits, "Mind") == [])
+
+
 if __name__ == "__main__":
     main()
+    test_find_habits_by_category()
     print(f"{PASSED} tests passed")

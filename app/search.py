@@ -33,3 +33,15 @@ def find_habits_by_effort(habits, min_minutes):
     return [h for h in (habits or [])
             if int(h.get("target_minutes") or 0) >= minimum]
 
+
+def find_habits_by_category(habits, category):
+    """Habits in one category, case-insensitive, creation order.
+
+    The search-module form of habits_by_category; [] when no habit
+    is in the category (or there are no habits).
+    """
+    wanted = (category or "").strip().lower()
+    if not wanted:
+        return []
+    return [h for h in (habits or [])
+            if (h.get("category") or "").lower() == wanted]
