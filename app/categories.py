@@ -69,3 +69,10 @@ def categories_used(habits):
     """
     return sorted({(habit.get("category") or "Daily Life")
                    for habit in (habits or [])})
+
+def count_categories(habits):
+    """How many distinct categories the habits use (0 when none).
+
+    The count form of categories_used.
+    """
+    return len(categories_used(habits))
