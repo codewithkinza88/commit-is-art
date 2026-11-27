@@ -18,6 +18,7 @@ from app.notes import (MAX_NOTE_LEN, add_note, count_notes,  # noqa: E402
                        notes_for_habit_this_week, notes_in_month,
                        notes_in_range, notes_for_habit_last_7_days,
                        notes_for_habit_last_14_days,
+                       notes_for_habit_last_30_days,
                        notes_count_last_7_days,
                        notes_count_last_14_days,
                        shortest_note_text, total_notes_count)
@@ -363,6 +364,23 @@ def test_notes_on_date():
           notes_on_date(notes, "2026-11-12") == [])
 
 
+def test_notes_for_habit_last_30_days():
+    notes = {}
+    add_note(notes, "h1", "2026-10-10", "Too old to count")
+    add_note(notes, "h1", "2026-10-20", "In the window")
+    add_note(notes, "h1", "2026-11-09", "Finished chapter 4")
+    add_note(notes, "h2", "2026-11-09", "Watered the plants")
+    check("notes in the last 30 days for h1 are the two in-window notes",
+          notes_for_habit_last_30_days(notes, "h1", "2026-11-09")
+          == [("2026-10-20", "In the window"),
+              ("2026-11-09", "Finished chapter 4")])
+    check("another habit's notes are not included",
+          notes_for_habit_last_30_days(notes, "h2", "2026-11-09")
+          == [("2026-11-09", "Watered the plants")])
+    check("an unknown habit has no notes",
+          notes_for_habit_last_30_days(notes, "h9", "2026-11-09") == [])
+
+
 if __name__ == "__main__":
     main()
     test_latest_note()
@@ -385,4 +403,5 @@ if __name__ == "__main__":
     test_notes_count_last_14_days()
     test_shortest_note_text()
     test_notes_on_date()
+    test_notes_for_habit_last_30_days()
     print(f"{PASSED} tests passed")
