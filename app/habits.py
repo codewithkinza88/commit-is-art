@@ -319,3 +319,12 @@ def total_target_minutes(habits):
     """
     return sum(int(h.get("target_minutes") or 0) for h in (habits or []))
 
+
+def shortest_habit_name(habits):
+    """The shortest habit name ("" when there are no habits).
+
+    Ties go to the habit first in creation order. Mirror of
+    longest_habit_name.
+    """
+    names = habit_names(habits)
+    return min(names, key=len) if names else ""
