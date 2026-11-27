@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.habits import new_habit  # noqa: E402
 from app.tracker import set_done, log_minutes  # noqa: E402
-from app.categories import best_category, category_summary, legend_categories, total_minutes_by_category  # noqa: E402
+from app.categories import best_category, category_summary, legend_categories, total_minutes_by_category, categories_used  # noqa: E402
 
 PASSED = 0
 
@@ -73,9 +73,24 @@ def test_legend_categories():
           legend_categories([]) == [])
 
 
+def test_categories_used():
+    habits = [
+        new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-01"),
+        new_habit("Read", "Books", 30, "📖", "#F9A8D4", "2026-11-01"),
+        new_habit("Water", "Health", 0, "💧", "#BDE0FE", "2026-11-01"),
+    ]
+    check("lists the used categories sorted",
+          categories_used(habits) == ["Books", "Health", "Study"])
+    check("a repeated category is listed once",
+          categories_used(habits[:1] + habits[:1]) == ["Study"])
+    check("no habits means no categories",
+          categories_used([]) == [])
+
+
 if __name__ == "__main__":
     test_category_summary()
     test_best_category()
     test_total_minutes_by_category()
     test_legend_categories()
+    test_categories_used()
     print(f"{PASSED} tests passed")

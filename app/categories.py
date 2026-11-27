@@ -60,3 +60,12 @@ def total_minutes_by_category(logs, habits, date_str):
         category = habit.get("category", "Daily Life")
         minutes[category] = minutes.get(category, 0) + summary["minutes_per_habit"].get(habit["name"], 0)
     return minutes
+
+def categories_used(habits):
+    """Sorted unique categories present in the habits.
+
+    The sorted form of legend_categories; [] when there are no
+    habits.
+    """
+    return sorted({(habit.get("category") or "Daily Life")
+                   for habit in (habits or [])})
