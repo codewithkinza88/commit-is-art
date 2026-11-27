@@ -187,3 +187,10 @@ def average_percent_this_month(summary):
     The accessor form beside total_minutes_this_month.
     """
     return int((summary or {}).get("average_percent") or 0)
+
+def perfect_days_this_month(summary):
+    """Perfect days from a monthly summary, 0 when missing.
+
+    The accessor form beside average_percent_this_month.
+    """
+    return int((summary or {}).get("perfect_days") or 0)
