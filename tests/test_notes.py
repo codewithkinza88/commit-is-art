@@ -10,7 +10,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.notes import (MAX_NOTE_LEN, add_note, count_notes,  # noqa: E402
                        count_notes_for_day, find_notes, get_note, has_note,
-                       latest_note, latest_note_text, longest_note,
+                       latest_note, latest_note_text, earliest_note_text,
+                       longest_note,
                                                              longest_note_text,
                                                              notes_count_this_week,
                        notes_for_day, notes_for_habit, notes_on_date,
@@ -396,6 +397,19 @@ def test_notes_count_last_30_days():
           notes_count_last_30_days({}, "2026-11-12") == 0)
 
 
+def test_earliest_note_text():
+    notes = {}
+    add_note(notes, "h1", "2026-11-03", "Read chapter 3")
+    add_note(notes, "h1", "2026-11-12", "Finished chapter 4")
+    add_note(notes, "h2", "2026-11-10", "Watered the plants")
+    check("the earliest note text is the oldest one",
+          earliest_note_text(notes, "h1") == "Read chapter 3")
+    check("another habit's earliest note is separate",
+          earliest_note_text(notes, "h2") == "Watered the plants")
+    check("a habit with no notes has no text",
+          earliest_note_text(notes, "h9") == "")
+
+
 if __name__ == "__main__":
     main()
     test_latest_note()
@@ -420,4 +434,5 @@ if __name__ == "__main__":
     test_notes_on_date()
     test_notes_for_habit_last_30_days()
     test_notes_count_last_30_days()
+    test_earliest_note_text()
     print(f"{PASSED} tests passed")

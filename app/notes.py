@@ -355,3 +355,12 @@ def notes_count_last_30_days(notes, end_date=None):
         end = end_date or _date.today()
     start = (end - _timedelta(days=29)).isoformat()
     return len(notes_in_range(notes or {}, start, end.isoformat()))
+
+def earliest_note_text(notes, habit_id):
+    """Text of the habit's earliest non-empty note.
+
+    "" when the habit has no notes — the text-only mirror of
+    latest_note_text, for the first words instead of the last.
+    """
+    pairs = notes_for_habit(notes or {}, habit_id)
+    return pairs[0][1] if pairs else ""
