@@ -15,7 +15,8 @@ from app.schedule import (count_due_every_day, count_due_on_weekday,
                           count_due_today_undone, due_this_week,
                           habits_due_every_day, habits_due_on,
                           habits_not_due_today,
-                          due_today_names, habits_due_tomorrow,
+                          due_today_names, due_tomorrow_names,
+                          habits_due_tomorrow,
                           habits_due_on_weekday_name,
                           is_due_today, next_due_weekday,
                           next_due_weekday_name, weekday_name,
@@ -285,6 +286,21 @@ def test_due_today_names():
     check("no habits give no names", due_today_names([], 0) == [])
 
 
+def test_due_tomorrow_names():
+    h1 = new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-01")
+    h2 = new_habit("Read", "Books", 30, "📖", "#F9A8D4", "2026-11-01")
+    h3 = new_habit("Walk", "Health", 0, "🚶", "#BDE0FE", "2026-11-01")
+    h1["days"] = [0]
+    h2["days"] = [1]
+    habits = [h1, h2, h3]
+    check("names the habits due tomorrow (Tuesday after Monday)",
+          due_tomorrow_names(habits, 0) == ["Read", "Walk"])
+    check("Sunday wraps to Monday",
+          due_tomorrow_names(habits, 6) == ["Study", "Walk"])
+    check("no habits means no names",
+          due_tomorrow_names([], 0) == [])
+
+
 if __name__ == "__main__":
     main()
     test_due_this_week()
@@ -303,4 +319,5 @@ if __name__ == "__main__":
     test_count_due_every_day()
     test_habits_not_due_today()
     test_due_today_names()
+    test_due_tomorrow_names()
     print(f"{PASSED} tests passed")

@@ -63,7 +63,8 @@ from app.monthly import (average_minutes_per_day, busiest_weekday,
                          days_logged_this_month, monthly_summary,
                          quietest_weekday)
 from app.schedule import (count_due_this_week, count_due_today_undone,
-                          due_today_names, habits_due_tomorrow)
+                          due_today_names, due_tomorrow_names,
+                          habits_due_tomorrow)
 from app.celebration import days_to_next_milestone, milestones_reached
 from app.goals import weekly_goal_progress, weekly_goal_warning
 from app.store import DEFAULT_PATH, load_store, save_store, seed_store
@@ -923,6 +924,9 @@ def main(page: ft.Page):
         due_today = due_today_names(habits, date.today().weekday())
         due_today_text = (f"Due today: {', '.join(due_today)}"
                           if due_today else "Due today: nothing — all free! 🌸")
+        due_tomorrow = due_tomorrow_names(habits, date.today().weekday())
+        due_tomorrow_text = (f"Due tomorrow: {', '.join(due_tomorrow)}"
+                             if due_tomorrow else "Due tomorrow: nothing — all free! 🌸")
         due_week_text = (f"Due this week: {due_week} habit"
                          + ("s" if due_week != 1 else ""))
         return ft.Column([
@@ -1013,6 +1017,7 @@ def main(page: ft.Page):
             ft.Text(tomorrow_text, size=14, color=TEXT),
             ft.Text(due_week_text, size=14, color=TEXT),
             ft.Text(due_today_text, size=14, color=TEXT),
+            ft.Text(due_tomorrow_text, size=14, color=TEXT),
             section_title("Last 7 days 📅"),
             *rows,
         ], spacing=12)

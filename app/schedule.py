@@ -189,3 +189,12 @@ def habits_due_on_weekday_name(habits, name):
     if short not in WEEKDAYS:
         return []
     return habits_due_on(habits or [], WEEKDAYS.index(short))
+
+def due_tomorrow_names(habits, weekday):
+    """Names of the habits due tomorrow (0=Mon .. 6=Sun).
+
+    Creation order is kept; [] when nothing is due tomorrow
+    (or there are no habits). Mirror of due_today_names.
+    """
+    return [h.get("name", "")
+            for h in habits_due_tomorrow(habits or [], weekday)]
