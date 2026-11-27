@@ -17,7 +17,7 @@ from app.habits import (  # noqa: E402
     count_by_effort, newest_habit, oldest_habit, habits_with_target,
     habits_without_target, habit_ids, habits_with_icon,
     archived_habit_names, longest_habit_name,
-    shortest_habit_name,
+    shortest_habit_name, archived_habit_ids,
     count_archived, total_target_minutes,
     clone_habit, habit_age_days, validate_effort,
 )
@@ -813,6 +813,19 @@ def test_shortest_habit_name():
           shortest_habit_name([]) == "")
 
 
+def test_archived_habit_ids():
+    h1 = new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-01")
+    h2 = new_habit("Read", "Books", 30, "📖", "#F9A8D4", "2026-11-01")
+    habits = [h1, h2]
+    archive_habit(habits, h2["id"])
+    check("the archived habit id is listed",
+          archived_habit_ids(habits) == [h2["id"]])
+    check("an active habit id is not listed",
+          archived_habit_ids([h1]) == [])
+    check("no habits means no ids",
+          archived_habit_ids([]) == [])
+
+
 if __name__ == "__main__":
     test_add_edit_delete_habit()
     test_tick_and_minutes()
@@ -867,5 +880,6 @@ if __name__ == "__main__":
     test_minutes_for_habit_last_14_days()
     test_is_done_yesterday()
     test_shortest_habit_name()
+    test_archived_habit_ids()
     print(f"{PASSED} tests passed")
 

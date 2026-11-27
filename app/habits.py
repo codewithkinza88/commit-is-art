@@ -328,3 +328,11 @@ def shortest_habit_name(habits):
     """
     names = habit_names(habits)
     return min(names, key=len) if names else ""
+
+def archived_habit_ids(habits):
+    """Ids of the archived habits, in creation order.
+
+    [] when no habit is archived (or there are no habits).
+    """
+    return [h.get("id") for h in (habits or [])
+            if h.get("archived", False)]
