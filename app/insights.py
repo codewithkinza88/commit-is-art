@@ -216,3 +216,22 @@ def consistency_message(score):
     if score >= 1:
         return "A slow week — tomorrow is fresh 💧"
     return "No ticks yet this week — plant one today 🌱"
+
+def done_rate_for_category(logs, habits, date_strs, category):
+    """Done rate for one category over the dates, as a percent 0-100.
+
+    Done ticks for habits in that category over the dates; 0 when
+    there are no dates or no habits in the category. The category
+    form of done_rate_for_habit.
+    """
+    if not date_strs:
+        return 0
+    in_category = [h for h in (habits or [])
+                   if (h.get("category") or "").lower()
+                   == (category or "").lower()]
+    if not in_category:
+        return 0
+    total = len(in_category) * len(date_strs)
+    done = sum(1 for habit in in_category for d in date_strs
+               if is_done(logs, habit, d))
+    return round(100 * done / total)

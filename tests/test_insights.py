@@ -13,6 +13,7 @@ from app.insights import (average_consistency, consistency_message,  # noqa: E40
                           consistency_score,                       habits_above_rate, habits_below_rate,
                                                 least_consistent_habit, most_consistent_habit,
                           needs_attention, weekly_done_rate, done_rate_for_habit,
+                          done_rate_for_category,
                           done_rate_overall, habit_with_most_minutes,
                           best_category_by_minutes)
 from app.tracker import set_done, log_minutes  # noqa: E402
@@ -210,6 +211,22 @@ def test_best_category_by_minutes():
           best_category_by_minutes(logs, [a, b], "2026-11-10") is None)
 
 
+def test_done_rate_for_category():
+    h1 = new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-01")
+    h2 = new_habit("Read", "Books", 30, "📖", "#F9A8D4", "2026-11-01")
+    logs = {}
+    set_done(logs, h1["id"], "2026-11-09", True)
+    set_done(logs, h2["id"], "2026-11-08", True)
+    set_done(logs, h2["id"], "2026-11-09", True)
+    dates = ["2026-11-08", "2026-11-09"]
+    check("half the Study days done is 50 percent",
+          done_rate_for_category(logs, [h1, h2], dates, "Study") == 50)
+    check("all the Books days done is 100 percent",
+          done_rate_for_category(logs, [h1, h2], dates, "Books") == 100)
+    check("a category with no habits is 0",
+          done_rate_for_category(logs, [h1, h2], dates, "Mind") == 0)
+
+
 if __name__ == "__main__":
     main()
     test_weekly_done_rate()
@@ -221,4 +238,5 @@ if __name__ == "__main__":
     test_done_rate_overall()
     test_habit_with_most_minutes()
     test_best_category_by_minutes()
+    test_done_rate_for_category()
     print(f"{PASSED} tests passed")
