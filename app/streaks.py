@@ -302,3 +302,14 @@ def last_done_label(logs, habit, end_date=None):
     if days == 1:
         return "Last done yesterday"
     return f"Last done {days} days ago"
+
+def habits_with_best_streak_at_least(logs, habits, minimum, end_date=None):
+    """Names of habits whose best streak is at least `minimum`.
+
+    Creation order is kept; [] when no habit reaches the level
+    (or there are no habits). The best-streak form of
+    habits_with_streak_at_least.
+    """
+    minimum = max(0, int(minimum or 0))
+    return [habit["name"] for habit in (habits or [])
+            if best_streak(logs, habit, end_date=end_date) >= minimum]

@@ -13,7 +13,7 @@ from app.habits import new_habit  # noqa: E402
 from app.tracker import set_done  # noqa: E402
 from app.streaks import (average_best_streak, best_streak,
                          days_since_last_done,  # noqa: E402
-                         habits_on_streak, habits_with_best_streak,
+                         habits_on_streak, habits_with_best_streak, habits_with_best_streak_at_least,
                                               habits_with_streak_at_least,
                          last_done_label, longest_gap,
                          longest_current_streak, longest_streak_overall,
@@ -399,6 +399,24 @@ def test_streak_summaries():
     check("no habits give no summaries", streak_summaries(logs, []) == [])
 
 
+def test_habits_with_best_streak_at_least():
+    h1 = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
+    h2 = new_habit("Read", "Books", 0, "📖", "#FFC6FF", "2026-11-01")
+    logs = {}
+    for day in ("2026-11-07", "2026-11-08", "2026-11-09"):
+        set_done(logs, h1["id"], day, True)
+    set_done(logs, h2["id"], "2026-11-09", True)
+    check("a 3-day best streak reaches 3",
+          habits_with_best_streak_at_least(logs, [h1, h2], 3,
+                                           date(2026, 11, 9)) == ["Study"])
+    check("a 3-day best streak reaches 2",
+          habits_with_best_streak_at_least(logs, [h1, h2], 2,
+                                           date(2026, 11, 9)) == ["Study"])
+    check("no habit reaches 4",
+          habits_with_best_streak_at_least(logs, [h1, h2], 4,
+                                           date(2026, 11, 9)) == [])
+
+
 if __name__ == "__main__":
     test_best_streak()
     test_average_streak()
@@ -423,4 +441,5 @@ if __name__ == "__main__":
     test_best_streaks_sorted()
     test_count_habits_on_streak()
     test_streak_summaries()
+    test_habits_with_best_streak_at_least()
     print(f"{PASSED} tests passed")
