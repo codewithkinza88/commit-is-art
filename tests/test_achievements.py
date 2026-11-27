@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.habits import new_habit  # noqa: E402
 from app.tracker import set_done, log_minutes  # noqa: E402
-from app.achievements import badges_count, badges_for, badge_labels, has_badge  # noqa: E402
+from app.achievements import badges_count, badges_for, badge_labels, has_badge, badge_emojis  # noqa: E402
 
 PASSED = 0
 
@@ -98,6 +98,19 @@ def test_has_badge():
           has_badge({}, [], "2026-11-07", "First Step") is False)
 
 
+def test_badge_emojis():
+    habits = [new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-01")]
+    logs = {}
+    log_minutes(logs, habits[0]["id"], "2026-11-07", 60)
+    check("the earned badge emojis are listed in award order",
+          badge_emojis(logs, habits, "2026-11-07") == ["🌱", "🌸"])
+    check("no badges means no emojis",
+          badge_emojis({}, [], "2026-11-07") == [])
+    check("emojis match the badge labels one to one",
+          len(badge_emojis(logs, habits, "2026-11-07"))
+          == len(badge_labels(logs, habits, "2026-11-07")))
+
+
 if __name__ == "__main__":
     test_no_badges_when_nothing_done()
     test_first_step_and_perfect_day()
@@ -106,4 +119,5 @@ if __name__ == "__main__":
     test_badges_count()
     test_badge_labels()
     test_has_badge()
+    test_badge_emojis()
     print(f"{PASSED} tests passed")

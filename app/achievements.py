@@ -73,3 +73,13 @@ def has_badge(logs, habits, date_str, label):
     no habits, or no badge carries the label).
     """
     return (label or "") in badge_labels(logs, habits, date_str)
+
+def badge_emojis(logs, habits, date_str):
+    """Emojis of the badges earned up to and including date_str.
+
+    The emoji of each badge in badges_for, in award order;
+    [] when nothing is earned yet (or there are no habits).
+    Mirror of badge_labels.
+    """
+    return [badge["emoji"]
+            for badge in badges_for(logs, habits, date_str)]
