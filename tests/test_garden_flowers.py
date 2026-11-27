@@ -18,7 +18,7 @@ from app.garden import (  # noqa: E402
     flower_bed, flower_count, flower_for, flowers_for_stage,
     plant_for, plant_of_the_day, plant_with_longest_streak,
     plants_at_stage, names_in_full_bloom, names_blooming,
-    names_sprouts, names_growing, names_seeds,
+    names_sprouts, names_growing, names_seeds, total_flowers,
     garden_stage_names,
 )
 from app.habits import new_habit  # noqa: E402
@@ -383,6 +383,23 @@ def test_names_seeds():
           names_seeds([], logs, "2026-11-09") == [])
 
 
+def test_total_flowers():
+    h1 = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
+    h2 = new_habit("Read", "Books", 0, "📖", "#FFC6FF", "2026-11-01")
+    h3 = new_habit("Walk", "Health", 0, "🚶", "#BDE0FE", "2026-11-01")
+    logs = {}
+    for day in ("2026-11-06", "2026-11-07", "2026-11-08", "2026-11-09"):
+        set_done(logs, h1["id"], day, True)
+    set_done(logs, h2["id"], "2026-11-09", True)
+    # h1 streak 4 -> blooming (5 flowers); h2 sprout (2); h3 seed (1).
+    check("counts every flower in the garden",
+          total_flowers([h1, h2, h3], logs, "2026-11-09") == 8)
+    check("a lone seed counts one flower",
+          total_flowers([h3], logs, "2026-11-09") == 1)
+    check("no habits means no flowers",
+          total_flowers([], logs, "2026-11-09") == 0)
+
+
 if __name__ == "__main__":
     test_garden_flowers()
     test_plant_of_the_day()
@@ -401,4 +418,5 @@ if __name__ == "__main__":
     test_names_sprouts()
     test_names_growing()
     test_names_seeds()
+    test_total_flowers()
     print(f"{PASSED} tests passed")

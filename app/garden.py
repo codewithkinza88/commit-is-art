@@ -413,3 +413,18 @@ def names_seeds(habits, logs, date_str):
     names_sprouts.
     """
     return plants_at_stage(habits, logs, date_str, "seed")
+
+def total_flowers(habits, logs, date_str):
+    """Total flower emojis across all plants on a date.
+
+    Sums the flowers for each plant's stage via plant_for and
+    FLOWERS_BY_STAGE — a seed counts 1 🌱; every flower emoji in
+    FLOWERS_BY_STAGE is a single code point, so the stage
+    string's length is its flower count. 0 when there are no
+    habits.
+    """
+    total = 0
+    for habit in (habits or []):
+        plant = plant_for(habit, logs, date_str)
+        total += len(FLOWERS_BY_STAGE.get(plant.get("stage"), ""))
+    return total
