@@ -338,3 +338,20 @@ def notes_for_habit_last_30_days(notes, habit_id, end_date=None):
     return [(date_str, text)
             for date_str, text in notes_for_habit(notes or {}, habit_id)
             if start <= date_str <= end.isoformat()]
+
+def notes_count_last_30_days(notes, end_date=None):
+    """How many non-empty notes were written in the last 30 days.
+
+    Counts notes_in_range over the 30 days ending on end_date
+    (default today); 0 when nothing was written in the window.
+    The 30-day form of notes_count_last_14_days.
+    """
+    from datetime import date as _date
+    from datetime import timedelta as _timedelta
+
+    if isinstance(end_date, str):
+        end = _date.fromisoformat(end_date)
+    else:
+        end = end_date or _date.today()
+    start = (end - _timedelta(days=29)).isoformat()
+    return len(notes_in_range(notes or {}, start, end.isoformat()))

@@ -21,6 +21,7 @@ from app.notes import (MAX_NOTE_LEN, add_note, count_notes,  # noqa: E402
                        notes_for_habit_last_30_days,
                        notes_count_last_7_days,
                        notes_count_last_14_days,
+                       notes_count_last_30_days,
                        shortest_note_text, total_notes_count)
 
 PASSED = 0
@@ -381,6 +382,20 @@ def test_notes_for_habit_last_30_days():
           notes_for_habit_last_30_days(notes, "h9", "2026-11-09") == [])
 
 
+def test_notes_count_last_30_days():
+    notes = {}
+    add_note(notes, "h1", "2026-10-28", "Too old for 14 days")
+    add_note(notes, "h1", "2026-11-03", "Read chapter 3")
+    add_note(notes, "h1", "2026-11-12", "Finished chapter 4")
+    add_note(notes, "h2", "2026-11-12", "Watered the plants")
+    check("counts the notes in the last 30 days",
+          notes_count_last_30_days(notes, "2026-11-12") == 4)
+    check("a note 15 days back counts in 30 days but not in 14",
+          notes_count_last_14_days(notes, "2026-11-12") == 3)
+    check("no notes means 0",
+          notes_count_last_30_days({}, "2026-11-12") == 0)
+
+
 if __name__ == "__main__":
     main()
     test_latest_note()
@@ -404,4 +419,5 @@ if __name__ == "__main__":
     test_shortest_note_text()
     test_notes_on_date()
     test_notes_for_habit_last_30_days()
+    test_notes_count_last_30_days()
     print(f"{PASSED} tests passed")

@@ -38,7 +38,8 @@ from app.insights import (best_category_by_minutes,
                           consistency_message, consistency_score,
                           most_consistent_habit, weekly_done_rate)
 from app.notes import (count_notes, latest_note,
-                       notes_count_last_14_days)
+                       notes_count_last_14_days,
+                       notes_count_last_30_days)
 from app.ordering import sort_habits
 from app.motivation import (comeback_message, evening_message,
                             morning_message, nightly_message, weekly_cheer,
@@ -976,6 +977,8 @@ def main(page: ft.Page):
                         f"{total_minutes_last_14_days(logs, habits)} minutes",
                         size=15, color=MUTED),
                 ft.Text(f"📝 {notes_count_last_14_days(notes)} notes in the last 2 weeks",
+                        size=15, color=MUTED),
+                ft.Text(f"📝 {notes_count_last_30_days(notes)} notes in the last month",
                         size=15, color=MUTED),
                 ft.Text(f"Last 7 days: "
                         f"{total_minutes_last_7_days(logs, habits)} minutes",
