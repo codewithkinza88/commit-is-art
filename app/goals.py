@@ -72,3 +72,14 @@ def weekly_goal_reached(logs, habit, weekly_target_minutes, end_date=None):
     """
     return weekly_goal_progress(logs, habit, weekly_target_minutes,
                                 end_date)["met"]
+
+def weekly_goal_percent(logs, habit, weekly_target_minutes, end_date=None):
+    """Percent of the weekly minutes goal reached, capped at 100.
+
+    0 when the target is 0 (there is no goal to measure against).
+    """
+    target = max(0, int(weekly_target_minutes or 0))
+    if target == 0:
+        return 0
+    minutes = minutes_in_last_7_days(logs, habit, end_date)
+    return min(100, round(100 * minutes / target))

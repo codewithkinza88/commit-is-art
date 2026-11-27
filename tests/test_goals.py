@@ -13,7 +13,7 @@ from app.habits import new_habit  # noqa: E402
 from app.tracker import log_minutes  # noqa: E402
 from app.goals import (minutes_in_last_7_days, weekly_goal_progress,  # noqa: E402
                        weekly_goal_warning, weekly_goal_remaining,
-                       weekly_goal_reached)
+                       weekly_goal_reached, weekly_goal_percent)
 
 PASSED = 0
 
@@ -93,6 +93,18 @@ def test_weekly_goal_reached():
           weekly_goal_reached(logs, habit, 0, date(2026, 11, 7)) is True)
 
 
+def test_weekly_goal_percent():
+    habit = new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-01")
+    logs = {}
+    log_minutes(logs, habit["id"], "2026-11-07", 30)
+    check("half the target is 50 percent",
+          weekly_goal_percent(logs, habit, 60, date(2026, 11, 7)) == 50)
+    check("the full target is 100 percent",
+          weekly_goal_percent(logs, habit, 30, date(2026, 11, 7)) == 100)
+    check("no target means 0 percent",
+          weekly_goal_percent(logs, habit, 0, date(2026, 11, 7)) == 0)
+
+
 if __name__ == "__main__":
     test_minutes_in_last_7_days()
     test_weekly_goal_progress()
@@ -100,4 +112,5 @@ if __name__ == "__main__":
     test_weekly_goal_warning()
     test_weekly_goal_remaining()
     test_weekly_goal_reached()
+    test_weekly_goal_percent()
     print(f"{PASSED} tests passed")
