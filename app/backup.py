@@ -66,3 +66,13 @@ def should_auto_backup(last_backup_date, today=None):
     else:
         day = today
     return (day - last).days >= BACKUP_REMINDER_DAYS
+
+def backup_counts(habits, logs, notes):
+    """Counts of the habits, logs and notes in a backup.
+
+    {"habits": n, "logs": n, "notes": n} — the size of each part
+    of make_backup, for the Backup & Restore view.
+    """
+    return {"habits": len(habits or []),
+            "logs": len(logs or {}),
+            "notes": len(notes or {})}

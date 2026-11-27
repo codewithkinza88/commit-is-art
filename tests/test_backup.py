@@ -9,7 +9,8 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.backup import (backup_filename, backup_to_json, make_backup,  # noqa: E402
-                        restore_from_json, should_auto_backup)
+                        restore_from_json, should_auto_backup,
+                        backup_counts)
 from app.habits import new_habit  # noqa: E402
 
 PASSED = 0
@@ -62,6 +63,20 @@ def main():
           should_auto_backup("soon", "2026-11-18") is True)
 
 
+def test_backup_counts():
+    habits = [new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-01")]
+    logs = {"2026-11-07": {habits[0]["id"]: {"done": True}}}
+    notes = {"2026-11-07": {habits[0]["id"]: "Studied DSA"}}
+    check("counts one of each part",
+          backup_counts(habits, logs, notes)
+          == {"habits": 1, "logs": 1, "notes": 1})
+    check("an empty backup counts all zeros",
+          backup_counts([], {}, {}) == {"habits": 0, "logs": 0, "notes": 0})
+    check("two habits count as two",
+          backup_counts(habits + habits, logs, notes)["habits"] == 2)
+
+
 if __name__ == "__main__":
     main()
+    test_backup_counts()
     print(f"{PASSED} tests passed")
