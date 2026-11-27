@@ -180,3 +180,10 @@ def average_minutes_per_day(summary):
     if not days:
         return 0
     return round((summary.get("total_minutes") or 0) / days)
+
+def average_percent_this_month(summary):
+    """Average percent from a monthly summary, 0 when missing.
+
+    The accessor form beside total_minutes_this_month.
+    """
+    return int((summary or {}).get("average_percent") or 0)

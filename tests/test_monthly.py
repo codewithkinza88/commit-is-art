@@ -16,7 +16,8 @@ from app.monthly import (average_minutes_on_logged_days,  # noqa: E402
                          longest_day_minutes, minutes_for_weekday,
                          monthly_summary, perfect_day_dates,
                          quietest_weekday, best_day_minutes,
-                         best_day_date_str, total_minutes_this_month)
+                         best_day_date_str, total_minutes_this_month,
+                         average_percent_this_month)
 
 PASSED = 0
 
@@ -240,6 +241,19 @@ def test_total_minutes_this_month():
     check("no summary totals 0", total_minutes_this_month(None) == 0)
 
 
+def test_average_percent_this_month():
+    habit = new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-01")
+    logs = {}
+    set_done(logs, habit["id"], "2026-11-09", True)
+    summary = monthly_summary(logs, [habit], 2026, 11)
+    check("reads the average percent from the summary",
+          average_percent_this_month(summary) == summary["average_percent"])
+    check("a missing summary gives 0",
+          average_percent_this_month({}) == 0)
+    check("None gives 0",
+          average_percent_this_month(None) == 0)
+
+
 if __name__ == "__main__":
     test_monthly_november()
     test_monthly_february_leap_year()
@@ -256,4 +270,5 @@ if __name__ == "__main__":
     test_perfect_day_dates()
     test_best_day_date_str()
     test_total_minutes_this_month()
+    test_average_percent_this_month()
     print(f"{PASSED} tests passed")
