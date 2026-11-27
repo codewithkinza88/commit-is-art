@@ -458,3 +458,18 @@ def days_done_last_30_days(logs, habit, end_date=None):
     return sum(1 for i in range(30)
                if is_done(logs, habit,
                           (end - timedelta(days=i)).isoformat()))
+
+def minutes_for_habit_last_30_days(logs, habit, end_date=None):
+    """Minutes logged for one habit over the last 30 days.
+
+    Sums minutes_for over the 30 days ending on end_date; 0 when
+    the habit logged nothing in the window. The 30-day form of
+    minutes_for_habit_last_14_days.
+    """
+    if isinstance(end_date, str):
+        end = date.fromisoformat(end_date)
+    else:
+        end = end_date or date.today()
+    return sum(minutes_for(logs, habit.get("id"),
+                           (end - timedelta(days=i)).isoformat())
+               for i in range(30))

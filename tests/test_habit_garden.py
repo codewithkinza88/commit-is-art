@@ -28,6 +28,7 @@ from app.tracker import (  # noqa: E402
     total_minutes_last_14_days, total_minutes_last_7_days,
     minutes_for_habit_this_month,
     minutes_for_habit_last_7_days, minutes_for_habit_last_14_days,
+    minutes_for_habit_last_30_days,
     minutes_for_habit_yesterday, is_done_yesterday,
     days_done_this_month, best_day_this_month, best_day_last_7_days,
     best_day_by_minutes, days_done_this_week, days_done_last_7_days,
@@ -841,6 +842,20 @@ def test_days_done_last_30_days():
           days_done_last_30_days({}, habit, "2026-11-09") == 0)
 
 
+def test_minutes_for_habit_last_30_days():
+    habit = new_habit("Study", "Study", 0, "📚", "#A5D8FF", "2026-11-01")
+    logs = {}
+    log_minutes(logs, habit["id"], "2026-10-20", 20)
+    log_minutes(logs, habit["id"], "2026-11-09", 30)
+    log_minutes(logs, habit["id"], "2026-10-10", 10)
+    check("sums the minutes of the last 30 days",
+          minutes_for_habit_last_30_days(logs, habit, "2026-11-09") == 50)
+    check("a day 20 days back counts in 30 days but not in 14",
+          minutes_for_habit_last_14_days(logs, habit, "2026-11-09") == 30)
+    check("no minutes means 0",
+          minutes_for_habit_last_30_days({}, habit, "2026-11-09") == 0)
+
+
 if __name__ == "__main__":
     test_add_edit_delete_habit()
     test_tick_and_minutes()
@@ -897,5 +912,6 @@ if __name__ == "__main__":
     test_shortest_habit_name()
     test_archived_habit_ids()
     test_days_done_last_30_days()
+    test_minutes_for_habit_last_30_days()
     print(f"{PASSED} tests passed")
 
