@@ -444,3 +444,17 @@ def best_day_by_minutes(logs, habits, end_date=None):
         if best is None or day["total_minutes"] >= best["minutes"]:
             best = {"date": day["date"], "minutes": day["total_minutes"]}
     return best
+
+def days_done_last_30_days(logs, habit, end_date=None):
+    """How many of the last 30 days (ending on end_date) the habit
+    was done — a number from 0 to 30.
+
+    The 30-day form of days_done_last_14_days.
+    """
+    if isinstance(end_date, str):
+        end = date.fromisoformat(end_date)
+    else:
+        end = end_date or date.today()
+    return sum(1 for i in range(30)
+               if is_done(logs, habit,
+                          (end - timedelta(days=i)).isoformat()))
