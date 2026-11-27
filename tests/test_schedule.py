@@ -16,7 +16,7 @@ from app.schedule import (count_due_every_day, count_due_on_weekday,
                           habits_due_every_day, habits_due_on,
                           habits_not_due_today,
                           due_today_names, due_tomorrow_names,
-                          habits_due_tomorrow,
+                          habits_due_tomorrow, count_due_today_done,
                           habits_due_on_weekday_name,
                           is_due_today, next_due_weekday,
                           next_due_weekday_name, weekday_name,
@@ -301,6 +301,20 @@ def test_due_tomorrow_names():
           due_tomorrow_names([], 0) == [])
 
 
+def test_count_due_today_done():
+    h1 = new_habit("Study", "Study", 60, "📚", "#A5D8FF", "2026-11-01")
+    h2 = new_habit("Read", "Books", 30, "📖", "#F9A8D4", "2026-11-01")
+    logs = {}
+    set_done(logs, h1["id"], "2026-11-09", True)
+    check("counts the one due habit already done",
+          count_due_today_done([h1, h2], logs, 0, "2026-11-09") == 1)
+    set_done(logs, h2["id"], "2026-11-09", True)
+    check("counts both when both are done",
+          count_due_today_done([h1, h2], logs, 0, "2026-11-09") == 2)
+    check("no done habits means 0",
+          count_due_today_done([h1, h2], {}, 0, "2026-11-09") == 0)
+
+
 if __name__ == "__main__":
     main()
     test_due_this_week()
@@ -320,4 +334,5 @@ if __name__ == "__main__":
     test_habits_not_due_today()
     test_due_today_names()
     test_due_tomorrow_names()
+    test_count_due_today_done()
     print(f"{PASSED} tests passed")

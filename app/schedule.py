@@ -198,3 +198,15 @@ def due_tomorrow_names(habits, weekday):
     """
     return [h.get("name", "")
             for h in habits_due_tomorrow(habits or [], weekday)]
+
+def count_due_today_done(habits, logs, weekday, date_str):
+    """How many habits due on weekday are already done on date_str.
+
+    Due habits come from habits_due_on; a habit counts as done when
+    tracker.is_done says so. 0 when nothing is due or nothing due
+    is done yet. Mirror of count_due_today_undone.
+    """
+    from app.tracker import is_done
+
+    return sum(1 for habit in habits_due_on(habits or [], weekday)
+               if is_done(logs or {}, habit, date_str))
