@@ -2,6 +2,19 @@
 
 All notable changes to Habit Garden are listed here.
 
+## 2026-11-26 — Badges, weekly goals and the last 30 days (version 1.17.0)
+
+- Badges: `has_badge()` checks one badge by label and `badge_emojis()` lists the emojis of the badges earned.
+- Weekly goals: `weekly_goal_reached()` is the yes/no form of the weekly goal and `weekly_goal_percent()` is the percent of the target reached, capped at 100.
+- Search and categories: `find_habits_by_category()` finds habits in one category, `count_notes_matching()` counts the notes matching a search, `find_notes_by_habit()` lists one habit's notes, `categories_used()` lists the categories in use and `count_categories()` counts them.
+- Backup and notifications: `backup_counts()` counts the habits, logs and notes in a backup, and `count_unread_for_habit()` counts the unread notifications naming one habit.
+- Habits: `shortest_habit_name()` mirrors the longest name, and `archived_habit_ids()` lists the ids of archived habits.
+- Last 30 days: `days_done_last_30_days()`, `minutes_for_habit_last_30_days()`, `notes_for_habit_last_30_days()` and `notes_count_last_30_days()` track one habit and its notes across the last 30 days — Tonight shows how many notes were written in the last month.
+- Streaks and garden: `habits_with_best_streak_at_least()` filters by best streak, `names_seeds()` names the plants still seeds — the Garden names the seeds — and `total_flowers()` counts every flower in the garden.
+- Due days: `due_tomorrow_names()` names the habits due tomorrow — Tonight shows them — and `count_due_today_done()` counts the due-today habits already done.
+- Validation, insights and month: `validate_month()` checks a month 1..12, `done_rate_for_category()` is the done rate for one category, and `average_percent_this_month()` and `perfect_days_this_month()` read the monthly summary.
+- Export and celebration: `logs_to_text()` is the text form of the logs, and `milestones_count()` counts the milestones reached.
+
 ## 2026-11-25 — Habit ids, last 14 days and sprouting names (version 1.16.0)
 
 - Habit lists: `habit_ids()` lists every habit id, `habits_with_icon()`

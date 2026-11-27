@@ -1,4 +1,4 @@
 """App identity (pure data, no Flet)."""
 
 APP_NAME = "Habit Garden"
-APP_VERSION = "1.16.0"
+APP_VERSION = "1.17.0"

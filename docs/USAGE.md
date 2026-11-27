@@ -167,3 +167,12 @@ in the last 2 weeks, and names the category with the most minutes
 today. The Garden names the plants that are sprouting, and each habit
 can be followed across the last 14 days — its minutes, its done days,
 and its notes — while yesterday gets its own look for one habit.
+
+## Badges, weekly goals and the last 30 days 🌱 (version 1.17.0)
+
+Tonight names the habits due tomorrow, shows how many notes were
+written in the last month, and the Garden names the plants still
+seeds and counts every flower. Each habit can be followed across
+the last 30 days — its minutes, its done days, and its notes —
+while badges, weekly goals and milestones get their own short
+forms.

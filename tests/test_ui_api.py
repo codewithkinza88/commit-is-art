@@ -216,9 +216,18 @@ def test_ui_api():
           and "days_to_next_milestone(longest_streak)" in source)
     check("a new habit gets a welcome message",
           "welcome_message(name_field.value)" in source)
-    check("app version is 1.16.0",
+    check("Tonight shows due-tomorrow names",
+          "Due tomorrow:" in source
+          and "due_tomorrow_names(habits" in source)
+    check("Tonight shows notes in the last month",
+          "notes in the last month" in source
+          and "notes_count_last_30_days(notes)" in source)
+    check("Garden shows seed names",
+          "🌱 Seeds:" in source
+          and "names_seeds(habits, logs, today)" in source)
+    check("app version is 1.17.0",
           open(os.path.join(root, "app", "version.py"),
-               encoding="utf-8").read().count('APP_VERSION = "1.16.0"') == 1)
+               encoding="utf-8").read().count('APP_VERSION = "1.17.0"') == 1)
     check("Tonight shows notes in the last 2 weeks",
           "notes in the last 2 weeks" in source
           and "notes_count_last_14_days(notes)" in source)
