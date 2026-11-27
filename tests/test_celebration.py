@@ -12,7 +12,7 @@ from app.celebration import (celebration_for,  # noqa: E402
                              celebration_message,
                              days_to_next_milestone,
                              is_milestone,
-                             milestone_message, milestones_reached,
+                             milestone_message, milestones_reached, milestones_count,
                              next_milestone_streak,
                              next_milestone_message)
 
@@ -91,6 +91,15 @@ def test_next_milestone_streak():
           next_milestone_streak(100) is None)
 
 
+def test_milestones_count():
+    check("one week reaches one milestone",
+          milestones_count(7) == 1)
+    check("thirty days reach three milestones",
+          milestones_count(30) == 3)
+    check("three days reach no milestone yet",
+          milestones_count(3) == 0)
+
+
 if __name__ == "__main__":
     main()
     test_days_to_next_milestone()
@@ -99,4 +108,5 @@ if __name__ == "__main__":
     test_celebration_for()
     test_celebration_message()
     test_next_milestone_streak()
+    test_milestones_count()
     print(f"{PASSED} tests passed")

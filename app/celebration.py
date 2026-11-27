@@ -99,3 +99,10 @@ def next_milestone_message(streak):
             return (f"🎯 {milestone - streak} more day(s) to a "
                     f"{milestone}-day streak!")
     return ""
+
+def milestones_count(streak):
+    """How many milestones a streak has reached (0 when none yet).
+
+    The count form of milestones_reached.
+    """
+    return len(milestones_reached(streak))
