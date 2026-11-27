@@ -11,7 +11,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from app.habits import new_habit  # noqa: E402
 from app.search import (count_matches, find_habits,  # noqa: E402
                         find_habits_by_effort, find_habits_by_icon,
-                        find_habits_by_category)
+                        find_habits_by_category, count_notes_matching)
 
 PASSED = 0
 
@@ -68,7 +68,20 @@ def test_find_habits_by_category():
           find_habits_by_category(habits, "Mind") == [])
 
 
+def test_count_notes_matching():
+    notes = {"2026-11-07": {"h1": "Studied DSA"},
+             "2026-11-08": {"h1": "Read a book",
+                            "h2": "Studied DSA again"}}
+    check("counts the notes matching a word",
+          count_notes_matching(notes, "DSA") == 2)
+    check("counts a single matching note",
+          count_notes_matching(notes, "book") == 1)
+    check("a blank query matches nothing",
+          count_notes_matching(notes, "") == 0)
+
+
 if __name__ == "__main__":
     main()
     test_find_habits_by_category()
+    test_count_notes_matching()
     print(f"{PASSED} tests passed")

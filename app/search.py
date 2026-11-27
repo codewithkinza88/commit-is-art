@@ -1,5 +1,7 @@
 """Search habits by name or category (pure logic, no Flet)."""
 
+from app.notes import find_notes
+
 def find_habits(habits, query):
     """Habits whose name or category contains query (case-insensitive).
 
@@ -45,3 +47,10 @@ def find_habits_by_category(habits, category):
         return []
     return [h for h in (habits or [])
             if (h.get("category") or "").lower() == wanted]
+
+def count_notes_matching(notes, query):
+    """How many notes match the query (0 when none match).
+
+    The count form of find_notes; a blank query matches nothing.
+    """
+    return len(find_notes(notes, query))
