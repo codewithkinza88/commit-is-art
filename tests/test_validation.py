@@ -11,7 +11,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from app.validation import (MAX_NAME_LEN, validate_category,  # noqa: E402
                             validate_colour, validate_date_str,
                             validate_habit_days,                         validate_habit_name,
-                            validate_icon, validate_minutes, validate_percent,
+                            validate_icon, validate_minutes, validate_percent, validate_month,
                             validate_habit_id,
                             validate_note_text,                         validate_target_minutes,
                             validate_search_query,
@@ -148,6 +148,17 @@ def test_validate_search_query():
     check("no query is empty", validate_search_query(None) == "")
 
 
+def test_validate_month():
+    check("a month in range is valid",
+          validate_month(6) == (True, 6, ""))
+    check("a non-numeric month is invalid",
+          validate_month("June") == (False, 0, "Month must be a number"))
+    check("a month below 1 is invalid",
+          validate_month(0) == (False, 0, "Month cannot be less than 1"))
+    check("a month over 12 is capped at 12",
+          validate_month(13) == (False, 12, "Month cannot be more than 12"))
+
+
 if __name__ == "__main__":
     main()
     test_validate_note_text()
@@ -159,4 +170,5 @@ if __name__ == "__main__":
     test_validate_percent()
     test_validate_habit_id()
     test_validate_search_query()
+    test_validate_month()
     print(f"{PASSED} tests passed")

@@ -161,6 +161,7 @@ def validate_minutes(value):
 
 
 MAX_PERCENT = 100
+MAX_MONTH = 12
 
 
 def validate_percent(value):
@@ -193,3 +194,19 @@ def validate_habit_id(value):
     if not clean:
         return False, "", "Habit id cannot be empty"
     return True, clean, ""
+
+def validate_month(value):
+    """(is_valid, month, error) for a month value 1..12.
+
+    Mirror of validate_percent: non-numeric input and months
+    below 1 are invalid, and anything over 12 is capped at 12.
+    """
+    try:
+        month = int(value)
+    except (TypeError, ValueError):
+        return False, 0, "Month must be a number"
+    if month < 1:
+        return False, 0, "Month cannot be less than 1"
+    if month > MAX_MONTH:
+        return False, MAX_MONTH, "Month cannot be more than 12"
+    return True, month, ""
